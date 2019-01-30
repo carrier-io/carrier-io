@@ -1,0 +1,53 @@
+def carrierspace = "/home/carrier/jenkins/workspace/perfui_demo_job"
+
+def get_influx_host(String env_var) {
+    def match = env_var =~ 'http://(.+)/jenkins'
+    return match[0][1]
+}
+
+node{
+    stage("configure") {
+        deleteDir()
+        sh "mkdir reports"
+        sh "mkdir tests"
+        sh '''echo """influxdb:
+  url: http://'''+get_influx_host(env.JENKINS_URL)+''':8086/
+  db_name: perfui
+  user:
+  password:
+example: # environment
+  Google:
+    url: https://www.google.com
+  Google_Search:
+    url: https://www.google.com/search?q=
+    parameters:
+      - ui+performance
+      - api+performance
+    check:
+      xpath: //a[contains(text(), "performance")]
+  Yahoo:
+    url: https://www.yahoo.com
+    check:
+      css: div#Masterwrap
+""" > tests/ExampleTest.yaml'''
+    }
+    stage("execute_test") {
+        def dockerParamsString = "--entrypoint=''"
+        def params = [
+            "-t",
+            "--name perfui "
+        ]
+        for (param in params) {
+            dockerParamsString += " ${param}"
+        }
+        docker.image("getcarrier/perf-ui:latest").inside(dockerParamsString){
+            sh "cp /var/jenkins_home/workspace/perfui_demo_job/tests/ExampleTest.yaml /tmp/tests/ExampleTest.yaml"
+            sh "/tmp/start_test.sh -n 1 -t ExampleTest.yaml -e example"
+            sh "mv /tmp/reports/* /var/jenkins_home/workspace/perfui_demo_job/reports/"
+        }
+    }
+    stage("publish results") {
+        xunit([JUnit(deleteOutputFiles: false, failIfNotNew: false, pattern: 'reports/*.xml', skipNoTestFiles: true, stopProcessingIfError: true)])
+    }
+}
+
