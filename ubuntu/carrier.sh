@@ -104,7 +104,7 @@ services:
   traefik:
     image: traefik:1.7
 	volumes:
-	  - ${HOMEDIR}/traefik.toml:/etc/traefik/traefik.toml
+	  - ${HOMEDIR}/traefik/traefik.toml:/etc/traefik/traefik.toml
 	  - /var/run/docker.sock:/var/run/docker.sock
     ports:
 	  - 8080:8080
