@@ -103,58 +103,60 @@ echo """version: '3'
 services:
   traefik:
     image: traefik:1.7
-	volumes:
-	  - ${HOMEDIR}/traefik/traefik.toml:/etc/traefik/traefik.toml
-	  - /var/run/docker.sock:/var/run/docker.sock
+    volumes:
+      - ${HOMEDIR}/traefik/traefik.toml:/etc/traefik/traefik.toml
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
-	  - 8080:8080
-	  - 80:80
+      - 8080:8080
+      - 80:80
   jenkins:
     build: $HOMEDIR/jenkins/
-	depends_on:
-	  - traefik
-	volumes:
-	  - ${HOMEDIR}/jenkins:/var/jenkins_home
-	  - /var/run/docker.sock:/var/run/docker.sock
-	labels:
-	  - 'traefik.backend=jenkins'
-	  - 'traefic.port=8080'
-	  - 'traefik.frontend.rule=PathPrefix: /jenkins'
-	  - 'traefik.frontend.passHostHeader=true'
+    depends_on:
+      - traefik
+    volumes:
+      - ${HOMEDIR}/jenkins:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - 'traefik.backend=jenkins'
+      - 'traefic.port=8080'
+      - 'traefik.frontend.rule=PathPrefix: /jenkins'
+      - 'traefik.frontend.passHostHeader=true'
   influx:
     build: $HOMEDIR/influx/
-	ports:
-	  - 2003:2003
-	  - 8086:8086
-	labels:
-	  - 'traefik.enable=false'
-	container_name: carrier-influx
+    volumes:
+      - $HOMEDIR/influx/influx_data:/var/lib/influxdb/data
+    ports:
+      - 2003:2003
+      - 8086:8086
+    labels:
+      - 'traefik.enable=false'
+    container_name: carrier-influx
   grafana:
     image: grafana/grafana:5.4.0
-	depends_on:
-	  - influx
-	volumes:
-	  - $HOMEDIR/grafana:/var/lib/grafana
-	environment:
-	  - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
-	  - GF_SERVER_ROOT_URL=http://${FULLHOST}/grafana
-	labels:
-	  - 'traefik.backend=grafana'
-	  - 'traefic.port=3000'
-	  - 'traefik.frontend.rule=PathPrefixStrip: /grafana'
-	  - 'traefik.frontend.passHostHeader=true'
-	user: root
+    depends_on:
+      - influx
+    volumes:
+      - $HOMEDIR/grafana:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_SERVER_ROOT_URL=http://${FULLHOST}/grafana
+    labels:
+      - 'traefik.backend=grafana'
+      - 'traefic.port=3000'
+      - 'traefik.frontend.rule=PathPrefixStrip: /grafana'
+      - 'traefik.frontend.passHostHeader=true'
+    user: root
   redis:
     image: redis:5.0.3
-	ports:
-	  - 6379:6379
-	labels:
-	  - 'traefik.enable=false'
+    ports:
+      - 6379:6379
+    labels:
+      - 'traefik.enable=false'
     container_name: carrier-redis
-	entrypoint:
-	  - redis-server
-	  - --requirepass
-	  - ${REDIS_PASSWORD}
+    entrypoint:
+      - redis-server
+      - --requirepass
+      - ${REDIS_PASSWORD}
 """ > $HOMEDIR/docker-compose.yaml
 cd $HOMEDIR
 docker-compose up -d
