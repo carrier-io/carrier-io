@@ -7,7 +7,6 @@ export HOMEDIR=/home/carrier
 export GROUPID=1001
 export USERID=1001
 export JENKINS_HOME=/var/jenkins_home
-export CPU_CORES=`nproc --all`
 
 mkdir $HOMEDIR/traefik
 mkdir $HOMEDIR/jenkins
