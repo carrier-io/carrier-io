@@ -1,28 +1,4 @@
 #!/bin/bash
-apt-get update
-apt-get install -y \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg-agent \
-    software-properties-common \
-    python-dev \
-    python-pip
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-apt-key fingerprint 0EBFCD88
-add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-   $(lsb_release -cs) \
-   stable"
-
-apt-get install -y docker-ce
-pip install docker-compose
-export USERNAME=carrier
-
-adduser --disabled-password --shell /bin/bash --gecos "" $USERNAME
-usermod -a -G docker $USERNAME
-sudo -su $USERNAME
-
 export USERNAME=carrier
 export GRAFANA_PASSWORD=password
 export REDIS_PASSWORD=password
@@ -31,11 +7,14 @@ export HOMEDIR=/home/carrier
 export GROUPID=1001
 export USERID=1001
 export JENKINS_HOME=/var/jenkins_home
+export CPU_CORES=`nproc --all`
+export FULLHOST=`hostname`
 echo "Input how many workers you want on this node"
 read CPU_CORES
-echo "Input public facing hostname"
+echo "Input how many workers you want on this node"
 read FULLHOST
-
+echo FULLHOST=$FULLHOST >> /home/carrier/.profile
+echo CPU_CORES=$CPU_CORES >> /home/carrier/.profile
 
 mkdir $HOMEDIR/traefik
 mkdir $HOMEDIR/jenkins
@@ -54,7 +33,7 @@ domain = "docker.local"
 watch = true''' > $HOMEDIR/traefik/traefik.toml
 
 
-echo '''FROM jenkins/jenkins:lts
+echo """FROM jenkins/jenkins:lts
 USER root
 RUN apt-get -qq update && apt-get install -y --no-install-recommends \
      apt-transport-https ca-certificates curl gnupg2 software-properties-common
@@ -62,20 +41,21 @@ RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
 RUN apt-key fingerprint 0EBFCD88
 RUN echo "deb [arch=amd64] https://download.docker.com/linux/debian \
      stretch stable" | \
-     tee /etc/apt/sources.list.d/docker.list
+	 tee /etc/apt/sources.list.d/docker.list
 RUN apt-get -qq update && apt-get install -y --no-install-recommends docker-ce
-RUN chown -R ${GROUPID}:${GROUPID} $JENKINS_HOME 
-RUN groupadd -g ${GROUPID} ${GROUPNAME}
-RUN adduser --home "$JENKINS_HOME" --ingroup ${GROUPNAME} --disabled-password --shell /bin/bash --gecos '' ${USERNAME}
-ENV JENKINS_OPTS --prefix=/jenkins
+RUN chown -R ${GROUPID}:${GROUPID} $JENKINS_HOME
+RUN groupadd --gid ${GROUPID} ${GROUPNAME}
+RUN adduser --home $JENKINS_HOME --ingroup ${GROUPNAME} --disabled-password --shell /bin/bash --gecos '' ${USERNAME}
+ENV 'JENKINS_OPTS=--prefix=/jenkins -Djenkins.install.runSetupWizard=false'
 RUN chown -R ${USERNAME}:${GROUPNAME} $JENKINS_HOME
 RUN userdel jenkins
 RUN chown -R $USERNAME $JENKINS_HOME /usr/share/jenkins/ref && \
-    chown $USERNAME /usr/local/bin/jenkins-support && \
-    chown $USERNAME /usr/local/bin/jenkins.sh && \
-    chown $USERNAME /bin/tini 
+	chown $USERNAME /usr/local/bin/jenkins-support && \
+	chown $USERNAME /usr/local/bin/jenkins.sh && \
+	chown $USERNAME /bin/tini
+RUN /usr/local/bin/install-plugins.sh job-dsl git cloudbees-folder credentials credentials-binding ansicolor timestamper workflow-aggregator pipeline-build-step Parameterized-Remote-Trigger publish-over-cifs email-ext ws-cleanup
 EXPOSE 8080
-''' > $HOMEDIR/jenkins/Dockerfile
+""" > $HOMEDIR/jenkins/Dockerfile
 
 echo '''[meta]
   dir = "/var/lib/influxdb/meta"
@@ -119,65 +99,62 @@ EXPOSE 8086
 EXPOSE 2003
 ''' > $HOMEDIR/influx/Dockerfile
 
-echo '''version: "3"
+echo """version: '3'
 services:
   traefik:
     image: traefik:1.7
-    volumes:
-      - ${HOMEDIR}/traefik.toml:/etc/traefik/traefik.toml
-      - /var/run/docker.sock:/var/run/docker.sock
+	volumes:
+	  - ${HOMEDIR}/traefik.toml:/etc/traefik/traefik.toml
+	  - /var/run/docker.sock:/var/run/docker.sock
     ports:
-      - 8080:8080
-      - 80:80
+	  - 8080:8080
+	  - 80:80
   jenkins:
     build: $HOMEDIR/jenkins/
-    depends_on:
-      - traefik
-    volumes:
-      - ${HOMEDIR}/jenkins:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-    labels:
-      - "traefik.backend=jenkins"
-      - "traefic.port=8080"
-      - "traefik.frontend.rule=PathPrefix: /jenkins"
-      - "traefik.frontend.passHostHeader=true"
+	depends_on:
+	  - traefik
+	volumes:
+	  - ${HOMEDIR}/jenkins:/var/jenkins_home
+	  - /var/run/docker.sock:/var/run/docker.sock
+	labels:
+	  - 'traefik.backend=jenkins'
+	  - 'traefic.port=8080'
+	  - 'traefik.frontend.rule=PathPrefix: /jenkins'
+	  - 'traefik.frontend.passHostHeader=true'
   influx:
     build: $HOMEDIR/influx/
-    ports:
-      - 2003:2003 
-      - 8086:8086
-    labels:
-      - "traefik.enable=false"
-    container_name: carrier-influx
+	ports:
+	  - 2003:2003
+	  - 8086:8086
+	labels:
+	  - 'traefik.enable=false'
+	container_name: carrier-influx
   grafana:
     image: grafana/grafana:5.4.0
-    depends_on:
-      - influx
-    volumes:
-      - $HOMEDIR/grafana:/var/lib/grafana
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
-      - GF_SERVER_ROOT_URL=http://${FULLHOST}/grafana
-    labels:
-      - "traefik.backend=grafana"
-      - "traefic.port=3000"
-      - "traefik.frontend.rule=PathPrefixStrip: /grafana"
-      - "traefik.frontend.passHostHeader=true"
-    user: root
+	depends_on:
+	  - influx
+	volumes:
+	  - $HOMEDIR/grafana:/var/lib/grafana
+	environment:
+	  - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+	  - GF_SERVER_ROOT_URL=http://${FULLHOST}/grafana
+	labels:
+	  - 'traefik.backend=grafana'
+	  - 'traefic.port=3000'
+	  - 'traefik.frontend.rule=PathPrefixStrip: /grafana'
+	  - 'traefik.frontend.passHostHeader=true'
+	user: root
   redis:
     image: redis:5.0.3
-    ports:
-      - 6379:6379
-    labels:
-      - "traefik.enable=false"
+	ports:
+	  - 6379:6379
+	labels:
+	  - 'traefik.enable=false'
     container_name: carrier-redis
-    entrypoint:
-      - redis-server
-      - --requirepass
-      - ${REDIS_PASSWORD}
-''' > $HOMEDIR/docker-compose.yaml
+	entrypoint:
+	  - redis-server
+	  - --requirepass
+	  - ${REDIS_PASSWORD}
+""" > $HOMEDIR/docker-compose.yaml
 cd $HOMEDIR
 docker-compose up -d
-
-      
-
