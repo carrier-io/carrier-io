@@ -21,5 +21,14 @@ export USERNAME=carrier
 
 adduser --disabled-password --shell /bin/bash --gecos "" $USERNAME
 usermod -a -G docker $USERNAME
+export CPU_CORES=`nproc --all`
+export FULLHOST=`hostname`
+echo "Input how many workers you want on this node"
+read CPU_CORES
+echo "Input how many workers you want on this node"
+read FULLHOST
+echo FULLHOST=$FULLHOST >> /home/carrier/.profile
+echo CPU_CORES=$CPU_CORES >> /home/carrier/.profile
+
 su carrier /bin/bash -c "curl https://raw.githubusercontent.com/carrier-io/carrier-io/master/ubuntu/carrier.sh | bash"
 
