@@ -154,9 +154,9 @@ services:
 cd $HOMEDIR
 docker-compose up -d
 
-pause 10
+sleep 10
 
-docker exec -it carrier-influx bash -c "influx -execute 'create database jmeter'"
-docker exec -it carrier-influx bash -c "influx -execute 'create database comparison'"
-docker exec -it carrier-influx bash -c "influx -execute 'create database gatling'"
-docker exec -it carrier-influx bash -c "influx -execute 'create database prodsec'"
+docker exec carrier-influx bash -c "influx -execute 'create database jmeter'"
+docker exec carrier-influx bash -c "influx -execute 'create database comparison'"
+docker exec carrier-influx bash -c "influx -execute 'create database gatling'"
+docker exec carrier-influx bash -c "influx -execute 'create database prodsec'"
