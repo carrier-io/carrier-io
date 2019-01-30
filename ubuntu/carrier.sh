@@ -46,7 +46,7 @@ RUN chown -R $USERNAME $JENKINS_HOME /usr/share/jenkins/ref && \
 	chown $USERNAME /usr/local/bin/jenkins-support && \
 	chown $USERNAME /usr/local/bin/jenkins.sh && \
 	chown $USERNAME /bin/tini
-RUN /usr/local/bin/install-plugins.sh job-dsl git cloudbees-folder credentials credentials-binding ansicolor timestamper workflow-aggregator pipeline-build-step Parameterized-Remote-Trigger publish-over-cifs email-ext ws-cleanup
+RUN /usr/local/bin/install-plugins.sh job-dsl git cloudbees-folder credentials credentials-binding ansicolor timestamper workflow-aggregator pipeline-build-step Parameterized-Remote-Trigger publish-over-cifs email-ext ws-cleanup envinject xunit
 EXPOSE 8080
 """ > $HOMEDIR/jenkins/Dockerfile
 
@@ -160,3 +160,4 @@ docker exec carrier-influx bash -c "influx -execute 'create database jmeter'"
 docker exec carrier-influx bash -c "influx -execute 'create database comparison'"
 docker exec carrier-influx bash -c "influx -execute 'create database gatling'"
 docker exec carrier-influx bash -c "influx -execute 'create database prodsec'"
+docker exec carrier-influx bash -c "influx -execute 'create database perfui'"
