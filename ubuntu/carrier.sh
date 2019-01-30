@@ -8,13 +8,6 @@ export GROUPID=1001
 export USERID=1001
 export JENKINS_HOME=/var/jenkins_home
 export CPU_CORES=`nproc --all`
-export FULLHOST=`hostname`
-echo "Input how many workers you want on this node"
-read CPU_CORES
-echo "Input how many workers you want on this node"
-read FULLHOST
-echo FULLHOST=$FULLHOST >> /home/carrier/.profile
-echo CPU_CORES=$CPU_CORES >> /home/carrier/.profile
 
 mkdir $HOMEDIR/traefik
 mkdir $HOMEDIR/jenkins
@@ -46,7 +39,8 @@ RUN apt-get -qq update && apt-get install -y --no-install-recommends docker-ce
 RUN chown -R ${GROUPID}:${GROUPID} $JENKINS_HOME
 RUN groupadd --gid ${GROUPID} ${GROUPNAME}
 RUN adduser --home $JENKINS_HOME --ingroup ${GROUPNAME} --disabled-password --shell /bin/bash --gecos '' ${USERNAME}
-ENV 'JENKINS_OPTS=--prefix=/jenkins -Djenkins.install.runSetupWizard=false'
+ENV JENKINS_OPTS --prefix=/jenkins
+ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false
 RUN chown -R ${USERNAME}:${GROUPNAME} $JENKINS_HOME
 RUN userdel jenkins
 RUN chown -R $USERNAME $JENKINS_HOME /usr/share/jenkins/ref && \
@@ -160,3 +154,10 @@ services:
 """ > $HOMEDIR/docker-compose.yaml
 cd $HOMEDIR
 docker-compose up -d
+
+pause 10
+
+docker exec -it carrier-influx bash -c "influx -execute 'create database jmeter'"
+docker exec -it carrier-influx bash -c "influx -execute 'create database comparison'"
+docker exec -it carrier-influx bash -c "influx -execute 'create database gatling'"
+docker exec -it carrier-influx bash -c "influx -execute 'create database prodsec'"
