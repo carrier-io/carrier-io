@@ -24,9 +24,9 @@ usermod -a -G docker $USERNAME
 export CPU_CORES=`nproc --all`
 export FULLHOST=`hostname`
 echo "Input how many workers you want on this node"
-read CPU_CORES
+read CPU_CORES </dev/tty
 echo "Input how many workers you want on this node"
-read FULLHOST
+read FULLHOST </dev/tty
 echo FULLHOST=$FULLHOST >> /home/carrier/.profile
 echo CPU_CORES=$CPU_CORES >> /home/carrier/.profile
 
