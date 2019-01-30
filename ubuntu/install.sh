@@ -15,7 +15,7 @@ add-apt-repository \
    $(lsb_release -cs) \
    stable"
 
-apt-get install -y docker-ce
+apt-get update && apt-get install -y docker-ce
 pip install docker-compose
 export USERNAME=carrier
 
