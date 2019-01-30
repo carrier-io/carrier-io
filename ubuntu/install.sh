@@ -21,5 +21,5 @@ export USERNAME=carrier
 
 adduser --disabled-password --shell /bin/bash --gecos "" $USERNAME
 usermod -a -G docker $USERNAME
-su carrier /bin/bash -c "curl https://raw.githubusercontent.com/carrier-io/carrier-io/ubuntu/master/carrier.sh | bash"
+su carrier /bin/bash -c "curl https://raw.githubusercontent.com/carrier-io/carrier-io/master/ubuntu/carrier.sh | bash"
 
