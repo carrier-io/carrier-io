@@ -172,12 +172,14 @@ cd $HOMEDIR
 docker-compose up -d
 
 sleep 10
-
+echo "Creating Databases"
 docker exec carrier-influx bash -c "influx -execute 'create database jmeter'"
 docker exec carrier-influx bash -c "influx -execute 'create database comparison'"
 docker exec carrier-influx bash -c "influx -execute 'create database gatling'"
 docker exec carrier-influx bash -c "influx -execute 'create database prodsec'"
 docker exec carrier-influx bash -c "influx -execute 'create database perfui'"
 
+echo "Provisioning PerfUI Demo Piece"
 curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/perfui.xml | curl -X POST "http://${FULLHOST}/jenkins/createItem?name=demo_perfui" --header "Content-Type: application/xml" -d @-
 curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/datasources | curl -X POST "http://${FULLHOST}/grafana/api/datasources" -u admin:${GRAFANA_PASSWORD} --header "Content-Type: application/json" -d @-
+curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/ui_performance_dashboard.json | sed -e "s/VAR_DB_URL/$FULLHOST/g" | curl -X POST "http://${FULLHOST}/grafana/api/dashboards/db" -u admin:${GRAFANA_PASSWORD} --header "Content-Type: application/json" -d @-
