@@ -1952,19 +1952,19 @@
       },
       {
         "current": {
-          "value": "${VAR_DB_URL}",
-          "text": "${VAR_DB_URL}"
+          "value": "VAR_DB_URL",
+          "text": "VAR_DB_URL"
         },
         "hide": 2,
         "label": null,
         "name": "db_url",
         "options": [
           {
-            "value": "${VAR_DB_URL}",
-            "text": "${VAR_DB_URL}"
+            "value": "VAR_DB_URL",
+            "text": "VAR_DB_URL"
           }
         ],
-        "query": "${VAR_DB_URL}",
+        "query": "VAR_DB_URL",
         "skipUrlSync": false,
         "type": "constant"
       },
