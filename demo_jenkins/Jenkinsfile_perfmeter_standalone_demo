@@ -24,7 +24,7 @@ node{
                   -l /tmp/reports/jmeter_${JOB_NAME}_${BUILD_ID}.jtl \\
                   -e -o /tmp/reports/HtmlReport_${JOB_NAME}_${BUILD_ID} \\
                   -Jinflux.host="""+get_influx_host(env.JENKINS_URL)+""" \\
-                  -JVUSERS=10 -JLOOP_COUNT=10 -Jinflux.db=jmeter -Jinflux.port=8086 \\
+                  -JVUSERS=10 -JDURATION=120 -Jinflux.db=jmeter -Jinflux.port=8086 \\
                   -JRAMP_UP=1 -Jsimulation=flood_io -Jbuild.id=flood_io_${JOB_NAME}_${BUILD_ID} \\
                   -Jproject.id=demo -Jtest.type=demo -Jenv.type=demo"""
             sh "mv /tmp/reports/* ${WORKSPACE}/reports/"
