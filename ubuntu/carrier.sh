@@ -46,7 +46,7 @@ RUN chown -R $USERNAME $JENKINS_HOME /usr/share/jenkins/ref && \
 	chown $USERNAME /usr/local/bin/jenkins-support && \
 	chown $USERNAME /usr/local/bin/jenkins.sh && \
 	chown $USERNAME /bin/tini
-RUN /usr/local/bin/install-plugins.sh job-dsl git cloudbees-folder credentials credentials-binding ansicolor timestamper workflow-aggregator workflow-cps pipeline-build-step Parameterized-Remote-Trigger publish-over-cifs email-ext ws-cleanup envinject xunit
+RUN /usr/local/bin/install-plugins.sh job-dsl git cloudbees-folder credentials credentials-binding ansicolor timestamper workflow-aggregator workflow-cps pipeline-build-step Parameterized-Remote-Trigger publish-over-cifs email-ext ws-cleanup envinject xunit performance
 EXPOSE 8080
 """ > $HOMEDIR/jenkins/Dockerfile
 
@@ -181,6 +181,7 @@ docker exec carrier-influx bash -c "influx -execute 'create database perfui'"
 
 echo "Provisioning PerfUI Demo Piece"
 curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/perfui.xml | curl -X POST "http://${FULLHOST}/jenkins/createItem?name=demo_perfui" --header "Content-Type: application/xml" -d @-
+curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/perfmeter_standalone.xml | curl -X POST "http://${FULLHOST}/jenkins/createItem?name=demo_perfmeter_standalone" --header "Content-Type: application/xml" -d @-
 curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/datasource_comparison | curl -X POST "http://${FULLHOST}/grafana/api/datasources" -u admin:password --header "Content-Type: application/json" -d @-
 curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/datasource_jmeter | curl -X POST "http://${FULLHOST}/grafana/api/datasources" -u admin:password --header "Content-Type: application/json" -d @-
 curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/datasource_gatling | curl -X POST "http://${FULLHOST}/grafana/api/datasources" -u admin:password --header "Content-Type: application/json" -d @-
