@@ -1,0 +1,28 @@
+<flow-definition plugin="workflow-job">
+<actions/>
+<description/>
+<keepDependencies>false</keepDependencies>
+<properties/>
+<definition class="org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition" plugin="workflow-cps">
+<scm class="hudson.plugins.git.GitSCM" plugin="git">
+<configVersion>2</configVersion>
+<userRemoteConfigs>
+<hudson.plugins.git.UserRemoteConfig>
+<url>https://github.com/carrier-io/carrier-io.git</url>
+</hudson.plugins.git.UserRemoteConfig>
+</userRemoteConfigs>
+<branches>
+<hudson.plugins.git.BranchSpec>
+<name>*/master</name>
+</hudson.plugins.git.BranchSpec>
+</branches>
+<doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+<submoduleCfg class="list"/>
+<extensions/>
+</scm>
+<scriptPath>demo_jenkins/Jenkinsfile_perui_demo</scriptPath>
+<lightweight>true</lightweight>
+</definition>
+<triggers/>
+<disabled>false</disabled>
+</flow-definition>

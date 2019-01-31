@@ -46,7 +46,7 @@ RUN chown -R $USERNAME $JENKINS_HOME /usr/share/jenkins/ref && \
 	chown $USERNAME /usr/local/bin/jenkins-support && \
 	chown $USERNAME /usr/local/bin/jenkins.sh && \
 	chown $USERNAME /bin/tini
-RUN /usr/local/bin/install-plugins.sh job-dsl git cloudbees-folder credentials credentials-binding ansicolor timestamper workflow-aggregator pipeline-build-step Parameterized-Remote-Trigger publish-over-cifs email-ext ws-cleanup envinject xunit
+RUN /usr/local/bin/install-plugins.sh job-dsl git cloudbees-folder credentials credentials-binding ansicolor timestamper workflow-aggregator workflow-cps pipeline-build-step Parameterized-Remote-Trigger publish-over-cifs email-ext ws-cleanup envinject xunit
 EXPOSE 8080
 """ > $HOMEDIR/jenkins/Dockerfile
 
@@ -96,6 +96,7 @@ echo """version: '3'
 services:
   traefik:
     image: traefik:1.7
+    restart: unless-stopped
     volumes:
       - ${HOMEDIR}/traefik/traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock
@@ -104,6 +105,7 @@ services:
       - 80:80
   jenkins:
     build: $HOMEDIR/jenkins/
+    restart: unless-stopped
     depends_on:
       - traefik
     volumes:
@@ -116,6 +118,7 @@ services:
       - 'traefik.frontend.passHostHeader=true'
   influx:
     build: $HOMEDIR/influx/
+    restart: unless-stopped
     volumes:
       - $HOMEDIR/influx/influx_data:/var/lib/influxdb/data
     ports:
@@ -126,6 +129,7 @@ services:
     container_name: carrier-influx
   grafana:
     image: grafana/grafana:5.4.0
+    restart: unless-stopped
     depends_on:
       - influx
     volumes:
@@ -141,6 +145,7 @@ services:
     user: root
   redis:
     image: redis:5.0.3
+    restart: unless-stopped
     ports:
       - 6379:6379
     labels:
@@ -150,6 +155,18 @@ services:
       - redis-server
       - --requirepass
       - ${REDIS_PASSWORD}
+  interceptor:
+    image: getcarrier/interceptor:latest
+    restart: unless-stopped
+    depends_on:
+      - redis
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - CPU_CORES=${CPU_CORES}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_HOST=${FULLHOST}
+    container_name: interceptor
 """ > $HOMEDIR/docker-compose.yaml
 cd $HOMEDIR
 docker-compose up -d
@@ -161,3 +178,6 @@ docker exec carrier-influx bash -c "influx -execute 'create database comparison'
 docker exec carrier-influx bash -c "influx -execute 'create database gatling'"
 docker exec carrier-influx bash -c "influx -execute 'create database prodsec'"
 docker exec carrier-influx bash -c "influx -execute 'create database perfui'"
+
+curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/perfui.xml | curl -X POST "http://${FULLHOST}/jenkins/createItem?name=demo_perfui" --header "Content-Type: application/xml" -d @-
+curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/datasources | curl -X POST "http://${FULLHOST}/grafana/api/datasources" -u admin:${GRAFANA_PASSWORD} --header "Content-Type: application/json" -d @-

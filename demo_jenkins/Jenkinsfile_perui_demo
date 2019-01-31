@@ -1,5 +1,3 @@
-def carrierspace = "/home/carrier/jenkins/workspace/perfui_demo_job"
-
 def get_influx_host(String env_var) {
     def match = env_var =~ 'http://(.+)/jenkins'
     return match[0][1]
@@ -41,9 +39,9 @@ example: # environment
             dockerParamsString += " ${param}"
         }
         docker.image("getcarrier/perf-ui:latest").inside(dockerParamsString){
-            sh "cp /var/jenkins_home/workspace/perfui_demo_job/tests/ExampleTest.yaml /tmp/tests/ExampleTest.yaml"
+            sh "cp "+env.WORKSPACE+"/tests/ExampleTest.yaml /tmp/tests/ExampleTest.yaml"
             sh "/tmp/start_test.sh -n 1 -t ExampleTest.yaml -e example"
-            sh "mv /tmp/reports/* /var/jenkins_home/workspace/perfui_demo_job/reports/"
+            sh "mv /tmp/reports/* "+env.WORKSPACE+"/reports/"
         }
     }
     stage("publish results") {

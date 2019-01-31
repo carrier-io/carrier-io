@@ -1,4 +1,10 @@
 #!/bin/bash
+export CPU_CORES=`nproc --all`
+export FULLHOST=`hostname`
+echo "Please input how many workers you want on this node"
+read CPU_CORES </dev/tty
+echo "Please input public facing DNS name of the host"
+read FULLHOST </dev/tty
 apt-get update
 apt-get install -y \
     apt-transport-https \
@@ -21,12 +27,6 @@ export USERNAME=carrier
 
 adduser --disabled-password --shell /bin/bash --gecos "" $USERNAME
 usermod -a -G docker $USERNAME
-export CPU_CORES=`nproc --all`
-export FULLHOST=`hostname`
-echo "Input how many workers you want on this node"
-read CPU_CORES </dev/tty
-echo "Input how many workers you want on this node"
-read FULLHOST </dev/tty
 echo FULLHOST=$FULLHOST >> /home/carrier/.profile
 echo CPU_CORES=$CPU_CORES >> /home/carrier/.profile
 
