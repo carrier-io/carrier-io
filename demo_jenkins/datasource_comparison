@@ -1,0 +1,16 @@
+{
+    "id":3,
+    "orgId":1,
+    "name":"comparison",
+    "type":"influxdb",
+    "typeLogoUrl":"public/app/plugins/datasource/influxdb/img/influxdb_logo.svg",
+    "access":"proxy",
+    "url":"http://carrier-influx:8086",
+    "password":"",
+    "user":"",
+    "database":"comparison",
+    "basicAuth":false,
+    "isDefault":true,
+    "jsonData":{"keepCookies":[]},
+    "readOnly":false
+}

@@ -1,0 +1,16 @@
+{
+    "id":1,
+    "orgId":1,
+    "name":"jmeter",
+    "type":"influxdb",
+    "typeLogoUrl":"public/app/plugins/datasource/influxdb/img/influxdb_logo.svg",
+    "access":"proxy",
+    "url":"http://carrier-influx:8086",
+    "password":"",
+    "user":"",
+    "database":"jmeter",
+    "basicAuth":false,
+    "isDefault":true,
+    "jsonData":{"keepCookies":[]},
+    "readOnly":false
+}

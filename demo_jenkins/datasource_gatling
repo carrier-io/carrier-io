@@ -1,0 +1,16 @@
+{
+    "id":4,
+    "orgId":1,
+    "name":"gatling",
+    "type":"influxdb",
+    "typeLogoUrl":"public/app/plugins/datasource/influxdb/img/influxdb_logo.svg",
+    "access":"proxy",
+    "url":"http://carrier-influx:8086",
+    "password":"",
+    "user":"",
+    "database":"gatling",
+    "basicAuth":false,
+    "isDefault":false,
+    "jsonData":{"keepCookies":[]},
+    "readOnly":false
+}

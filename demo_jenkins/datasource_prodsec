@@ -1,0 +1,16 @@
+{
+    "id":5,
+    "orgId":1,
+    "name":"prodsec",
+    "type":"influxdb",
+    "typeLogoUrl":"public/app/plugins/datasource/influxdb/img/influxdb_logo.svg",
+    "access":"proxy",
+    "url":"http://carrier-influx:8086",
+    "password":"",
+    "user":"",
+    "database":"prodsec",
+    "basicAuth":false,
+    "isDefault":false,
+    "jsonData":{"keepCookies":[]},
+    "readOnly":false
+}

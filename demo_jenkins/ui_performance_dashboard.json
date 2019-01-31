@@ -1,2098 +1,2100 @@
 {
-  "__requires": [
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "5.3.4"
-    },
-    {
-      "type": "panel",
-      "id": "graph",
-      "name": "Graph",
-      "version": "5.0.0"
-    },
-    {
-      "type": "datasource",
-      "id": "influxdb",
-      "name": "InfluxDB",
-      "version": "5.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "singlestat",
-      "name": "Singlestat",
-      "version": "5.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "text",
-      "name": "Text",
-      "version": "5.0.0"
-    }
-  ],
-  "annotations": {
-    "list": [
+  "dashboard": {
+    "__requires": [
       {
-        "builtIn": 1,
-        "datasource": "-- Grafana --",
-        "enable": true,
-        "hide": true,
-        "iconColor": "rgba(0, 211, 255, 1)",
-        "limit": 100,
-        "name": "Annotations & Alerts",
-        "showIn": 0,
-        "type": "dashboard"
+        "type": "grafana",
+        "id": "grafana",
+        "name": "Grafana",
+        "version": "5.3.4"
+      },
+      {
+        "type": "panel",
+        "id": "graph",
+        "name": "Graph",
+        "version": "5.0.0"
+      },
+      {
+        "type": "datasource",
+        "id": "influxdb",
+        "name": "InfluxDB",
+        "version": "5.0.0"
+      },
+      {
+        "type": "panel",
+        "id": "singlestat",
+        "name": "Singlestat",
+        "version": "5.0.0"
+      },
+      {
+        "type": "panel",
+        "id": "text",
+        "name": "Text",
+        "version": "5.0.0"
       }
-    ]
-  },
-  "editable": true,
-  "gnetId": null,
-  "graphTooltip": 1,
-  "id": null,
-  "iteration": 1548845610866,
-  "links": [],
-  "panels": [
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 0
-      },
-      "id": 137,
-      "panels": [],
-      "repeat": null,
-      "title": "Summary",
-      "type": "row"
+    ],
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": "-- Grafana --",
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "limit": 100,
+          "name": "Annotations & Alerts",
+          "showIn": 0,
+          "type": "dashboard"
+        }
+      ]
     },
-    {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": false,
-      "colors": [
-        "rgba(245, 54, 54, 0.9)",
-        "rgba(237, 129, 40, 0.89)",
-        "rgba(50, 172, 45, 0.97)"
-      ],
-      "datasource": "perfui",
-      "decimals": 0,
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 0,
-        "y": 1
-      },
-      "height": "100px",
-      "id": 91,
-      "interval": null,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false
-      },
-      "tableColumn": "",
-      "targets": [
-        {
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "policy": "default",
-          "query": "SELECT SUM(count) FROM \"uiperf\" WHERE \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /(?i)^$scenario$/ AND $timeFilter GROUP BY count",
-          "rawQuery": true,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "count"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "sum"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            },
-            {
-              "condition": "AND",
-              "key": "scenario",
-              "operator": "=~",
-              "value": "/(?i)^$scenario$/"
-            }
-          ]
-        }
-      ],
-      "thresholds": "",
-      "title": "Total Pages/Actions count",
-      "type": "singlestat",
-      "valueFontSize": "80%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "0",
-          "value": "null"
-        }
-      ],
-      "valueName": "max"
-    },
-    {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": false,
-      "colors": [
-        "rgba(245, 54, 54, 0.9)",
-        "rgba(237, 129, 40, 0.89)",
-        "rgba(50, 172, 45, 0.97)"
-      ],
-      "datasource": "perfui",
-      "decimals": 0,
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 4,
-        "y": 1
-      },
-      "height": "100px",
-      "id": 90,
-      "interval": null,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false
-      },
-      "tableColumn": "",
-      "targets": [
-        {
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT SUM(count) FROM \"uiperf\" WHERE \"scenario\" =~ /(?i)^$scenario$/ AND status = 'ko' AND $timeFilter GROUP BY count",
-          "rawQuery": true,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "count"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "sum"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            },
-            {
-              "condition": "AND",
-              "key": "scenario",
-              "operator": "=~",
-              "value": "/(?i)^$scenario$/"
-            }
-          ]
-        }
-      ],
-      "thresholds": "",
-      "title": "Total Failed Pages count",
-      "type": "singlestat",
-      "valueFontSize": "80%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "0",
-          "value": "null"
-        }
-      ],
-      "valueName": "max"
-    },
-    {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": false,
-      "colors": [
-        "rgba(245, 54, 54, 0.9)",
-        "rgba(237, 129, 40, 0.89)",
-        "rgba(50, 172, 45, 0.97)"
-      ],
-      "datasource": "perfui",
-      "decimals": null,
-      "format": "ms",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 8,
-        "y": 1
-      },
-      "height": "100px",
-      "id": 92,
-      "interval": null,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false
-      },
-      "tableColumn": "",
-      "targets": [
-        {
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "policy": "default",
-          "query": "SELECT SUM(count) FROM \"uiperf\" WHERE \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /(?i)^$scenario$/ AND status = 'ko' AND $timeFilter GROUP BY count",
-          "rawQuery": false,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "latency"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            },
-            {
-              "condition": "AND",
-              "key": "scenario",
-              "operator": "=~",
-              "value": "/(?i)^$scenario$/"
-            },
-            {
-              "condition": "AND",
-              "key": "status",
-              "operator": "=",
-              "value": "ok"
-            }
-          ]
-        }
-      ],
-      "thresholds": "",
-      "title": "Latency",
-      "type": "singlestat",
-      "valueFontSize": "80%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "0",
-          "value": "null"
-        }
-      ],
-      "valueName": "max"
-    },
-    {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": false,
-      "colors": [
-        "rgba(245, 54, 54, 0.9)",
-        "rgba(237, 129, 40, 0.89)",
-        "rgba(50, 172, 45, 0.97)"
-      ],
-      "datasource": "perfui",
-      "decimals": null,
-      "format": "ms",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 12,
-        "y": 1
-      },
-      "height": "100px",
-      "id": 93,
-      "interval": null,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false
-      },
-      "tableColumn": "",
-      "targets": [
-        {
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "policy": "default",
-          "query": "SELECT SUM(count) FROM \"uiperf\" WHERE \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /(?i)^$scenario$/ AND status = 'ko' AND $timeFilter GROUP BY count",
-          "rawQuery": false,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "transfer"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            },
-            {
-              "condition": "AND",
-              "key": "scenario",
-              "operator": "=~",
-              "value": "/(?i)^$scenario$/"
-            },
-            {
-              "condition": "AND",
-              "key": "status",
-              "operator": "=",
-              "value": "ok"
-            }
-          ]
-        }
-      ],
-      "thresholds": "",
-      "title": "Response Transfer",
-      "type": "singlestat",
-      "valueFontSize": "80%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "0",
-          "value": "null"
-        }
-      ],
-      "valueName": "max"
-    },
-    {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": false,
-      "colors": [
-        "rgba(245, 54, 54, 0.9)",
-        "rgba(237, 129, 40, 0.89)",
-        "rgba(50, 172, 45, 0.97)"
-      ],
-      "datasource": "perfui",
-      "decimals": null,
-      "format": "ms",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 16,
-        "y": 1
-      },
-      "height": "100px",
-      "id": 94,
-      "interval": null,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false
-      },
-      "tableColumn": "",
-      "targets": [
-        {
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "policy": "default",
-          "query": "SELECT  max(\"onload\") +  max(\"tti\")  +  max(\"ttl\")  FROM \"uiperf\" WHERE \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /(?i)^$scenario$/ AND status = 'ok' AND $timeFilter GROUP BY time($interval) fill(null)",
-          "rawQuery": true,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "onload"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            },
-            {
-              "condition": "AND",
-              "key": "scenario",
-              "operator": "=~",
-              "value": "/(?i)^$scenario$/"
-            }
-          ]
-        }
-      ],
-      "thresholds": "",
-      "title": "Browser processing",
-      "type": "singlestat",
-      "valueFontSize": "80%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "0",
-          "value": "null"
-        }
-      ],
-      "valueName": "max"
-    },
-    {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": false,
-      "colors": [
-        "rgba(245, 54, 54, 0.9)",
-        "rgba(237, 129, 40, 0.89)",
-        "rgba(50, 172, 45, 0.97)"
-      ],
-      "datasource": "perfui",
-      "decimals": null,
-      "format": "ms",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 20,
-        "y": 1
-      },
-      "height": "100px",
-      "id": 95,
-      "interval": null,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false
-      },
-      "tableColumn": "",
-      "targets": [
-        {
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "policy": "default",
-          "query": "SELECT  max(\"ttl\")  FROM \"uiperf\" WHERE \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /(?i)^$scenario$/ AND status = 'ok' AND $timeFilter GROUP BY time($interval) fill(null)",
-          "rawQuery": false,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "total_time"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            },
-            {
-              "condition": "AND",
-              "key": "scenario",
-              "operator": "=~",
-              "value": "/(?i)^$scenario$/"
-            },
-            {
-              "condition": "AND",
-              "key": "status",
-              "operator": "=",
-              "value": "ok"
-            }
-          ]
-        }
-      ],
-      "thresholds": "",
-      "title": "Total Page/Action time",
-      "type": "singlestat",
-      "valueFontSize": "80%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "0",
-          "value": "null"
-        }
-      ],
-      "valueName": "max"
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "perfui",
-      "fill": 1,
-      "gridPos": {
-        "h": 9,
-        "w": 24,
-        "x": 0,
-        "y": 4
-      },
-      "height": "350px",
-      "id": 81,
-      "legend": {
-        "alignAsTable": true,
-        "avg": false,
-        "current": false,
-        "max": true,
-        "min": true,
-        "rightSide": true,
-        "show": true,
-        "total": false,
-        "values": true
-      },
-      "lines": false,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [
-        {
-          "alias": "Total time",
-          "color": "#0A50A1",
-          "stack": false,
-          "zindex": -3
-        },
-        {
-          "alias": "Failed",
-          "color": "#BF1B00",
-          "stack": false,
-          "zindex": -2
-        },
-        {
-          "alias": "Latency"
-        },
-        {
-          "alias": "Transfer"
-        },
-        {
-          "alias": "Time to DOM Interactive"
-        },
-        {
-          "alias": "Time to DOM Load"
-        }
-      ],
-      "spaceLength": 10,
-      "stack": true,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "Latency",
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$rps_interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT max(\"latency\") FROM \"uiperf\" WHERE scenario=~ /$scenario/ AND \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND $timeFilter GROUP BY time($rps_interval) fill(null)",
-          "rawQuery": true,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "latency"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "status",
-              "operator": "=",
-              "value": "ok"
-            },
-            {
-              "condition": "AND",
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            }
-          ]
-        },
-        {
-          "alias": "Response transfer",
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$rps_interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT max(\"transfer\") FROM \"uiperf\" WHERE scenario=~ /$scenario/ AND  \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND $timeFilter GROUP BY time($rps_interval) fill(null)",
-          "rawQuery": true,
-          "refId": "B",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "transfer"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "status",
-              "operator": "=",
-              "value": "ok"
-            },
-            {
-              "condition": "AND",
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            }
-          ]
-        },
-        {
-          "alias": "Time to DOM Interactive",
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$rps_interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT max(\"tti\") FROM \"uiperf\" WHERE  scenario=~ /$scenario/ AND \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND $timeFilter GROUP BY time($rps_interval) fill(null)",
-          "rawQuery": true,
-          "refId": "C",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "tti"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "status",
-              "operator": "=",
-              "value": "ok"
-            },
-            {
-              "condition": "AND",
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            }
-          ]
-        },
-        {
-          "alias": "Time to DOM Load",
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$rps_interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT max(\"ttl\") FROM \"uiperf\" WHERE scenario=~ /$scenario/ AND  \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND $timeFilter GROUP BY time($rps_interval) fill(null)",
-          "rawQuery": true,
-          "refId": "D",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "ttl"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "status",
-              "operator": "=",
-              "value": "ok"
-            },
-            {
-              "condition": "AND",
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            }
-          ]
-        },
-        {
-          "alias": "Onload event time",
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$rps_interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT max(\"onload\") FROM \"uiperf\" WHERE scenario=~ /$scenario/ AND  \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND $timeFilter GROUP BY time($rps_interval) fill(null)",
-          "rawQuery": true,
-          "refId": "G",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "ttl"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "status",
-              "operator": "=",
-              "value": "ok"
-            },
-            {
-              "condition": "AND",
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            }
-          ]
-        },
-        {
-          "alias": "Total time",
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$rps_interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT max(\"total_time\") FROM \"uiperf\" WHERE  scenario=~ /$scenario/ AND \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND $timeFilter GROUP BY time($rps_interval) fill(null)",
-          "rawQuery": true,
-          "refId": "F",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "total_time"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "status",
-              "operator": "=",
-              "value": "ok"
-            },
-            {
-              "condition": "AND",
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            }
-          ]
-        },
-        {
-          "alias": "Failed",
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$rps_interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT max(\"total_time\") FROM \"uiperf\" WHERE  scenario=~ /$scenario/ AND \"status\" = 'ko' AND \"domain\" =~ /^$domain$/ AND $timeFilter GROUP BY time($rps_interval) fill(null)",
-          "rawQuery": true,
-          "refId": "E",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "total_time"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "status",
-              "operator": "=",
-              "value": "ko"
-            },
-            {
-              "condition": "AND",
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            }
-          ]
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Page load time summary",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "ms",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 13
-      },
-      "id": 140,
-      "panels": [],
-      "repeat": "page_name",
-      "title": "$page_name Details",
-      "type": "row"
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "perfui",
-      "fill": 1,
-      "gridPos": {
-        "h": 9,
-        "w": 18,
-        "x": 0,
-        "y": 14
-      },
-      "height": "350px",
-      "id": 76,
-      "legend": {
-        "alignAsTable": true,
-        "avg": false,
-        "current": false,
-        "max": true,
-        "min": true,
-        "rightSide": true,
-        "show": true,
-        "total": false,
-        "values": true
-      },
-      "lines": false,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [
-        {
-          "alias": "Total time",
-          "color": "#0A50A1",
-          "stack": false,
-          "zindex": -3
-        },
-        {
-          "alias": "Failed",
-          "color": "#BF1B00",
-          "stack": false
-        }
-      ],
-      "spaceLength": 10,
-      "stack": true,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "Latency",
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$rps_interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT max(\"latency\") FROM \"uiperf\" WHERE (\"page\" =~ /^$page_name$/ AND \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /^$scenario$/) AND $timeFilter GROUP BY time($rps_interval) fill(null)",
-          "rawQuery": false,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "latency"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "page",
-              "operator": "=~",
-              "value": "/^$page_name$/"
-            },
-            {
-              "condition": "AND",
-              "key": "status",
-              "operator": "=",
-              "value": "ok"
-            },
-            {
-              "condition": "AND",
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            },
-            {
-              "condition": "AND",
-              "key": "scenario",
-              "operator": "=~",
-              "value": "/^$scenario$/"
-            }
-          ]
-        },
-        {
-          "alias": "Transfer",
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$rps_interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT max(\"transfer\") FROM \"uiperf\" WHERE (\"page\" =~ /^$page_name$/ AND \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /^$scenario$/) AND $timeFilter GROUP BY time($rps_interval) fill(null)",
-          "rawQuery": true,
-          "refId": "B",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "transfer"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "page",
-              "operator": "=~",
-              "value": "/^$page_name(Page)$/"
-            },
-            {
-              "condition": "AND",
-              "key": "status",
-              "operator": "=",
-              "value": "ok"
-            },
-            {
-              "condition": "AND",
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            },
-            {
-              "condition": "AND",
-              "key": "scenario",
-              "operator": "=~",
-              "value": "/^$scenario$/"
-            }
-          ]
-        },
-        {
-          "alias": "Time to DOM Interactive",
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$rps_interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT max(\"tti\") FROM \"uiperf\" WHERE (\"page\" =~ /^$page_name$/ AND \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /^$scenario$/) AND $timeFilter GROUP BY time($rps_interval) fill(null)",
-          "rawQuery": true,
-          "refId": "C",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "tti"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "page",
-              "operator": "=~",
-              "value": "/^$page_name(Page)$/"
-            },
-            {
-              "condition": "AND",
-              "key": "status",
-              "operator": "=",
-              "value": "ok"
-            },
-            {
-              "condition": "AND",
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            },
-            {
-              "condition": "AND",
-              "key": "scenario",
-              "operator": "=~",
-              "value": "/^$scenario$/"
-            }
-          ]
-        },
-        {
-          "alias": "Time to DOM Load",
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$rps_interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT max(\"ttl\") FROM \"uiperf\" WHERE (\"page\" =~ /^$page_name$/ AND \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /^$scenario$/) AND $timeFilter GROUP BY time($rps_interval) fill(null)",
-          "rawQuery": true,
-          "refId": "D",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "ttl"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "page",
-              "operator": "=~",
-              "value": "/^$page_name(Page)$/"
-            },
-            {
-              "condition": "AND",
-              "key": "status",
-              "operator": "=",
-              "value": "ok"
-            },
-            {
-              "condition": "AND",
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            },
-            {
-              "condition": "AND",
-              "key": "scenario",
-              "operator": "=~",
-              "value": "/^$scenario$/"
-            }
-          ]
-        },
-        {
-          "alias": "Onload event time",
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$rps_interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "G",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "onload"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "page",
-              "operator": "=~",
-              "value": "/^$page_name$/"
-            },
-            {
-              "condition": "AND",
-              "key": "status",
-              "operator": "=",
-              "value": "ok"
-            },
-            {
-              "condition": "AND",
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            },
-            {
-              "condition": "AND",
-              "key": "scenario",
-              "operator": "=~",
-              "value": "/^$scenario$/"
-            }
-          ]
-        },
-        {
-          "alias": "Total time",
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$rps_interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT max(\"total_time\") FROM \"uiperf\" WHERE (\"page\" =~ /^$page_name$/ AND \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /^$scenario$/) AND $timeFilter GROUP BY time($rps_interval) fill(null)",
-          "rawQuery": true,
-          "refId": "F",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "total_time"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "page",
-              "operator": "=~",
-              "value": "/^$page_name$/"
-            },
-            {
-              "condition": "AND",
-              "key": "status",
-              "operator": "=",
-              "value": "ok"
-            },
-            {
-              "condition": "AND",
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            },
-            {
-              "condition": "AND",
-              "key": "scenario",
-              "operator": "=~",
-              "value": "/^$scenario$/"
-            }
-          ]
-        },
-        {
-          "alias": "Failed",
-          "dsType": "influxdb",
-          "groupBy": [
-            {
-              "params": [
-                "$rps_interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "uiperf",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT max(\"total_time\") FROM \"uiperf\" WHERE \"page\" =~ /^$page_name$/ AND \"status\" = 'ko' AND \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /^$scenario$/ AND $timeFilter GROUP BY time($rps_interval) fill(null)",
-          "rawQuery": true,
-          "refId": "E",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "total_time"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "page",
-              "operator": "=~",
-              "value": "/^$page_name(Page)$/"
-            },
-            {
-              "condition": "AND",
-              "key": "status",
-              "operator": "=",
-              "value": "ko"
-            },
-            {
-              "condition": "AND",
-              "key": "domain",
-              "operator": "=~",
-              "value": "/^$domain$/"
-            },
-            {
-              "condition": "AND",
-              "key": "scenario",
-              "operator": "=~",
-              "value": "/^$scenario$/"
-            }
-          ]
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "$page_name",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "ms",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "content": "<script type=\"text/javascript\" language=\"javascript\" src=\"//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js\" />\n<script type=\"text/javascript\" language=\"javascript\" src='//cdn.jsdelivr.net/gh/carrier-io/perf-ui@master/lib/grafana_wrapper.js'\n/>\n<script type=\"text/javascript\" language=\"javascript\" src='//cdn.jsdelivr.net/gh/carrier-io/perf-ui@master/lib/timing_api_waterfall.js' />\n<script>\n\n    function addSpinner$page_name() {\n        $('#timingApiTable$page_name').empty();\n        if ($('div.$page_name-spinner').length == 0) {\n            var spinner = $('<div>')\n            spinner.attr(\"class\", \"$page_name-spinner\");\n            spinner.html(\"<div  style=\\\"text-align: center;\\\"> <i class=\\\"fa fa-spinner fa-spin\\\" style=\\\" font-size: xx-large;\\\"></i> </div>\")\n            $(\"#timingApiTable$page_name\").append(spinner)\n        }\n    }\n\n    function removeSpinner$page_name() {\n        $('div.$page_name-spinner').remove()\n    }\n\n    function getQuery$page_name(wrapper, percentile, pageName, timing) {\n        criterion = '';\n        if (percentile.indexOf(\"in\") > 0) {\n            criterion = \"MIN(\\\"\" + timing + \"\\\")\";\n        } else if (percentile.indexOf(\"ax\") > 0) {\n            criterion = \"MAX(\\\"\" + timing + \"\\\")\";\n        } else {\n            criterion = \"PERCENTILE(\\\"\" + timing + \"\\\",\" + percentile.replace(\" pct\", \"\") + \")\"\n        }\n        var timeFilter = wrapper.getTime()['filter'];\n        var scenario = wrapper.getVar('scenario')[0];\n\n        return 'select ' + criterion + ' AS \"' + percentile\n            + '\", raw_data_timing, raw_objects_timing from $db_name..\"uiperf\" where scenario= \\''\n            + scenario + '\\' AND status=~ /ok/ AND page=~ /^'\n            + pageName + '/ and '\n            + timeFilter + \"; \";\n    }\n\n    var db_url = \"$db_url/query\";\n    var db_name = \"$db_name\";\n\n    var tabl_data = [\n        { name: \"Min\", total_time: 0, raw_data_timing: \"\", raw_objects_timing: \"\" },\n        { name: \"50 pct\", total_time: 0, raw_data_timing: \"\", raw_objects_timing: \"\" },\n        { name: \"75 pct\", total_time: 0, raw_data_timing: \"\", raw_objects_timing: \"\" },\n        { name: \"90 pct\", total_time: 0, raw_data_timing: \"\", raw_objects_timing: \"\" },\n        { name: \"95 pct\", total_time: 0, raw_data_timing: \"\", raw_objects_timing: \"\" },\n        { name: \"99 pct\", total_time: 0, raw_data_timing: \"\", raw_objects_timing: \"\" },\n        { name: \"Max\", total_time: 0, raw_data_timing: \"\", raw_objects_timing: \"\" }\n    ];\n\n    function generateRow(ind, rowData, pageName) {\n        var tr = $('<tr/>');\n        var dataCell = $('<td/>');\n        var linkEll = $('<a/>')\n        var id = rowData['name'] + '_' + pageName + '_' + ind\n        linkEll.attr(\"id\", id);\n        linkEll.attr(\"href\", '#');\n        linkEll.text(rowData['name']);\n        dataCell.append(linkEll);\n        var script = document.createElement('script');\n        script.type = 'text/javascript';\n        script.text = 'function ShowBig_' + pageName + '_' + ind + '(){showBigPicture(' + rowData['raw_objects_timing'] + ',' + rowData[\"raw_data_timing\"] + ');};\\nvar el = document.getElementById(\"' + id + '\");\\nel.onclick=ShowBig_' + pageName + '_' + ind + ';';\n        dataCell.append(script);\n        tr.append(dataCell);\n        var infoCell = $('<td/>');\n        var textEll = $('<span/>');\n        textEll.text(rowData[\"total_time\"].toString());\n        infoCell.append(textEll);\n        tr.append(infoCell);\n\n        return tr\n    }\n\n    function checkDataTableIsLoaded$page_name(wrapper, tabl_data, pageName, timing) {\n        addSpinner$page_name()\n        var query = \"\"\n        var table = $('<table/>');\n        table.attr(\"width\", \"100%\");\n\n        for (var i = 0; i < tabl_data.length; i++)\n            query += getQuery$page_name(wrapper, tabl_data[i]['name'], pageName, timing);\n\n        $.post(db_url, { q: query, db: db_name, epoch: \"ms\" }).done(function (data, status) {\n            var data = data.results\n            if (!data || !data[0]['series']) {\n                console.log(\"no series\")\n                showTimingTableMessage$page_name('No successful requests in selected time range.')\n            } else {\n                for (var i = 0; i < data.length; i++) {\n                    var rowData = data[i]\n                    var result_json = {\n                        name: rowData['series'][0]['columns'][1],\n                        total_time: rowData['series'][0]['values'][0][1],\n                        raw_data_timing: rowData[\"series\"][0]['values'][0][2],\n                        raw_objects_timing: rowData[\"series\"][0]['values'][0][3]\n                    }\n                    table.append(generateRow(i.toString(), result_json, pageName));\n                }\n                $('#timingApiTable$page_name').empty();\n                $('#timingApiTable$page_name').append(table);\n            }\n        })\n    }\n\n    function showTimingTableMessage$page_name(mess) {\n        removeSpinner$page_name()\n        $('#timingApiTable$page_name').empty();\n        var message = $('<span>');\n        message.attr(\"id\", \"timing-table-message\");\n        message.text(mess)\n        $('#timingApiTable$page_name').append(message);\n    }\n\n    function waitForGWrapper$page_name() {\n        try {\n            var wrapper = new GWrapper('UI_page_details');\n            var pageName = '$page_name'\n            var timeFilter = wrapper.getTime()['filter'];\n            var scenario = wrapper.getVar('scenario')[0];\n            var timing = \"total_time\"\n            var test_q = 'SELECT \"total_time\",\"duration\" FROM \"uiperf\" WHERE \"page\" =~ /^$page_name/ AND '\n                + 'scenario=~ /^' + scenario + '/' + ' AND status=~ /ok/ and ' + timeFilter + ' limit 1';\n\n\n            $.post(db_url, { q: test_q, db: db_name, epoch: \"ms\" }).done(function (data, status) {\n                var data = data.results\n                if (!data[0].series) {\n                    showTimingTableMessage$page_name('No successful requests in selected time range.')\n                } else {\n                    if (data[0].series[0].values[0][2] != null)\n                        timing = \"duration\";\n\n                    checkDataTableIsLoaded$page_name(wrapper, tabl_data, pageName, timing);\n                }\n            })\n        } catch (err) {\n            console.log(\"Errors \" + err)\n            setTimeout(function () { waitForGWrapper$page_name() }, 500);\n        }\n    }\n\n    $(document).ready(function () { waitForGWrapper$page_name(); });\n    angular.element('grafana-app').injector().get('$rootScope').$on('refresh', function () { waitForGWrapper$page_name() })\n\n</script>\n<style>\n    #timing-table-message {\n        display: table;\n        margin-left: auto;\n        margin-right: auto;\n        text-align: center;\n    }\n</style>\n<div id=\"timingApiTable$page_name\"></div>",
-      "gridPos": {
-        "h": 9,
-        "w": 6,
-        "x": 18,
-        "y": 14
-      },
-      "height": "350px",
-      "id": 77,
-      "links": [],
-      "mode": "html",
-      "title": "Percentiles Summary",
-      "type": "text"
-    }
-  ],
-  "refresh": false,
-  "schemaVersion": 16,
-  "style": "dark",
-  "tags": [
-    "ui"
-  ],
-  "templating": {
-    "list": [
+    "editable": true,
+    "gnetId": null,
+    "graphTooltip": 1,
+    "id": null,
+    "iteration": 1548845610866,
+    "links": [],
+    "panels": [
       {
-        "allValue": "",
-        "current": {},
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "id": 137,
+        "panels": [],
+        "repeat": null,
+        "title": "Summary",
+        "type": "row"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "rgba(245, 54, 54, 0.9)",
+          "rgba(237, 129, 40, 0.89)",
+          "rgba(50, 172, 45, 0.97)"
+        ],
         "datasource": "perfui",
-        "hide": 0,
-        "includeAll": false,
-        "label": "Scenario",
-        "multi": false,
-        "name": "scenario",
-        "options": [],
-        "query": "SHOW TAG VALUES WITH KEY = \"scenario\"",
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 1,
-        "tagValuesQuery": "",
-        "tags": [],
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      },
-      {
-        "allValue": ".*",
-        "current": {},
-        "datasource": "perfui",
-        "hide": 0,
-        "includeAll": true,
-        "label": "Domain",
-        "multi": true,
-        "name": "domain",
-        "options": [],
-        "query": "SHOW TAG VALUES FROM \"uiperf\" WITH KEY = \"domain\"",
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
-        "tagValuesQuery": "",
-        "tags": [],
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      },
-      {
-        "allValue": "all",
-        "current": {},
-        "datasource": "perfui",
-        "hide": 0,
-        "includeAll": true,
-        "label": "Page",
-        "multi": true,
-        "name": "page_name",
-        "options": [],
-        "query": "SHOW TAG VALUES FROM \"uiperf\" WITH KEY = \"page\" WHERE domain =~ /$domain/ AND scenario =~ /(?i)$scenario/",
-        "refresh": 1,
-        "regex": "(.*)",
-        "skipUrlSync": false,
-        "sort": 1,
-        "tagValuesQuery": "",
-        "tags": [],
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      },
-      {
-        "current": {
-          "value": "VAR_DB_URL",
-          "text": "VAR_DB_URL"
+        "decimals": 0,
+        "format": "none",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
         },
-        "hide": 2,
-        "label": null,
-        "name": "db_url",
-        "options": [
+        "gridPos": {
+          "h": 3,
+          "w": 4,
+          "x": 0,
+          "y": 1
+        },
+        "height": "100px",
+        "id": 91,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
           {
-            "value": "VAR_DB_URL",
-            "text": "VAR_DB_URL"
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
           }
         ],
-        "query": "VAR_DB_URL",
-        "skipUrlSync": false,
-        "type": "constant"
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "50%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "policy": "default",
+            "query": "SELECT SUM(count) FROM \"uiperf\" WHERE \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /(?i)^$scenario$/ AND $timeFilter GROUP BY count",
+            "rawQuery": true,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "count"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "sum"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              },
+              {
+                "condition": "AND",
+                "key": "scenario",
+                "operator": "=~",
+                "value": "/(?i)^$scenario$/"
+              }
+            ]
+          }
+        ],
+        "thresholds": "",
+        "title": "Total Pages/Actions count",
+        "type": "singlestat",
+        "valueFontSize": "80%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "0",
+            "value": "null"
+          }
+        ],
+        "valueName": "max"
       },
       {
-        "auto": true,
-        "auto_count": 30,
-        "auto_min": "10s",
-        "current": {
-          "text": "auto",
-          "value": "$__auto_interval_rps_interval"
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "rgba(245, 54, 54, 0.9)",
+          "rgba(237, 129, 40, 0.89)",
+          "rgba(50, 172, 45, 0.97)"
+        ],
+        "datasource": "perfui",
+        "decimals": 0,
+        "format": "none",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
         },
-        "hide": 0,
-        "label": "rps_interval",
-        "name": "rps_interval",
-        "options": [
+        "gridPos": {
+          "h": 3,
+          "w": 4,
+          "x": 4,
+          "y": 1
+        },
+        "height": "100px",
+        "id": 90,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
           {
-            "selected": true,
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "50%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT SUM(count) FROM \"uiperf\" WHERE \"scenario\" =~ /(?i)^$scenario$/ AND status = 'ko' AND $timeFilter GROUP BY count",
+            "rawQuery": true,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "count"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "sum"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              },
+              {
+                "condition": "AND",
+                "key": "scenario",
+                "operator": "=~",
+                "value": "/(?i)^$scenario$/"
+              }
+            ]
+          }
+        ],
+        "thresholds": "",
+        "title": "Total Failed Pages count",
+        "type": "singlestat",
+        "valueFontSize": "80%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "0",
+            "value": "null"
+          }
+        ],
+        "valueName": "max"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "rgba(245, 54, 54, 0.9)",
+          "rgba(237, 129, 40, 0.89)",
+          "rgba(50, 172, 45, 0.97)"
+        ],
+        "datasource": "perfui",
+        "decimals": null,
+        "format": "ms",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 4,
+          "x": 8,
+          "y": 1
+        },
+        "height": "100px",
+        "id": 92,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "50%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "policy": "default",
+            "query": "SELECT SUM(count) FROM \"uiperf\" WHERE \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /(?i)^$scenario$/ AND status = 'ko' AND $timeFilter GROUP BY count",
+            "rawQuery": false,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "latency"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              },
+              {
+                "condition": "AND",
+                "key": "scenario",
+                "operator": "=~",
+                "value": "/(?i)^$scenario$/"
+              },
+              {
+                "condition": "AND",
+                "key": "status",
+                "operator": "=",
+                "value": "ok"
+              }
+            ]
+          }
+        ],
+        "thresholds": "",
+        "title": "Latency",
+        "type": "singlestat",
+        "valueFontSize": "80%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "0",
+            "value": "null"
+          }
+        ],
+        "valueName": "max"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "rgba(245, 54, 54, 0.9)",
+          "rgba(237, 129, 40, 0.89)",
+          "rgba(50, 172, 45, 0.97)"
+        ],
+        "datasource": "perfui",
+        "decimals": null,
+        "format": "ms",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 4,
+          "x": 12,
+          "y": 1
+        },
+        "height": "100px",
+        "id": 93,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "50%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "policy": "default",
+            "query": "SELECT SUM(count) FROM \"uiperf\" WHERE \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /(?i)^$scenario$/ AND status = 'ko' AND $timeFilter GROUP BY count",
+            "rawQuery": false,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "transfer"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              },
+              {
+                "condition": "AND",
+                "key": "scenario",
+                "operator": "=~",
+                "value": "/(?i)^$scenario$/"
+              },
+              {
+                "condition": "AND",
+                "key": "status",
+                "operator": "=",
+                "value": "ok"
+              }
+            ]
+          }
+        ],
+        "thresholds": "",
+        "title": "Response Transfer",
+        "type": "singlestat",
+        "valueFontSize": "80%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "0",
+            "value": "null"
+          }
+        ],
+        "valueName": "max"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "rgba(245, 54, 54, 0.9)",
+          "rgba(237, 129, 40, 0.89)",
+          "rgba(50, 172, 45, 0.97)"
+        ],
+        "datasource": "perfui",
+        "decimals": null,
+        "format": "ms",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 4,
+          "x": 16,
+          "y": 1
+        },
+        "height": "100px",
+        "id": 94,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "50%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "policy": "default",
+            "query": "SELECT  max(\"onload\") +  max(\"tti\")  +  max(\"ttl\")  FROM \"uiperf\" WHERE \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /(?i)^$scenario$/ AND status = 'ok' AND $timeFilter GROUP BY time($interval) fill(null)",
+            "rawQuery": true,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "onload"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              },
+              {
+                "condition": "AND",
+                "key": "scenario",
+                "operator": "=~",
+                "value": "/(?i)^$scenario$/"
+              }
+            ]
+          }
+        ],
+        "thresholds": "",
+        "title": "Browser processing",
+        "type": "singlestat",
+        "valueFontSize": "80%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "0",
+            "value": "null"
+          }
+        ],
+        "valueName": "max"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "rgba(245, 54, 54, 0.9)",
+          "rgba(237, 129, 40, 0.89)",
+          "rgba(50, 172, 45, 0.97)"
+        ],
+        "datasource": "perfui",
+        "decimals": null,
+        "format": "ms",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 4,
+          "x": 20,
+          "y": 1
+        },
+        "height": "100px",
+        "id": 95,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "50%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "policy": "default",
+            "query": "SELECT  max(\"ttl\")  FROM \"uiperf\" WHERE \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /(?i)^$scenario$/ AND status = 'ok' AND $timeFilter GROUP BY time($interval) fill(null)",
+            "rawQuery": false,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "total_time"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              },
+              {
+                "condition": "AND",
+                "key": "scenario",
+                "operator": "=~",
+                "value": "/(?i)^$scenario$/"
+              },
+              {
+                "condition": "AND",
+                "key": "status",
+                "operator": "=",
+                "value": "ok"
+              }
+            ]
+          }
+        ],
+        "thresholds": "",
+        "title": "Total Page/Action time",
+        "type": "singlestat",
+        "valueFontSize": "80%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "0",
+            "value": "null"
+          }
+        ],
+        "valueName": "max"
+      },
+      {
+        "aliasColors": {},
+        "bars": true,
+        "dashLength": 10,
+        "dashes": false,
+        "datasource": "perfui",
+        "fill": 1,
+        "gridPos": {
+          "h": 9,
+          "w": 24,
+          "x": 0,
+          "y": 4
+        },
+        "height": "350px",
+        "id": 81,
+        "legend": {
+          "alignAsTable": true,
+          "avg": false,
+          "current": false,
+          "max": true,
+          "min": true,
+          "rightSide": true,
+          "show": true,
+          "total": false,
+          "values": true
+        },
+        "lines": false,
+        "linewidth": 1,
+        "links": [],
+        "nullPointMode": "null",
+        "percentage": false,
+        "pointradius": 5,
+        "points": false,
+        "renderer": "flot",
+        "seriesOverrides": [
+          {
+            "alias": "Total time",
+            "color": "#0A50A1",
+            "stack": false,
+            "zindex": -3
+          },
+          {
+            "alias": "Failed",
+            "color": "#BF1B00",
+            "stack": false,
+            "zindex": -2
+          },
+          {
+            "alias": "Latency"
+          },
+          {
+            "alias": "Transfer"
+          },
+          {
+            "alias": "Time to DOM Interactive"
+          },
+          {
+            "alias": "Time to DOM Load"
+          }
+        ],
+        "spaceLength": 10,
+        "stack": true,
+        "steppedLine": false,
+        "targets": [
+          {
+            "alias": "Latency",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$rps_interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"latency\") FROM \"uiperf\" WHERE scenario=~ /$scenario/ AND \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND $timeFilter GROUP BY time($rps_interval) fill(null)",
+            "rawQuery": true,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "latency"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "status",
+                "operator": "=",
+                "value": "ok"
+              },
+              {
+                "condition": "AND",
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              }
+            ]
+          },
+          {
+            "alias": "Response transfer",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$rps_interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"transfer\") FROM \"uiperf\" WHERE scenario=~ /$scenario/ AND  \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND $timeFilter GROUP BY time($rps_interval) fill(null)",
+            "rawQuery": true,
+            "refId": "B",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "transfer"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "status",
+                "operator": "=",
+                "value": "ok"
+              },
+              {
+                "condition": "AND",
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              }
+            ]
+          },
+          {
+            "alias": "Time to DOM Interactive",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$rps_interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"tti\") FROM \"uiperf\" WHERE  scenario=~ /$scenario/ AND \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND $timeFilter GROUP BY time($rps_interval) fill(null)",
+            "rawQuery": true,
+            "refId": "C",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "tti"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "status",
+                "operator": "=",
+                "value": "ok"
+              },
+              {
+                "condition": "AND",
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              }
+            ]
+          },
+          {
+            "alias": "Time to DOM Load",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$rps_interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"ttl\") FROM \"uiperf\" WHERE scenario=~ /$scenario/ AND  \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND $timeFilter GROUP BY time($rps_interval) fill(null)",
+            "rawQuery": true,
+            "refId": "D",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "ttl"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "status",
+                "operator": "=",
+                "value": "ok"
+              },
+              {
+                "condition": "AND",
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              }
+            ]
+          },
+          {
+            "alias": "Onload event time",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$rps_interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"onload\") FROM \"uiperf\" WHERE scenario=~ /$scenario/ AND  \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND $timeFilter GROUP BY time($rps_interval) fill(null)",
+            "rawQuery": true,
+            "refId": "G",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "ttl"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "status",
+                "operator": "=",
+                "value": "ok"
+              },
+              {
+                "condition": "AND",
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              }
+            ]
+          },
+          {
+            "alias": "Total time",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$rps_interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"total_time\") FROM \"uiperf\" WHERE  scenario=~ /$scenario/ AND \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND $timeFilter GROUP BY time($rps_interval) fill(null)",
+            "rawQuery": true,
+            "refId": "F",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "total_time"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "status",
+                "operator": "=",
+                "value": "ok"
+              },
+              {
+                "condition": "AND",
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              }
+            ]
+          },
+          {
+            "alias": "Failed",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$rps_interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"total_time\") FROM \"uiperf\" WHERE  scenario=~ /$scenario/ AND \"status\" = 'ko' AND \"domain\" =~ /^$domain$/ AND $timeFilter GROUP BY time($rps_interval) fill(null)",
+            "rawQuery": true,
+            "refId": "E",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "total_time"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "status",
+                "operator": "=",
+                "value": "ko"
+              },
+              {
+                "condition": "AND",
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              }
+            ]
+          }
+        ],
+        "thresholds": [],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "Page load time summary",
+        "tooltip": {
+          "shared": true,
+          "sort": 0,
+          "value_type": "individual"
+        },
+        "type": "graph",
+        "xaxis": {
+          "buckets": null,
+          "mode": "time",
+          "name": null,
+          "show": true,
+          "values": []
+        },
+        "yaxes": [
+          {
+            "format": "ms",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          },
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          }
+        ],
+        "yaxis": {
+          "align": false,
+          "alignLevel": null
+        }
+      },
+      {
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 13
+        },
+        "id": 140,
+        "panels": [],
+        "repeat": "page_name",
+        "title": "$page_name Details",
+        "type": "row"
+      },
+      {
+        "aliasColors": {},
+        "bars": true,
+        "dashLength": 10,
+        "dashes": false,
+        "datasource": "perfui",
+        "fill": 1,
+        "gridPos": {
+          "h": 9,
+          "w": 18,
+          "x": 0,
+          "y": 14
+        },
+        "height": "350px",
+        "id": 76,
+        "legend": {
+          "alignAsTable": true,
+          "avg": false,
+          "current": false,
+          "max": true,
+          "min": true,
+          "rightSide": true,
+          "show": true,
+          "total": false,
+          "values": true
+        },
+        "lines": false,
+        "linewidth": 1,
+        "links": [],
+        "nullPointMode": "null",
+        "percentage": false,
+        "pointradius": 5,
+        "points": false,
+        "renderer": "flot",
+        "seriesOverrides": [
+          {
+            "alias": "Total time",
+            "color": "#0A50A1",
+            "stack": false,
+            "zindex": -3
+          },
+          {
+            "alias": "Failed",
+            "color": "#BF1B00",
+            "stack": false
+          }
+        ],
+        "spaceLength": 10,
+        "stack": true,
+        "steppedLine": false,
+        "targets": [
+          {
+            "alias": "Latency",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$rps_interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"latency\") FROM \"uiperf\" WHERE (\"page\" =~ /^$page_name$/ AND \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /^$scenario$/) AND $timeFilter GROUP BY time($rps_interval) fill(null)",
+            "rawQuery": false,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "latency"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "page",
+                "operator": "=~",
+                "value": "/^$page_name$/"
+              },
+              {
+                "condition": "AND",
+                "key": "status",
+                "operator": "=",
+                "value": "ok"
+              },
+              {
+                "condition": "AND",
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              },
+              {
+                "condition": "AND",
+                "key": "scenario",
+                "operator": "=~",
+                "value": "/^$scenario$/"
+              }
+            ]
+          },
+          {
+            "alias": "Transfer",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$rps_interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"transfer\") FROM \"uiperf\" WHERE (\"page\" =~ /^$page_name$/ AND \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /^$scenario$/) AND $timeFilter GROUP BY time($rps_interval) fill(null)",
+            "rawQuery": true,
+            "refId": "B",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "transfer"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "page",
+                "operator": "=~",
+                "value": "/^$page_name(Page)$/"
+              },
+              {
+                "condition": "AND",
+                "key": "status",
+                "operator": "=",
+                "value": "ok"
+              },
+              {
+                "condition": "AND",
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              },
+              {
+                "condition": "AND",
+                "key": "scenario",
+                "operator": "=~",
+                "value": "/^$scenario$/"
+              }
+            ]
+          },
+          {
+            "alias": "Time to DOM Interactive",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$rps_interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"tti\") FROM \"uiperf\" WHERE (\"page\" =~ /^$page_name$/ AND \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /^$scenario$/) AND $timeFilter GROUP BY time($rps_interval) fill(null)",
+            "rawQuery": true,
+            "refId": "C",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "tti"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "page",
+                "operator": "=~",
+                "value": "/^$page_name(Page)$/"
+              },
+              {
+                "condition": "AND",
+                "key": "status",
+                "operator": "=",
+                "value": "ok"
+              },
+              {
+                "condition": "AND",
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              },
+              {
+                "condition": "AND",
+                "key": "scenario",
+                "operator": "=~",
+                "value": "/^$scenario$/"
+              }
+            ]
+          },
+          {
+            "alias": "Time to DOM Load",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$rps_interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"ttl\") FROM \"uiperf\" WHERE (\"page\" =~ /^$page_name$/ AND \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /^$scenario$/) AND $timeFilter GROUP BY time($rps_interval) fill(null)",
+            "rawQuery": true,
+            "refId": "D",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "ttl"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "page",
+                "operator": "=~",
+                "value": "/^$page_name(Page)$/"
+              },
+              {
+                "condition": "AND",
+                "key": "status",
+                "operator": "=",
+                "value": "ok"
+              },
+              {
+                "condition": "AND",
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              },
+              {
+                "condition": "AND",
+                "key": "scenario",
+                "operator": "=~",
+                "value": "/^$scenario$/"
+              }
+            ]
+          },
+          {
+            "alias": "Onload event time",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$rps_interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "refId": "G",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "onload"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "page",
+                "operator": "=~",
+                "value": "/^$page_name$/"
+              },
+              {
+                "condition": "AND",
+                "key": "status",
+                "operator": "=",
+                "value": "ok"
+              },
+              {
+                "condition": "AND",
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              },
+              {
+                "condition": "AND",
+                "key": "scenario",
+                "operator": "=~",
+                "value": "/^$scenario$/"
+              }
+            ]
+          },
+          {
+            "alias": "Total time",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$rps_interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"total_time\") FROM \"uiperf\" WHERE (\"page\" =~ /^$page_name$/ AND \"status\" = 'ok' AND \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /^$scenario$/) AND $timeFilter GROUP BY time($rps_interval) fill(null)",
+            "rawQuery": true,
+            "refId": "F",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "total_time"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "page",
+                "operator": "=~",
+                "value": "/^$page_name$/"
+              },
+              {
+                "condition": "AND",
+                "key": "status",
+                "operator": "=",
+                "value": "ok"
+              },
+              {
+                "condition": "AND",
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              },
+              {
+                "condition": "AND",
+                "key": "scenario",
+                "operator": "=~",
+                "value": "/^$scenario$/"
+              }
+            ]
+          },
+          {
+            "alias": "Failed",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$rps_interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "uiperf",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"total_time\") FROM \"uiperf\" WHERE \"page\" =~ /^$page_name$/ AND \"status\" = 'ko' AND \"domain\" =~ /^$domain$/ AND \"scenario\" =~ /^$scenario$/ AND $timeFilter GROUP BY time($rps_interval) fill(null)",
+            "rawQuery": true,
+            "refId": "E",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "total_time"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "page",
+                "operator": "=~",
+                "value": "/^$page_name(Page)$/"
+              },
+              {
+                "condition": "AND",
+                "key": "status",
+                "operator": "=",
+                "value": "ko"
+              },
+              {
+                "condition": "AND",
+                "key": "domain",
+                "operator": "=~",
+                "value": "/^$domain$/"
+              },
+              {
+                "condition": "AND",
+                "key": "scenario",
+                "operator": "=~",
+                "value": "/^$scenario$/"
+              }
+            ]
+          }
+        ],
+        "thresholds": [],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "$page_name",
+        "tooltip": {
+          "shared": true,
+          "sort": 0,
+          "value_type": "individual"
+        },
+        "type": "graph",
+        "xaxis": {
+          "buckets": null,
+          "mode": "time",
+          "name": null,
+          "show": true,
+          "values": []
+        },
+        "yaxes": [
+          {
+            "format": "ms",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          },
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          }
+        ],
+        "yaxis": {
+          "align": false,
+          "alignLevel": null
+        }
+      },
+      {
+        "content": "<script type=\"text/javascript\" language=\"javascript\" src=\"//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js\" />\n<script type=\"text/javascript\" language=\"javascript\" src='//cdn.jsdelivr.net/gh/carrier-io/perf-ui@master/lib/grafana_wrapper.js'\n/>\n<script type=\"text/javascript\" language=\"javascript\" src='//cdn.jsdelivr.net/gh/carrier-io/perf-ui@master/lib/timing_api_waterfall.js' />\n<script>\n\n    function addSpinner$page_name() {\n        $('#timingApiTable$page_name').empty();\n        if ($('div.$page_name-spinner').length == 0) {\n            var spinner = $('<div>')\n            spinner.attr(\"class\", \"$page_name-spinner\");\n            spinner.html(\"<div  style=\\\"text-align: center;\\\"> <i class=\\\"fa fa-spinner fa-spin\\\" style=\\\" font-size: xx-large;\\\"></i> </div>\")\n            $(\"#timingApiTable$page_name\").append(spinner)\n        }\n    }\n\n    function removeSpinner$page_name() {\n        $('div.$page_name-spinner').remove()\n    }\n\n    function getQuery$page_name(wrapper, percentile, pageName, timing) {\n        criterion = '';\n        if (percentile.indexOf(\"in\") > 0) {\n            criterion = \"MIN(\\\"\" + timing + \"\\\")\";\n        } else if (percentile.indexOf(\"ax\") > 0) {\n            criterion = \"MAX(\\\"\" + timing + \"\\\")\";\n        } else {\n            criterion = \"PERCENTILE(\\\"\" + timing + \"\\\",\" + percentile.replace(\" pct\", \"\") + \")\"\n        }\n        var timeFilter = wrapper.getTime()['filter'];\n        var scenario = wrapper.getVar('scenario')[0];\n\n        return 'select ' + criterion + ' AS \"' + percentile\n            + '\", raw_data_timing, raw_objects_timing from $db_name..\"uiperf\" where scenario= \\''\n            + scenario + '\\' AND status=~ /ok/ AND page=~ /^'\n            + pageName + '/ and '\n            + timeFilter + \"; \";\n    }\n\n    var db_url = \"$db_url/query\";\n    var db_name = \"$db_name\";\n\n    var tabl_data = [\n        { name: \"Min\", total_time: 0, raw_data_timing: \"\", raw_objects_timing: \"\" },\n        { name: \"50 pct\", total_time: 0, raw_data_timing: \"\", raw_objects_timing: \"\" },\n        { name: \"75 pct\", total_time: 0, raw_data_timing: \"\", raw_objects_timing: \"\" },\n        { name: \"90 pct\", total_time: 0, raw_data_timing: \"\", raw_objects_timing: \"\" },\n        { name: \"95 pct\", total_time: 0, raw_data_timing: \"\", raw_objects_timing: \"\" },\n        { name: \"99 pct\", total_time: 0, raw_data_timing: \"\", raw_objects_timing: \"\" },\n        { name: \"Max\", total_time: 0, raw_data_timing: \"\", raw_objects_timing: \"\" }\n    ];\n\n    function generateRow(ind, rowData, pageName) {\n        var tr = $('<tr/>');\n        var dataCell = $('<td/>');\n        var linkEll = $('<a/>')\n        var id = rowData['name'] + '_' + pageName + '_' + ind\n        linkEll.attr(\"id\", id);\n        linkEll.attr(\"href\", '#');\n        linkEll.text(rowData['name']);\n        dataCell.append(linkEll);\n        var script = document.createElement('script');\n        script.type = 'text/javascript';\n        script.text = 'function ShowBig_' + pageName + '_' + ind + '(){showBigPicture(' + rowData['raw_objects_timing'] + ',' + rowData[\"raw_data_timing\"] + ');};\\nvar el = document.getElementById(\"' + id + '\");\\nel.onclick=ShowBig_' + pageName + '_' + ind + ';';\n        dataCell.append(script);\n        tr.append(dataCell);\n        var infoCell = $('<td/>');\n        var textEll = $('<span/>');\n        textEll.text(rowData[\"total_time\"].toString());\n        infoCell.append(textEll);\n        tr.append(infoCell);\n\n        return tr\n    }\n\n    function checkDataTableIsLoaded$page_name(wrapper, tabl_data, pageName, timing) {\n        addSpinner$page_name()\n        var query = \"\"\n        var table = $('<table/>');\n        table.attr(\"width\", \"100%\");\n\n        for (var i = 0; i < tabl_data.length; i++)\n            query += getQuery$page_name(wrapper, tabl_data[i]['name'], pageName, timing);\n\n        $.post(db_url, { q: query, db: db_name, epoch: \"ms\" }).done(function (data, status) {\n            var data = data.results\n            if (!data || !data[0]['series']) {\n                console.log(\"no series\")\n                showTimingTableMessage$page_name('No successful requests in selected time range.')\n            } else {\n                for (var i = 0; i < data.length; i++) {\n                    var rowData = data[i]\n                    var result_json = {\n                        name: rowData['series'][0]['columns'][1],\n                        total_time: rowData['series'][0]['values'][0][1],\n                        raw_data_timing: rowData[\"series\"][0]['values'][0][2],\n                        raw_objects_timing: rowData[\"series\"][0]['values'][0][3]\n                    }\n                    table.append(generateRow(i.toString(), result_json, pageName));\n                }\n                $('#timingApiTable$page_name').empty();\n                $('#timingApiTable$page_name').append(table);\n            }\n        })\n    }\n\n    function showTimingTableMessage$page_name(mess) {\n        removeSpinner$page_name()\n        $('#timingApiTable$page_name').empty();\n        var message = $('<span>');\n        message.attr(\"id\", \"timing-table-message\");\n        message.text(mess)\n        $('#timingApiTable$page_name').append(message);\n    }\n\n    function waitForGWrapper$page_name() {\n        try {\n            var wrapper = new GWrapper('UI_page_details');\n            var pageName = '$page_name'\n            var timeFilter = wrapper.getTime()['filter'];\n            var scenario = wrapper.getVar('scenario')[0];\n            var timing = \"total_time\"\n            var test_q = 'SELECT \"total_time\",\"duration\" FROM \"uiperf\" WHERE \"page\" =~ /^$page_name/ AND '\n                + 'scenario=~ /^' + scenario + '/' + ' AND status=~ /ok/ and ' + timeFilter + ' limit 1';\n\n\n            $.post(db_url, { q: test_q, db: db_name, epoch: \"ms\" }).done(function (data, status) {\n                var data = data.results\n                if (!data[0].series) {\n                    showTimingTableMessage$page_name('No successful requests in selected time range.')\n                } else {\n                    if (data[0].series[0].values[0][2] != null)\n                        timing = \"duration\";\n\n                    checkDataTableIsLoaded$page_name(wrapper, tabl_data, pageName, timing);\n                }\n            })\n        } catch (err) {\n            console.log(\"Errors \" + err)\n            setTimeout(function () { waitForGWrapper$page_name() }, 500);\n        }\n    }\n\n    $(document).ready(function () { waitForGWrapper$page_name(); });\n    angular.element('grafana-app').injector().get('$rootScope').$on('refresh', function () { waitForGWrapper$page_name() })\n\n</script>\n<style>\n    #timing-table-message {\n        display: table;\n        margin-left: auto;\n        margin-right: auto;\n        text-align: center;\n    }\n</style>\n<div id=\"timingApiTable$page_name\"></div>",
+        "gridPos": {
+          "h": 9,
+          "w": 6,
+          "x": 18,
+          "y": 14
+        },
+        "height": "350px",
+        "id": 77,
+        "links": [],
+        "mode": "html",
+        "title": "Percentiles Summary",
+        "type": "text"
+      }
+    ],
+    "refresh": false,
+    "schemaVersion": 16,
+    "style": "dark",
+    "tags": [
+      "ui"
+    ],
+    "templating": {
+      "list": [
+        {
+          "allValue": "",
+          "current": {},
+          "datasource": "perfui",
+          "hide": 0,
+          "includeAll": false,
+          "label": "Scenario",
+          "multi": false,
+          "name": "scenario",
+          "options": [],
+          "query": "SHOW TAG VALUES WITH KEY = \"scenario\"",
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 1,
+          "tagValuesQuery": "",
+          "tags": [],
+          "tagsQuery": "",
+          "type": "query",
+          "useTags": false
+        },
+        {
+          "allValue": ".*",
+          "current": {},
+          "datasource": "perfui",
+          "hide": 0,
+          "includeAll": true,
+          "label": "Domain",
+          "multi": true,
+          "name": "domain",
+          "options": [],
+          "query": "SHOW TAG VALUES FROM \"uiperf\" WITH KEY = \"domain\"",
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "tagValuesQuery": "",
+          "tags": [],
+          "tagsQuery": "",
+          "type": "query",
+          "useTags": false
+        },
+        {
+          "allValue": "all",
+          "current": {},
+          "datasource": "perfui",
+          "hide": 0,
+          "includeAll": true,
+          "label": "Page",
+          "multi": true,
+          "name": "page_name",
+          "options": [],
+          "query": "SHOW TAG VALUES FROM \"uiperf\" WITH KEY = \"page\" WHERE domain =~ /$domain/ AND scenario =~ /(?i)$scenario/",
+          "refresh": 1,
+          "regex": "(.*)",
+          "skipUrlSync": false,
+          "sort": 1,
+          "tagValuesQuery": "",
+          "tags": [],
+          "tagsQuery": "",
+          "type": "query",
+          "useTags": false
+        },
+        {
+          "current": {
+            "value": "VAR_DB_URL",
+            "text": "VAR_DB_URL"
+          },
+          "hide": 2,
+          "label": null,
+          "name": "db_url",
+          "options": [
+            {
+              "value": "VAR_DB_URL",
+              "text": "VAR_DB_URL"
+            }
+          ],
+          "query": "VAR_DB_URL",
+          "skipUrlSync": false,
+          "type": "constant"
+        },
+        {
+          "auto": true,
+          "auto_count": 30,
+          "auto_min": "10s",
+          "current": {
             "text": "auto",
             "value": "$__auto_interval_rps_interval"
           },
-          {
-            "selected": false,
-            "text": "1m",
-            "value": "1m"
-          },
-          {
-            "selected": false,
-            "text": "10m",
-            "value": "10m"
-          },
-          {
-            "selected": false,
-            "text": "30m",
-            "value": "30m"
-          },
-          {
-            "selected": false,
-            "text": "1h",
-            "value": "1h"
-          },
-          {
-            "selected": false,
-            "text": "6h",
-            "value": "6h"
-          },
-          {
-            "selected": false,
-            "text": "12h",
-            "value": "12h"
-          },
-          {
-            "selected": false,
-            "text": "1d",
-            "value": "1d"
-          },
-          {
-            "selected": false,
-            "text": "7d",
-            "value": "7d"
-          },
-          {
-            "selected": false,
-            "text": "14d",
-            "value": "14d"
-          },
-          {
-            "selected": false,
-            "text": "30d",
-            "value": "30d"
-          }
-        ],
-        "query": "1m,10m,30m,1h,6h,12h,1d,7d,14d,30d",
-        "refresh": 2,
-        "skipUrlSync": false,
-        "type": "interval"
-      },
-      {
-        "current": {
-          "value": "perfui",
-          "text": "perfui"
+          "hide": 0,
+          "label": "rps_interval",
+          "name": "rps_interval",
+          "options": [
+            {
+              "selected": true,
+              "text": "auto",
+              "value": "$__auto_interval_rps_interval"
+            },
+            {
+              "selected": false,
+              "text": "1m",
+              "value": "1m"
+            },
+            {
+              "selected": false,
+              "text": "10m",
+              "value": "10m"
+            },
+            {
+              "selected": false,
+              "text": "30m",
+              "value": "30m"
+            },
+            {
+              "selected": false,
+              "text": "1h",
+              "value": "1h"
+            },
+            {
+              "selected": false,
+              "text": "6h",
+              "value": "6h"
+            },
+            {
+              "selected": false,
+              "text": "12h",
+              "value": "12h"
+            },
+            {
+              "selected": false,
+              "text": "1d",
+              "value": "1d"
+            },
+            {
+              "selected": false,
+              "text": "7d",
+              "value": "7d"
+            },
+            {
+              "selected": false,
+              "text": "14d",
+              "value": "14d"
+            },
+            {
+              "selected": false,
+              "text": "30d",
+              "value": "30d"
+            }
+          ],
+          "query": "1m,10m,30m,1h,6h,12h,1d,7d,14d,30d",
+          "refresh": 2,
+          "skipUrlSync": false,
+          "type": "interval"
         },
-        "hide": 2,
-        "label": null,
-        "name": "db_name",
-        "options": [
-          {
+        {
+          "current": {
             "value": "perfui",
             "text": "perfui"
-          }
-        ],
-        "query": "perfui",
-        "skipUrlSync": false,
-        "type": "constant"
-      }
-    ]
-  },
-  "time": {
-    "from": "2018-12-05T23:52:25.897Z",
-    "to": "2018-12-05T23:56:02.234Z"
-  },
-  "timepicker": {
-    "refresh_intervals": [
-      "1s",
-      "5s",
-      "10s",
-      "30s",
-      "1m",
-      "5m",
-      "15m",
-      "30m",
-      "1h",
-      "2h",
-      "1d"
-    ],
-    "time_options": [
-      "5m",
-      "15m",
-      "1h",
-      "6h",
-      "12h",
-      "24h",
-      "2d",
-      "7d",
-      "30d"
-    ]
-  },
-  "timezone": "browser",
-  "title": "UI Performance",
-  "uid": "BSrQYBYmk",
-  "version": 8
+          },
+          "hide": 2,
+          "label": null,
+          "name": "db_name",
+          "options": [
+            {
+              "value": "perfui",
+              "text": "perfui"
+            }
+          ],
+          "query": "perfui",
+          "skipUrlSync": false,
+          "type": "constant"
+        }
+      ]
+    },
+    "time": {
+      "from": "2018-12-05T23:52:25.897Z",
+      "to": "2018-12-05T23:56:02.234Z"
+    },
+    "timepicker": {
+      "refresh_intervals": [
+        "1s",
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "time_options": [
+        "5m",
+        "15m",
+        "1h",
+        "6h",
+        "12h",
+        "24h",
+        "2d",
+        "7d",
+        "30d"
+      ]
+    },
+    "timezone": "browser",
+    "title": "UI Performance",
+    "uid": "BSrQYBYmk",
+    "version": 8
+  }
 }
