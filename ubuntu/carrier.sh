@@ -46,7 +46,7 @@ RUN chown -R $USERNAME $JENKINS_HOME /usr/share/jenkins/ref && \
 	chown $USERNAME /usr/local/bin/jenkins-support && \
 	chown $USERNAME /usr/local/bin/jenkins.sh && \
 	chown $USERNAME /bin/tini
-RUN /usr/local/bin/install-plugins.sh job-dsl git cloudbees-folder credentials credentials-binding ansicolor timestamper workflow-aggregator workflow-cps pipeline-build-step Parameterized-Remote-Trigger publish-over-cifs email-ext ws-cleanup envinject xunit performance
+RUN /usr/local/bin/install-plugins.sh job-dsl git cloudbees-folder credentials credentials-binding timestamper workflow-aggregator workflow-cps pipeline-build-step Parameterized-Remote-Trigger publish-over-cifs email-ext ws-cleanup junit performance
 EXPOSE 8080
 """ > $HOMEDIR/jenkins/Dockerfile
 

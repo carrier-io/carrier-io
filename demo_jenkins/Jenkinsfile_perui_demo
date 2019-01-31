@@ -45,7 +45,7 @@ example: # environment
         }
     }
     stage("publish results") {
-        xunit([JUnit(deleteOutputFiles: false, failIfNotNew: false, pattern: 'reports/*.xml', skipNoTestFiles: true, stopProcessingIfError: true)])
+        junit: 'reports/*.xml'
     }
 }
 
