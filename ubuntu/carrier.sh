@@ -181,5 +181,9 @@ docker exec carrier-influx bash -c "influx -execute 'create database perfui'"
 
 echo "Provisioning PerfUI Demo Piece"
 curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/perfui.xml | curl -X POST "http://${FULLHOST}/jenkins/createItem?name=demo_perfui" --header "Content-Type: application/xml" -d @-
-curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/datasources | curl -X POST "http://${FULLHOST}/grafana/api/datasources" -u admin:${GRAFANA_PASSWORD} --header "Content-Type: application/json" -d @-
+curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/datasource_comparison | curl -X POST "http://${FULLHOST}/grafana/api/datasources" -u admin:password --header "Content-Type: application/json" -d @-
+curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/datasource_jmeter | curl -X POST "http://${FULLHOST}/grafana/api/datasources" -u admin:password --header "Content-Type: application/json" -d @-
+curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/datasource_gatling | curl -X POST "http://${FULLHOST}/grafana/api/datasources" -u admin:password --header "Content-Type: application/json" -d @-
+curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/datasource_perfui | curl -X POST "http://${FULLHOST}/grafana/api/datasources" -u admin:password --header "Content-Type: application/json" -d @-
+curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/datasource_prodsec | curl -X POST "http://${FULLHOST}/grafana/api/datasources" -u admin:password --header "Content-Type: application/json" -d @-
 curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/ui_performance_dashboard.json | sed -e "s/VAR_DB_URL/$FULLHOST/g" | curl -X POST "http://${FULLHOST}/grafana/api/dashboards/db" -u admin:${GRAFANA_PASSWORD} --header "Content-Type: application/json" -d @-
