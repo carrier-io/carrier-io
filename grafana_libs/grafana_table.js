@@ -54,8 +54,8 @@ function appendSTRow(row){
     $('#summary-table').DataTable().row.add(row).draw()
 }
 
-function retrieveData(query){
-    $.get(wrapper.getVar('db_url')+"/query", { q: query, db: wrapper.getVar('db_name')+, epoch: EPOCH},
+function retrieveData(db_url, db_name, query){
+    $.get(db_url +"/query", { q: query, db: db_name, epoch: EPOCH},
         function(data, status){
             if(status == 'success'){
                 var series = data.results[0].series
@@ -215,7 +215,9 @@ function waitForSTGWrapper(){
 function checkSTIsLoaded(wrapper){
     if($.fn.DataTable){
         query = generateQuery(wrapper);
-        retrieveData(query)
+        db_url = wrapper.getVar('db_url');
+        db_name = wrapper.getVar('db_name');
+        retrieveData(db_url, db_name, query);
     }else{
         setTimeout(function() { checkSTIsLoaded()}, 500);
     }
