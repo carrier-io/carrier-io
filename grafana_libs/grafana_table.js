@@ -55,7 +55,7 @@ function appendSTRow(row){
 }
 
 function retrieveData(query){
-    $.get("$db_url/query", { q: query, db: "$db_name", epoch: EPOCH},
+    $.get(wrapper.getVar('db_url')+"/query", { q: query, db: wrapper.getVar('db_name')+, epoch: EPOCH},
         function(data, status){
             if(status == 'success'){
                 var series = data.results[0].series
