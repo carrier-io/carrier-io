@@ -1,38 +1,35 @@
-<script type ="text/javascript" language = "javascript" src="//cdn.jsdelivr.net/gh/carrier-io/carrier-io@master/grafana_libs/grafana_wrapper.js"/>
-<script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"/>
-<script>
-	function generateQuery(wrapper){
-        function appendValues(name,arr){
-            return (arr.length) ? (name + '=~ /^(' + arr.join('|') + ')$/ AND ') : '';
-        }
+function generateQuery(wrapper){
+    function appendValues(name,arr){
+        return (arr.length) ? (name + '=~ /^(' + arr.join('|') + ')$/ AND ') : '';
+    }
 
-        var AND  = ' AND ';
-        var WHERE = ' WHERE ';
-        var GROUP_BY = ' GROUP BY request_name; ';
-        var query;
-        var testTypes = wrapper.getVar('test_type', onAllEmpty=false).toString();
-        var environments = appendValues('env', wrapper.getVar('env'));
-        var userCounts = appendValues('user_count', wrapper.getVar('users'));
+    var AND  = ' AND ';
+    var WHERE = ' WHERE ';
+    var GROUP_BY = ' GROUP BY request_name; ';
+    var query;
+    var testTypes = wrapper.getVar('test_type', onAllEmpty=false).toString();
+    var environments = appendValues('env', wrapper.getVar('env'));
+    var userCounts = appendValues('user_count', wrapper.getVar('users'));
 
-        var simulation = ' simulation=\'' +  wrapper.getVar('test')[0] + '\'';
-        var timeFilter = wrapper.getTime()['filter'];
-        var from_block =  testTypes + WHERE + simulation + AND + userCounts + environments;
+    var simulation = ' simulation=\'' +  wrapper.getVar('test')[0] + '\'';
+    var timeFilter = wrapper.getTime()['filter'];
+    var from_block =  testTypes + WHERE + simulation + AND + userCounts + environments;
 
-        query = 'SELECT SUM(count) AS "total" FROM ' + from_block + 'status= \'all\'' + AND +  timeFilter + GROUP_BY;
-        query += 'SELECT SUM(count) AS "ok" FROM ' + from_block +  'status= \'ok\'' + AND + timeFilter + GROUP_BY;
+    query = 'SELECT SUM(count) AS "total" FROM ' + from_block + 'status= \'all\'' + AND +  timeFilter + GROUP_BY;
+    query += 'SELECT SUM(count) AS "ok" FROM ' + from_block +  'status= \'ok\'' + AND + timeFilter + GROUP_BY;
 
-        duplicate_part =  from_block +  'status= \'all\'' + AND +  timeFilter + GROUP_BY;
-        query += 'SELECT MEAN(avrg_rps) AS "rps" FROM (SELECT MEAN(count) AS "avrg_rps" FROM ' + from_block +' status= \'ok\' AND ' + timeFilter+ ' GROUP BY time(1s)) GROUP BY request_name;'
+    duplicate_part =  from_block +  'status= \'all\'' + AND +  timeFilter + GROUP_BY;
+    query += 'SELECT MEAN(avrg_rps) AS "rps" FROM (SELECT MEAN(count) AS "avrg_rps" FROM ' + from_block +' status= \'ok\' AND ' + timeFilter+ ' GROUP BY time(1s)) GROUP BY request_name;'
 
-        query += 'SELECT MIN(min) AS "min", MEAN(mean) AS "average", MAX(max) AS "max"  FROM ' + duplicate_part;
-        query += 'SELECT STDDEV(mean)        AS "stddev" FROM ' + duplicate_part;
-        query += 'SELECT MEDIAN(mean)        AS "median" FROM ' + duplicate_part;
-        query += 'SELECT PERCENTILE(mean,75) AS "perc75" FROM ' + duplicate_part;
-        query += 'SELECT PERCENTILE(mean,95) AS "perc95" FROM ' + duplicate_part;
-        query += 'SELECT PERCENTILE(mean,99) AS "perc99" FROM ' + duplicate_part;
+    query += 'SELECT MIN(min) AS "min", MEAN(mean) AS "average", MAX(max) AS "max"  FROM ' + duplicate_part;
+    query += 'SELECT STDDEV(mean)        AS "stddev" FROM ' + duplicate_part;
+    query += 'SELECT MEDIAN(mean)        AS "median" FROM ' + duplicate_part;
+    query += 'SELECT PERCENTILE(mean,75) AS "perc75" FROM ' + duplicate_part;
+    query += 'SELECT PERCENTILE(mean,95) AS "perc95" FROM ' + duplicate_part;
+    query += 'SELECT PERCENTILE(mean,99) AS "perc99" FROM ' + duplicate_part;
 
-        return query;
-    };
+    return query;
+};
 
 function formatDataset(data){
     rows = {};
@@ -237,4 +234,3 @@ ROUND_FLOAT_FACTOR = 3;
 
 window.onload = waitForSTGWrapper();
 angular.element('grafana-app').injector().get('$rootScope').$on('refresh',function(){waitForSTGWrapper()});
-</script>
