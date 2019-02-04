@@ -221,12 +221,9 @@ function checkSTIsLoaded(wrapper){
     }
 }
 
-// DB_NAME = "perftest";
 EPOCH = "ms";
 TABLE_TIME_EPOCH = 's'; //s for seconds, any other value for milliseconds
 
-// LOWER_RT_TRESHOLD = 2.0;
-// HIGHER_RT_TRESHOLD = 3.0;
 LOWER_RT_TRESHOLD = parseFloat("$low_limit")/1000.0
 HIGHER_RT_TRESHOLD = parseFloat("$high_limit")/1000.0
 ERROR_PERC_TRESHOLD = 1.0;
