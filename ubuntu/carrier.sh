@@ -46,7 +46,12 @@ RUN chown -R $USERNAME $JENKINS_HOME /usr/share/jenkins/ref && \
 	chown $USERNAME /usr/local/bin/jenkins-support && \
 	chown $USERNAME /usr/local/bin/jenkins.sh && \
 	chown $USERNAME /bin/tini
-RUN /usr/local/bin/install-plugins.sh job-dsl git cloudbees-folder credentials credentials-binding timestamper workflow-aggregator workflow-cps pipeline-build-step Parameterized-Remote-Trigger publish-over-cifs email-ext ws-cleanup junit performance
+RUN /usr/local/bin/install-plugins.sh job-dsl durable-task git cloudbees-folder \
+                                      credentials credentials-binding timestamper \
+                                      workflow-aggregator workflow-cps pipeline-build-step \
+                                      Parameterized-Remote-Trigger publish-over-cifs \
+                                      email-ext ws-cleanup junit performance htmlpublisher || \
+                                      echo 'You would need to configure jenkins before running the tests'
 EXPOSE 8080
 """ > $HOMEDIR/jenkins/Dockerfile
 
@@ -178,6 +183,7 @@ docker exec carrier-influx bash -c "influx -execute 'create database comparison'
 docker exec carrier-influx bash -c "influx -execute 'create database gatling'"
 docker exec carrier-influx bash -c "influx -execute 'create database prodsec'"
 docker exec carrier-influx bash -c "influx -execute 'create database perfui'"
+docker exec carrier-influx bash -c "influx -execute 'create database telegraf'"
 
 echo "Provisioning PerfUI Demo Piece"
 curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/perfui.xml | curl -X POST "http://${FULLHOST}/jenkins/createItem?name=demo_perfui" --header "Content-Type: application/xml" -d @-
