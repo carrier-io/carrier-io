@@ -1,4 +1,4 @@
-<script type ="text/javascript" language = "javascript" src='//cdn.jsdelivr.net/gh/carrier-io/carrier-io@master/grafana_lib/grafana_wrapper.js' />
+<script type ="text/javascript" language = "javascript" src="//cdn.jsdelivr.net/gh/carrier-io/carrier-io@master/grafana_libs/grafana_wrapper.js"/>
 <script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"/>
 <script>
 	function generateQuery(wrapper){
