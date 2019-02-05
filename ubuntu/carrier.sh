@@ -176,7 +176,7 @@ services:
 cd $HOMEDIR
 docker-compose up -d
 
-sleep 10
+sleep 20
 echo "Creating Databases"
 docker exec carrier-influx bash -c "influx -execute 'create database jmeter'"
 docker exec carrier-influx bash -c "influx -execute 'create database comparison'"
