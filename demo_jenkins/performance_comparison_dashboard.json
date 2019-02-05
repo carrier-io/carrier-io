@@ -37,7 +37,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "Comparison",
+          "datasource": "comparison",
           "decimals": 2,
           "fill": 1,
           "gridPos": {
@@ -175,7 +175,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "Comparison",
+          "datasource": "comparison",
           "decimals": 2,
           "fill": 0,
           "gridPos": {
@@ -524,7 +524,7 @@
         },
         {
           "columns": [],
-          "datasource": "Comparison",
+          "datasource": "comparison",
           "fontSize": "100%",
           "gridPos": {
             "h": 9,
@@ -615,7 +615,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "Comparison",
+          "datasource": "comparison",
           "format": "none",
           "gauge": {
             "maxValue": 100,
@@ -721,7 +721,7 @@
         },
         {
           "columns": [],
-          "datasource": "Comparison",
+          "datasource": "comparison",
           "fontSize": "100%",
           "gridPos": {
             "h": 7,
@@ -822,13 +822,13 @@
               "tags": []
             }
           ],
-          "title": "Comparison of $build1 and $build2",
+          "title": "comparison of $build1 and $build2",
           "transform": "table",
           "type": "table"
         },
         {
           "columns": [],
-          "datasource": "Comparison",
+          "datasource": "comparison",
           "fontSize": "100%",
           "gridPos": {
             "h": 7,
@@ -920,7 +920,7 @@
           {
             "allValue": "",
             "current": {},
-            "datasource": "Comparison",
+            "datasource": "comparison",
             "definition": "",
             "hide": 0,
             "includeAll": true,
@@ -1000,7 +1000,7 @@
           {
             "allValue": "",
             "current": {},
-            "datasource": "Comparison",
+            "datasource": "comparison",
             "definition": "",
             "hide": 0,
             "includeAll": false,
@@ -1022,7 +1022,7 @@
           {
             "allValue": "",
             "current": {},
-            "datasource": "Comparison",
+            "datasource": "comparison",
             "definition": "",
             "hide": 0,
             "includeAll": true,
@@ -1080,7 +1080,7 @@
           {
             "allValue": null,
             "current": {},
-            "datasource": "Comparison",
+            "datasource": "comparison",
             "definition": "",
             "hide": 0,
             "includeAll": true,
@@ -1170,7 +1170,7 @@
           {
             "allValue": null,
             "current": {},
-            "datasource": "Comparison",
+            "datasource": "comparison",
             "definition": "",
             "hide": 0,
             "includeAll": false,
@@ -1192,7 +1192,7 @@
           {
             "allValue": null,
             "current": {},
-            "datasource": "Comparison",
+            "datasource": "comparison",
             "definition": "",
             "hide": 0,
             "includeAll": false,
@@ -1262,7 +1262,7 @@
         ]
       },
       "timezone": "browser",
-      "title": "Comparison Dashboard",
+      "title": "comparison Dashboard",
       "uid": "b_qfjP_ik",
       "version": 2
     }
