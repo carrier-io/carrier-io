@@ -1,0 +1,40 @@
+def get_influx_host(String env_var) {
+    def match = env_var =~ 'http://(.+)/jenkins'
+    return match[0][1]
+}
+
+node {
+    stage("configure"){
+        deleteDir()
+        sh 'mkdir reports'
+        sh '''echo """influx:
+  host: '''+get_influx_host(env.JENKINS_URL)+'''
+  port: 8086
+  graphite_port: 2003
+""" > config.yaml'''
+    }
+    stage('execute tests') {
+        def dockerParamsString = ""
+        def params = [
+            "--entrypoint=''",
+            "-e test=\"carrier.Flood\"",
+            "-e url=\"https://challengers.flood.io\"",
+            "-e env=\"stag\"",
+            "-e duration=120",
+            "-e users=10",
+            "-e rampup_time=10",
+            "-e test_type=\"demo\""
+        ]
+        for (param in params) {
+            dockerParamsString += " ${param}"
+        }
+        docker.image("getcarrier/perfgun:latest").inside(dockerParamsString) {
+            sh "cp ${WORKSPACE}/config.yaml /tmp/config.yaml"
+            sh "executor.sh"
+            sh "cp -R /opt/gatling/results/* ${WORKSPACE}/reports/"
+        }
+    }
+    stage("publish results"){
+        publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'results/*/', reportFiles: 'index.html', reportName: 'Gatling Report', reportTitles: ''])
+    }
+}

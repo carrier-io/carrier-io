@@ -1,0 +1,1270 @@
+{
+  "dashboard": {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          },
+          {
+            "datasource": "comparison",
+            "enable": false,
+            "iconColor": "rgb(18, 154, 36)",
+            "limit": 100,
+            "name": "Test events",
+            "query": "SELECT title,text,environment FROM events WHERE $timeFilter",
+            "tagsColumn": "environment",
+            "textColumn": "text",
+            "titleColumn": "title",
+            "type": "alert"
+          }
+        ]
+      },
+      "editable": true,
+      "gnetId": null,
+      "graphTooltip": 1,
+      "id": null,
+      "iteration": 1549376016573,
+      "links": [],
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "Comparison",
+          "decimals": 2,
+          "fill": 1,
+          "gridPos": {
+            "h": 9,
+            "w": 20,
+            "x": 0,
+            "y": 0
+          },
+          "height": "350px",
+          "id": 1,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": true,
+            "min": true,
+            "rightSide": true,
+            "show": true,
+            "sideWidth": null,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "minSpan": 24,
+          "nullPointMode": "connected",
+          "percentage": false,
+          "pointradius": 5,
+          "points": true,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "$tag_request_name",
+              "dsType": "influxdb",
+              "groupBy": [
+                {
+                  "params": [
+                    "$interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "policy": "default",
+              "query": "SELECT mean($calculation) FROM api_comparison WHERE simulation = '$simulation' AND \"request_name\" =~ /^$request_name$/  AND $timeFilter GROUP BY time($grouping), \"request_name\" fill(null)",
+              "rawQuery": true,
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "$calculation"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeRegions": [],
+          "timeShift": null,
+          "title": "Response time over time for $simulation",
+          "tooltip": {
+            "shared": false,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "ms",
+              "label": "Response Time",
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": false
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "content": "<script>\n\n    MARKED_BUILD = ''\n    EPOCH = \"ms\";\n\n    function getVar(varName, onAllEmpty = true) {\n        var vars = angular.element('dashboard-submenu').injector().get('variableSrv').variables;\n        var result = []; vars.forEach(function (variable) {\n            if (variable.name == varName) {\n                if (variable.options[0].value == \"$__all\"\n                    && variable.options[0].selected) {\n                    if (onAllEmpty) { return []; } else {\n                        for (var i = 1; i < variable.options.length; i++) {\n                            result.push(variable.options[i].value);\n                        } return result\n                    }\n                } else {\n                    variable.options.forEach(function (option) { if (option.selected) { result.push(option.value); } });\n                }\n            };\n        }); return result\n    };\n\n    function formatDataset(data) {\n        rows = [];\n        results = data.results;\n        results.forEach(function (result, i) {\n            series = result.series;\n            if (series != undefined) {\n                series.forEach(function (serie) {\n                    var keys = serie.columns;\n                    var values = serie.values;\n                    values.forEach(function (value) {\n                        var row = {};\n                        value.forEach(function (val, v) {\n                            row[keys[v]] = val != null ? val : 0;\n                        })\n                        rows.push(row);\n                    });\n                });\n            }\n        });\n        return rows\n    }\n\n    function getBuildData(build_id) {\n        var result = []\n        var query = `select * from api_comparison where build_id='${build_id}'`\n\n        $.ajax({\n            type: \"GET\",\n            url: '/grafana/api/datasources/proxy/3/query',\n            async: false,\n            data: { q: query, db: \"$db_name\", epoch: EPOCH },\n            success: function (data) {\n                result = formatDataset(data)\n            },\n            error: function (json, code) {\n                console.log(\"Some error occured: \")\n                console.error(json)\n            }\n        });\n\n        return result;\n    }\n\n    function checkBaselineData(build_id) {\n        var result = []\n        var query = `select * from api_comparison where build_id='${build_id}' limit 1`\n\n        $.ajax({\n            type: \"GET\",\n            url: '/grafana/api/datasources/proxy/3/query',\n            async: false,\n            data: { q: query, db: \"$db_name\", epoch: EPOCH },\n            success: function (data) {\n                result = formatDataset(data)\n            },\n            error: function (json, code) {\n                console.log(\"Some error occured: \")\n                console.error(json)\n            }\n        });\n\n        return result;\n    }\n\n    function getCurrentBaseline(simulation) {\n        var result = ''\n        var query = `select last(pct95), build_id from api_comparison where \"simulation\"='${simulation}' and \"build_id\" =~ /^audit/ limit 1`\n\n        $.ajax({\n            type: \"GET\",\n            url: '/grafana/api/datasources/proxy/3/query',\n            async: false,\n            data: { q: query, db: \"$db_name\", epoch: EPOCH },\n            success: function (data) {\n                data = formatDataset(data)\n                if (data[0]) {\n                    result = data[0]['build_id']\n                }\n            },\n            error: function (json, code) {\n                console.log(\"Some error occured: \")\n                console.error(json)\n            }\n        });\n\n        return result;\n    }\n\n    function postBaselineBuild() {\n        var url = '/grafana/api/datasources/proxy/4/write?db=$db_name'\n        var simulation = getVar('simulation')\n        var build_id = MARKED_BUILD\n        var split = build_id.split(\"_\")\n        var user_count = split[1]\n        var data = getBuildData(build_id)\n        build_id = build_id.replace(/\\S+_\\d+_/g, `audit_${simulation}_`).replace(/T\\d+.*/g, '')\n        build_id = build_id + \"_user_count_\" + user_count\n        var build_check = checkBaselineData(build_id)\n        if (build_check.length > 0) {\n            alert(`Build has already marked as '${build_id}'.`)\n        } else {\n            if (data.length != 0) {\n                data.forEach(function (request) {\n                    var write_data = `api_comparison,simulation=${request.simulation},users=${request.users},test_type=${request.test_type},build_id=${build_id},request_name=${request.request_name},method=${request.method},duration=${request.duration} `\n                        + `throughput=${request.throughput},total=${request.total},ok=${request.ok},ko=${request.ko},1xx=${request['1xx']},2xx=${request['2xx']},3xx=${request['3xx']},4xx=${request['4xx']},5xx=${request['5xx']},NaN=${request.NaN}`\n                        + `,min=${request.min},max=${request.max},mean=${request.mean},pct50=${request.pct50},pct75=${request.pct75},pct90=${request.pct90},pct95=${request.pct95},pct99=${request.pct99} ${request.time}`\n                    $.ajax({\n                        type: \"POST\",\n                        url: url,\n                        contentType: \"application/octet-stream\",\n                        async: false,\n                        data: write_data,\n                        success: function (json) {\n                            console.log('Saved.')\n                        },\n                        error: function (json, code) {\n                            console.log(json)\n                        }\n                    });\n                })\n                alert(`Bulid '${MARKED_BUILD}' marked as '${build_id}'`)\n            } else {\n                alert('No data for selected build id.')\n            }\n        }\n        return false;\n    }\n\n    function getBuildName() {\n        var select = document.getElementById(\"select_build\")\n        MARKED_BUILD = select.options[select.selectedIndex].text\n    }\n\n    function showCurrentBaseline(simulation) {\n        var baseline = getCurrentBaseline(simulation)\n        var container = $('#current_baseline')\n        if (baseline != '') {\n            container.html(`Current baseline is: <br /><b>${baseline}</b>`)\n        } else {\n            container.html(`Baseline for '${simulation}' simulation not yet set.`)\n        }\n\n    }\n\n    function waitForRefresh() {\n        try {\n            $('#select_build').remove()\n            var select = $('<select>').attr('id', 'select_build').attr('onchange', 'getBuildName()').attr('width', '100%')\n            var simulation = getVar('simulation')\n            var build1 = getVar('build1')\n            var build2 = getVar('build2')\n            var option_1 = $('<option>').text(build1).attr('value', 'build_1')\n            var option_2 = $('<option>').text(build2).attr('value', 'build_2')\n\n            select.append(option_1)\n            select.append(option_2)\n            $('#build_ids').append(select)\n\n            showCurrentBaseline(simulation)\n        } catch (err) {\n            console.log(err)\n        }\n    }\n\n    $(document).ready(function () {\n        waitForRefresh();\n        getBuildName();\n    });\n    angular.element('grafana-app').injector().get('$rootScope').$on('refresh', function () { waitForRefresh(); getBuildName(); });\n\n</script>\n<style>\n    #mark_button {\n        background-color: #00678b;\n        color: white;\n        border: 2px solid #00678b;\n        border-radius: 4px;\n    }\n\n    #mark_button:hover {\n        background-color: #04b3f8;\n    }\n</style>\n\nPlease select build to mark as baseline:\n<div id='build_ids'></div>\n<br />\n<input type=\"button\" id='mark_button' onclick=\"postBaselineBuild()\" value=\"Mark as baseline\" />\n<br />\n<div id='current_baseline'></div>",
+          "gridPos": {
+            "h": 9,
+            "w": 4,
+            "x": 20,
+            "y": 0
+          },
+          "id": 7,
+          "links": [],
+          "mode": "html",
+          "title": "",
+          "type": "text"
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "Comparison",
+          "decimals": 2,
+          "fill": 0,
+          "gridPos": {
+            "h": 9,
+            "w": 10,
+            "x": 0,
+            "y": 9
+          },
+          "height": "350px",
+          "id": 3,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": true,
+            "min": true,
+            "rightSide": true,
+            "show": true,
+            "sideWidth": null,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "minSpan": 12,
+          "nullPointMode": "connected",
+          "percentage": false,
+          "pointradius": 5,
+          "points": true,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "1xx",
+              "dsType": "influxdb",
+              "groupBy": [
+                {
+                  "params": [
+                    "$interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "policy": "default",
+              "query": "SELECT sum(/1xx$/) FROM api_comparison WHERE simulation = '$simulation'  AND \"request_name\" =~ /^$request_name$/ AND $timeFilter GROUP BY time($grouping) fill(null)",
+              "rawQuery": true,
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "$calculation"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
+            },
+            {
+              "alias": "2xx",
+              "dsType": "influxdb",
+              "groupBy": [
+                {
+                  "params": [
+                    "$interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "policy": "default",
+              "query": "SELECT sum(/2xx$/) FROM api_comparison WHERE simulation = '$simulation' AND \"request_name\" =~ /^$request_name$/  AND $timeFilter GROUP BY time($grouping) fill(null)",
+              "rawQuery": true,
+              "refId": "B",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "$calculation"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
+            },
+            {
+              "alias": "3xx",
+              "dsType": "influxdb",
+              "groupBy": [
+                {
+                  "params": [
+                    "$interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "policy": "default",
+              "query": "SELECT sum(/3xx$/) FROM api_comparison WHERE simulation = '$simulation' AND \"request_name\" =~ /^$request_name$/  AND $timeFilter GROUP BY time($grouping) fill(null)",
+              "rawQuery": true,
+              "refId": "C",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "$calculation"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
+            },
+            {
+              "alias": "4xx",
+              "dsType": "influxdb",
+              "groupBy": [
+                {
+                  "params": [
+                    "$interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "policy": "default",
+              "query": "SELECT sum(/4xx$/) FROM api_comparison WHERE simulation = '$simulation' AND \"request_name\" =~ /^$request_name$/  AND $timeFilter GROUP BY time($grouping) fill(null)",
+              "rawQuery": true,
+              "refId": "D",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "$calculation"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
+            },
+            {
+              "alias": "5xx",
+              "dsType": "influxdb",
+              "groupBy": [
+                {
+                  "params": [
+                    "$interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "policy": "default",
+              "query": "SELECT sum(/5xx$/) FROM api_comparison WHERE simulation = '$simulation' AND \"request_name\" =~ /^$request_name$/  AND $timeFilter GROUP BY time($grouping) fill(null)",
+              "rawQuery": true,
+              "refId": "E",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "$calculation"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
+            },
+            {
+              "alias": "NaN",
+              "dsType": "influxdb",
+              "groupBy": [
+                {
+                  "params": [
+                    "$interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "policy": "default",
+              "query": "SELECT sum(/NaN$/) FROM api_comparison WHERE simulation = '$simulation' AND \"request_name\" =~ /^$request_name$/  AND $timeFilter GROUP BY time($grouping) fill(null)",
+              "rawQuery": true,
+              "refId": "F",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "$calculation"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
+            },
+            {
+              "alias": "Failures",
+              "dsType": "influxdb",
+              "groupBy": [
+                {
+                  "params": [
+                    "$interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "policy": "default",
+              "query": "SELECT sum(/ko$/) FROM api_comparison WHERE simulation = '$simulation' AND \"request_name\" =~ /^$request_name$/  AND $timeFilter GROUP BY time($grouping) fill(null)",
+              "rawQuery": true,
+              "refId": "G",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "$calculation"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeRegions": [],
+          "timeShift": null,
+          "title": "Response Codes for $simulation",
+          "tooltip": {
+            "shared": false,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": "Quantity",
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": false
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "columns": [],
+          "datasource": "Comparison",
+          "fontSize": "100%",
+          "gridPos": {
+            "h": 9,
+            "w": 14,
+            "x": 10,
+            "y": 9
+          },
+          "height": "350",
+          "id": 4,
+          "links": [],
+          "minSpan": 12,
+          "pageSize": null,
+          "scroll": true,
+          "showHeader": true,
+          "sort": {
+            "col": null,
+            "desc": false
+          },
+          "styles": [
+            {
+              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "pattern": "Time",
+              "type": "hidden"
+            },
+            {
+              "colorMode": null,
+              "colors": [
+                "rgba(245, 54, 54, 0.9)",
+                "rgba(237, 129, 40, 0.89)",
+                "rgba(50, 172, 45, 0.97)"
+              ],
+              "decimals": 2,
+              "pattern": "/.*/",
+              "thresholds": [],
+              "type": "number",
+              "unit": "short"
+            }
+          ],
+          "targets": [
+            {
+              "dsType": "influxdb",
+              "groupBy": [
+                {
+                  "params": [
+                    "$interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "policy": "default",
+              "query": "SELECT \"sum_1xx1\" AS \"1xx t1\", \"sum_1xx2\" AS \"1xx t2\", \"sum_2xx1\" AS \"2xx t1\", \"sum_2xx2\" AS \"2xx t2\",         \"sum_3xx1\" AS \"3xx t1\", \"sum_3xx2\" AS \"3xx t2\", \"sum_4xx1\" AS \"4xx t1\", \"sum_4xx2\" AS \"4xx t2\",         \"sum_5xx1\" AS \"5xx t1\", \"sum_5xx2\" AS \"5xx t2\", \"sum_NaN1\" AS \"NaN t1\", \"sum_NaN2\" AS \"NaN t2\"           FROM (SELECT sum(*) FROM \t(SELECT last(\"1xx\"::float) AS \"1xx1\", last(\"2xx\"::float) AS \"2xx1\",      \t\t         last(\"3xx\"::float) AS \"3xx1\", last(\"4xx\"::float) AS \"4xx1\", \t\t\t         last(\"5xx\"::float) AS \"5xx1\", last(\"NaN\"::float) AS \"NaN1\"  \t\t\t         from api_comparison where build_id = '$build1' AND \"request_name\" =~ /^$request_name$/), \t         (SELECT last(\"1xx\"::float) AS \"1xx2\", last(\"2xx\"::float) AS \"2xx2\",      \t\t         last(\"3xx\"::float) AS \"3xx2\", last(\"4xx\"::float) AS \"4xx2\", \t\t\t         last(\"5xx\"::float) AS \"5xx2\", last(\"NaN\"::float) AS \"NaN2\"  \t\t\t         from api_comparison where build_id = '$build2' AND \"request_name\" =~ /^$request_name$/) ) GROUP BY request_name",
+              "rawQuery": true,
+              "refId": "A",
+              "resultFormat": "table",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
+            }
+          ],
+          "title": "Response code breakdown",
+          "transform": "table",
+          "type": "table"
+        },
+        {
+          "cacheTimeout": null,
+          "colorBackground": false,
+          "colorValue": false,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "datasource": "Comparison",
+          "format": "none",
+          "gauge": {
+            "maxValue": 100,
+            "minValue": -100,
+            "show": true,
+            "thresholdLabels": false,
+            "thresholdMarkers": true
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 4,
+            "x": 0,
+            "y": 18
+          },
+          "id": 6,
+          "interval": null,
+          "links": [],
+          "mappingType": 1,
+          "mappingTypes": [
+            {
+              "name": "value to text",
+              "value": 1
+            },
+            {
+              "name": "range to text",
+              "value": 2
+            }
+          ],
+          "maxDataPoints": 100,
+          "minSpan": 4,
+          "nullPointMode": "connected",
+          "nullText": null,
+          "postfix": " %",
+          "postfixFontSize": "50%",
+          "prefix": "",
+          "prefixFontSize": "50%",
+          "rangeMaps": [
+            {
+              "from": "null",
+              "text": "N/A",
+              "to": "null"
+            }
+          ],
+          "sparkline": {
+            "fillColor": "rgba(31, 118, 189, 0.18)",
+            "full": false,
+            "lineColor": "rgb(31, 120, 193)",
+            "show": false
+          },
+          "tableColumn": "",
+          "targets": [
+            {
+              "alias": "",
+              "dsType": "influxdb",
+              "groupBy": [
+                {
+                  "params": [
+                    "$interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "policy": "default",
+              "query": "SELECT ((\"sum_check2\"-\"sum_check1\")/\"sum_check2\")*100 FROM (SELECT sum(*) FROM (SELECT last(\"$calculation\"::float) AS \"check1\" from api_comparison where build_id = '$build1'), (SELECT last(\"$calculation\"::float) AS \"check2\" from api_comparison where build_id = '$build2') )",
+              "rawQuery": true,
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
+            }
+          ],
+          "thresholds": "100,40,20",
+          "title": "Diff by $calculation",
+          "type": "singlestat",
+          "valueFontSize": "80%",
+          "valueMaps": [
+            {
+              "op": "=",
+              "text": "N/A",
+              "value": "null"
+            }
+          ],
+          "valueName": "avg"
+        },
+        {
+          "columns": [],
+          "datasource": "Comparison",
+          "fontSize": "100%",
+          "gridPos": {
+            "h": 7,
+            "w": 20,
+            "x": 4,
+            "y": 18
+          },
+          "id": 2,
+          "links": [],
+          "minSpan": 20,
+          "pageSize": null,
+          "scroll": true,
+          "showHeader": true,
+          "sort": {
+            "col": 0,
+            "desc": true
+          },
+          "styles": [
+            {
+              "colorMode": null,
+              "colors": [
+                "rgba(245, 54, 54, 0.9)",
+                "rgba(237, 129, 40, 0.89)",
+                "rgba(50, 172, 45, 0.97)"
+              ],
+              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "decimals": 2,
+              "pattern": "Time",
+              "thresholds": [],
+              "type": "hidden",
+              "unit": "short"
+            },
+            {
+              "colorMode": null,
+              "colors": [
+                "rgba(245, 54, 54, 0.9)",
+                "rgba(237, 129, 40, 0.89)",
+                "rgba(50, 172, 45, 0.97)"
+              ],
+              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "decimals": 2,
+              "pattern": "/(Min|Max|Pct).*/",
+              "thresholds": [],
+              "type": "number",
+              "unit": "ms"
+            },
+            {
+              "colorMode": null,
+              "colors": [
+                "rgba(245, 54, 54, 0.9)",
+                "rgba(237, 129, 40, 0.89)",
+                "rgba(50, 172, 45, 0.97)"
+              ],
+              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "decimals": 2,
+              "pattern": "/.*/",
+              "thresholds": [],
+              "type": "number",
+              "unit": "short"
+            }
+          ],
+          "targets": [
+            {
+              "dsType": "influxdb",
+              "groupBy": [
+                {
+                  "params": [
+                    "$interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "policy": "default",
+              "query": "SELECT \"sum_First Total\" AS \"Total Req t1\", \"sum_Second Total\" AS \"Total Req t2\",          \"sum_First Min\" AS \"Min t1\", \"sum_Second Min\" AS \"Min t2\",         \"sum_First PCT95\" AS \"Pct95 t1\", \"sum_Second PCT95\" AS \"Pct95 t2\",  \t    \"sum_First Max\" AS \"Max t1\", \"sum_Second Max\" AS \"Max t2\", \t    \"sum_First Success\" AS \"Success t1\", \"sum_Second Success\" AS \"Success t2\",  \t    \"sum_First Failed\" AS \"Failed t1\", \"sum_Second Failed\" AS \"Failed t2\"  FROM (SELECT sum(*) from \t(SELECT last(\"total\"::float) AS \"First Total\", last(\"min\"::float) AS \"First Min\",      \t\t last(\"pct95\"::float) AS \"First PCT95\", last(\"max\"::float) AS \"First Max\",  \t\t\t last(\"ok\"::float) AS \"First Success\", last(\"ko\"::float) AS \"First Failed\"  \t\t\t from api_comparison where build_id = '$build1' AND \"request_name\" =~ /^$request_name$/), \t (SELECT last(\"total\"::float) AS \"Second Total\", last(\"min\"::float) AS \"Second Min\",      \t\t last(\"pct95\"::float) AS \"Second PCT95\", last(\"max\"::float) AS \"Second Max\",  \t\t\t last(\"ok\"::float) AS \"Second Success\", last(\"ko\"::float) AS \"Second Failed\"  \t\t\t from api_comparison where build_id = '$build2' AND \"request_name\" =~ /^$request_name$/) ) GROUP BY request_name",
+              "rawQuery": true,
+              "refId": "A",
+              "resultFormat": "table",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
+            }
+          ],
+          "title": "Comparison of $build1 and $build2",
+          "transform": "table",
+          "type": "table"
+        },
+        {
+          "columns": [],
+          "datasource": "Comparison",
+          "fontSize": "100%",
+          "gridPos": {
+            "h": 7,
+            "w": 24,
+            "x": 0,
+            "y": 25
+          },
+          "id": 5,
+          "links": [],
+          "pageSize": null,
+          "scroll": true,
+          "showHeader": true,
+          "sort": {
+            "col": 0,
+            "desc": true
+          },
+          "styles": [
+            {
+              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "pattern": "Time",
+              "type": "hidden"
+            },
+            {
+              "colorMode": null,
+              "colors": [
+                "rgba(245, 54, 54, 0.9)",
+                "rgba(237, 129, 40, 0.89)",
+                "rgba(50, 172, 45, 0.97)"
+              ],
+              "decimals": 2,
+              "pattern": "/.*/",
+              "thresholds": [],
+              "type": "number",
+              "unit": "ms"
+            }
+          ],
+          "targets": [
+            {
+              "dsType": "influxdb",
+              "groupBy": [
+                {
+                  "params": [
+                    "$interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "policy": "default",
+              "query": "SELECT \"sum_pct501\" AS \"p50 t1\", \"sum_pct502\" AS \"p50 t2\",         \"sum_pct751\" AS \"p75 t1\", \"sum_pct752\" AS \"p75 t2\", \t    \"sum_pct901\" AS \"p90 t1\", \"sum_pct902\" AS \"p90 t2\", \t    \"sum_pct951\" AS \"p95 t1\", \"sum_pct952\" AS \"p95 t2\", \t    \"sum_pct991\" AS \"p99 t1\", \"sum_pct992\" AS \"p99 t2\" FROM (SELECT sum(*) FROM \t (SELECT last(\"pct50\"::float) AS \"pct501\", last(\"pct75\"::float) AS \"pct751\",      \t\t last(\"pct90\"::float) AS \"pct901\", last(\"pct95\"::float) AS \"pct951\", \t\t\t last(\"pct99\"::float) AS \"pct991\"  \t\t\t from api_comparison where build_id = '$build1' AND \"request_name\" =~ /^$request_name$/), \t (SELECT last(\"pct50\"::float) AS \"pct502\", last(\"pct75\"::float) AS \"pct752\",      \t\t last(\"pct90\"::float) AS \"pct902\", last(\"pct95\"::float) AS \"pct952\", \t\t\t last(\"pct99\"::float) AS \"pct992\"  \t\t\t from api_comparison where build_id = '$build2'  AND \"request_name\" =~ /^$request_name$/) ) GROUP BY request_name",
+              "rawQuery": true,
+              "refId": "A",
+              "resultFormat": "table",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
+            }
+          ],
+          "title": "Percentile comparison for $build1 and $build2",
+          "transform": "table",
+          "type": "table"
+        }
+      ],
+      "refresh": false,
+      "schemaVersion": 16,
+      "style": "dark",
+      "tags": [
+        "benchmark"
+      ],
+      "templating": {
+        "list": [
+          {
+            "allValue": "",
+            "current": {},
+            "datasource": "Comparison",
+            "definition": "",
+            "hide": 0,
+            "includeAll": true,
+            "label": "Request name",
+            "multi": false,
+            "name": "request_name",
+            "options": [],
+            "query": "SHOW TAG VALUES FROM api_comparison WITH KEY = \"request_name\" WHERE \"simulation\" =~ /^$simulation$/",
+            "refresh": 1,
+            "regex": "^(?!allRequests$).*",
+            "skipUrlSync": false,
+            "sort": 1,
+            "tagValuesQuery": "",
+            "tags": [],
+            "tagsQuery": "",
+            "type": "query",
+            "useTags": false
+          },
+          {
+            "allValue": null,
+            "current": {
+              "selected": true,
+              "text": "pct95",
+              "value": "pct95"
+            },
+            "hide": 0,
+            "includeAll": false,
+            "label": "Calculation",
+            "multi": false,
+            "name": "calculation",
+            "options": [
+              {
+                "selected": false,
+                "text": "min",
+                "value": "min"
+              },
+              {
+                "selected": false,
+                "text": "mean",
+                "value": "mean"
+              },
+              {
+                "selected": false,
+                "text": "max",
+                "value": "max"
+              },
+              {
+                "selected": false,
+                "text": "pct50",
+                "value": "pct50"
+              },
+              {
+                "selected": false,
+                "text": "pct75",
+                "value": "pct75"
+              },
+              {
+                "selected": false,
+                "text": "pct90",
+                "value": "pct90"
+              },
+              {
+                "selected": true,
+                "text": "pct95",
+                "value": "pct95"
+              },
+              {
+                "selected": false,
+                "text": "pct99",
+                "value": "pct99"
+              }
+            ],
+            "query": "min, mean, max, pct50, pct75, pct90, pct95, pct99",
+            "skipUrlSync": false,
+            "type": "custom"
+          },
+          {
+            "allValue": "",
+            "current": {},
+            "datasource": "Comparison",
+            "definition": "",
+            "hide": 0,
+            "includeAll": false,
+            "label": "Simulation",
+            "multi": false,
+            "name": "simulation",
+            "options": [],
+            "query": "SHOW TAG VALUES FROM api_comparison WITH KEY = \"simulation\"",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "tagValuesQuery": "",
+            "tags": [],
+            "tagsQuery": "",
+            "type": "query",
+            "useTags": false
+          },
+          {
+            "allValue": "",
+            "current": {},
+            "datasource": "Comparison",
+            "definition": "",
+            "hide": 0,
+            "includeAll": true,
+            "label": "User count",
+            "multi": true,
+            "name": "user_count",
+            "options": [],
+            "query": "SHOW TAG VALUES FROM api_comparison WITH KEY = \"users\" WHERE simulation =~ /^$simulation$/",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "tagValuesQuery": "",
+            "tags": [],
+            "tagsQuery": "",
+            "type": "query",
+            "useTags": false
+          },
+          {
+            "current": {
+              "value": "http://epuakhaw1400.kyiv.epam.com",
+              "text": "http://epuakhaw1400.kyiv.epam.com"
+            },
+            "hide": 2,
+            "label": "",
+            "name": "db_url",
+            "options": [
+              {
+                "value": "http://epuakhaw1400.kyiv.epam.com",
+                "text": "http://epuakhaw1400.kyiv.epam.com"
+              }
+            ],
+            "query": "http://epuakhaw1400.kyiv.epam.com",
+            "skipUrlSync": false,
+            "type": "constant"
+          },
+          {
+            "current": {
+              "value": "http://epuakhaw1400.kyiv.epam.com",
+              "text": "http://epuakhaw1400.kyiv.epam.com"
+            },
+            "hide": 2,
+            "label": "",
+            "name": "perf_host",
+            "options": [
+              {
+                "value": "http://epuakhaw1400.kyiv.epam.com",
+                "text": "http://epuakhaw1400.kyiv.epam.com"
+              }
+            ],
+            "query": "http://epuakhaw1400.kyiv.epam.com",
+            "skipUrlSync": false,
+            "type": "constant"
+          },
+          {
+            "allValue": null,
+            "current": {},
+            "datasource": "Comparison",
+            "definition": "",
+            "hide": 0,
+            "includeAll": true,
+            "label": "Duration",
+            "multi": false,
+            "name": "duration",
+            "options": [],
+            "query": "SHOW TAG VALUES FROM api_comparison WITH KEY = \"duration\"",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "tagValuesQuery": "",
+            "tags": [],
+            "tagsQuery": "",
+            "type": "query",
+            "useTags": false
+          },
+          {
+            "auto": true,
+            "auto_count": 100,
+            "auto_min": "10s",
+            "current": {
+              "text": "auto",
+              "value": "$__auto_interval_grouping"
+            },
+            "hide": 0,
+            "label": null,
+            "name": "grouping",
+            "options": [
+              {
+                "selected": true,
+                "text": "auto",
+                "value": "$__auto_interval_grouping"
+              },
+              {
+                "selected": false,
+                "text": "1s",
+                "value": "1s"
+              },
+              {
+                "selected": false,
+                "text": "10s",
+                "value": "10s"
+              },
+              {
+                "selected": false,
+                "text": "30s",
+                "value": "30s"
+              },
+              {
+                "selected": false,
+                "text": "1m",
+                "value": "1m"
+              },
+              {
+                "selected": false,
+                "text": "3m",
+                "value": "3m"
+              },
+              {
+                "selected": false,
+                "text": "5m",
+                "value": "5m"
+              },
+              {
+                "selected": false,
+                "text": "10m",
+                "value": "10m"
+              },
+              {
+                "selected": false,
+                "text": "30m",
+                "value": "30m"
+              },
+              {
+                "selected": false,
+                "text": "1h",
+                "value": "1h"
+              }
+            ],
+            "query": "1s,10s,30s,1m,3m,5m,10m,30m,1h",
+            "refresh": 2,
+            "skipUrlSync": false,
+            "type": "interval"
+          },
+          {
+            "allValue": null,
+            "current": {},
+            "datasource": "Comparison",
+            "definition": "",
+            "hide": 0,
+            "includeAll": false,
+            "label": "Build One",
+            "multi": false,
+            "name": "build1",
+            "options": [],
+            "query": "SHOW TAG VALUES FROM api_comparison WITH KEY = \"build_id\" WHERE simulation =~ /^$simulation$/",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "tagValuesQuery": "",
+            "tags": [],
+            "tagsQuery": "",
+            "type": "query",
+            "useTags": false
+          },
+          {
+            "allValue": null,
+            "current": {},
+            "datasource": "Comparison",
+            "definition": "",
+            "hide": 0,
+            "includeAll": false,
+            "label": "Build Two",
+            "multi": false,
+            "name": "build2",
+            "options": [],
+            "query": "SHOW TAG VALUES FROM api_comparison WITH KEY = \"build_id\" WHERE simulation =~ /^$simulation$/",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "tagValuesQuery": "",
+            "tags": [],
+            "tagsQuery": "",
+            "type": "query",
+            "useTags": false
+          },
+          {
+            "current": {
+              "value": "comparison",
+              "text": "comparison"
+            },
+            "hide": 0,
+            "label": null,
+            "name": "db_name",
+            "options": [
+              {
+                "value": "comparison",
+                "text": "comparison"
+              }
+            ],
+            "query": "comparison",
+            "skipUrlSync": false,
+            "type": "constant"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-2d",
+        "to": "now"
+      },
+      "timepicker": {
+        "refresh_intervals": [
+          "1s",
+          "5s",
+          "10s",
+          "30s",
+          "1m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "1d"
+        ],
+        "time_options": [
+          "5m",
+          "15m",
+          "1h",
+          "6h",
+          "12h",
+          "24h",
+          "2d",
+          "7d",
+          "30d"
+        ]
+      },
+      "timezone": "browser",
+      "title": "Comparison Dashboard",
+      "uid": "b_qfjP_ik",
+      "version": 2
+    }
+  }
+}
