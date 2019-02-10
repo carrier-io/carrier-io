@@ -5,7 +5,12 @@ as a root user
 
 ```curl https://raw.githubusercontent.com/carrier-io/carrier-io/master/ubuntu/install.sh | bash```
 
-during installation you will be asked to input prefered amount of workers and public DNS name
+### CentOS 7
+as a root user 
+
+```curl https://raw.githubusercontent.com/carrier-io/carrier-io/master/centos/install.sh | bash```
+
+during installation you will be asked to input preferred amount of workers and public DNS name
 
 one installation is done you can find:
 
