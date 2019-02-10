@@ -1,5 +1,6 @@
 # Carrier | Continuous test execution platform
-## Platform Configuration. Standalone Deployment. 
+
+## Platform Configuration. Standalone Deployment. Clean OS 
 ### Ubuntu 16.04
 as a root user 
 
@@ -9,6 +10,12 @@ as a root user
 as a root user 
 
 ```curl https://raw.githubusercontent.com/carrier-io/carrier-io/master/centos/install.sh | bash```
+
+### Amazon Linux 2
+as a root user 
+
+```curl https://raw.githubusercontent.com/carrier-io/carrier-io/master/amazon2/install.sh | bash```
+
 
 during installation you will be asked to input preferred amount of workers and public DNS name
 
