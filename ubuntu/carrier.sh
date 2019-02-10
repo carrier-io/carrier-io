@@ -176,6 +176,7 @@ services:
 cd $HOMEDIR
 docker-compose up -d
 
+
 sleep 20
 echo "Creating Databases"
 docker exec carrier-influx bash -c "influx -execute 'create database jmeter'"
@@ -185,6 +186,8 @@ docker exec carrier-influx bash -c "influx -execute 'create database prodsec'"
 docker exec carrier-influx bash -c "influx -execute 'create database perfui'"
 docker exec carrier-influx bash -c "influx -execute 'create database telegraf'"
 
+echo "Waiting for Jenkins to configure"
+sleep 40
 echo "Provisioning PerfUI Demo Piece"
 curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/perfui.xml | curl -X POST "http://${FULLHOST}/jenkins/createItem?name=demo_perfui" --header "Content-Type: application/xml" -d @-
 curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/perfmeter_standalone.xml | curl -X POST "http://${FULLHOST}/jenkins/createItem?name=demo_perfmeter_standalone" --header "Content-Type: application/xml" -d @-
