@@ -18,12 +18,7 @@ node {
         def params = [
             "--entrypoint=''",
             "-e test=\"carrier.Flood\"",
-            "-e url=\"https://challengers.flood.io\"",
-            "-e env=\"stag\"",
-            "-e duration=120",
-            "-e users=10",
-            "-e rampup_time=10",
-            "-e test_type=\"demo\""
+            "-e GATLING_TEST_PARAMS=\"-DapiUrl=https://challengers.flood.io -Dduration=10 -Dramp_users=1 -Dramp_duration=1\""
         ]
         for (param in params) {
             dockerParamsString += " ${param}"
