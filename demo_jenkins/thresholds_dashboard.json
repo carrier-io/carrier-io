@@ -1,0 +1,264 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 1,
+  "id": null,
+  "iteration": 1550244805122,
+  "links": [],
+  "panels": [
+    {
+      "content": "<script>\n    var default_yellow = '$lower_t'\n    var default_red = '$higher_t'\n    var simulation = getVar('test', false)[0];\n\n    DB_NAME = \"$db_name\";\n    EPOCH = \"ms\";\n    DB_URL = \"$db_url\";\n\n    function getVar(varName, onAllEmpty = true) {\n        var vars = angular.element('dashboard-submenu').injector().get('variableSrv').variables;\n        var result = []; vars.forEach(function (variable) {\n            if (variable.name == varName) {\n                if (variable.options[0].value == \"$__all\"\n                    && variable.options[0].selected) {\n                    if (onAllEmpty) { return []; } else {\n                        for (var i = 1; i < variable.options.length; i++) {\n                            result.push(variable.options[i].value);\n                        } return result\n                    }\n                } else {\n                    variable.options.forEach(function (option) { if (option.selected) { result.push(option.value); } });\n                }\n            };\n        }); return result\n    };\n\n    function getThresholds(simulation, request_name) {\n        var result = [0, 0]\n        var query = `select yellow, red from threshold where \"simulation\"='${simulation}' and \"request_name\"='${request_name}' order by time desc limit 1`\n\n        $.ajax({\n            type: \"GET\",\n            url: DB_URL + '/query',\n            async: false,\n            data: { q: query, db: DB_NAME, epoch: EPOCH },\n            success: function (data) {\n                var series = data.results[0].series\n                if (typeof series != 'undefined') {\n                    result[0] = series[0].values[0][1]\n                    result[1] = series[0].values[0][2]\n                }\n            },\n            error: function (json, code) {\n                console.log(json)\n            }\n        });\n\n        return result;\n    }\n\n    function sendToInflux(simulation, form_id, request_name) {\n        var form = $(`#${form_id}`).serializeArray()\n        var yellow = form[0].value\n        var red = form[1].value\n        request_name = request_name.replace(/ /g, '\\\\ ')\n\n        var url = DB_URL + '/write?db=' + DB_NAME\n        var data = `threshold,simulation=${simulation},request_name=${request_name} yellow=${yellow},red=${red}`\n\n        if (yellow < red) {\n            $.ajax({\n                type: \"POST\",\n                url: url,\n                contentType: \"application/octet-stream\",\n                async: false,\n                data: data,\n                success: function (json) {\n                    alert('Saved.')\n                    console.log(json)\n                },\n                error: function (json, code) {\n                    console.log(json)\n                }\n            });\n        } else {\n            alert('Yellow threshold should be grater then red.')\n        }\n\n        return false;\n    }\n\n    function renderTable(simulation) {\n        var request_names = null;\n        var request_name_jmeter = getVar('request_name_jmeter', false);\n        var request_name_gatling = getVar('request_name_gatling', false);\n        var page_name_perfui = getVar('page_name_perfui', false);\n        \n        if(request_name_jmeter.length > 0){\n            request_names = request_name_jmeter\n        } else if(request_name_gatling.length > 0) {\n            request_names = request_name_gatling\n        } else if(page_name_perfui.length > 0) { \n            request_names = page_name_perfui\n        } else {\n            console.log(\"Any pages/requests present.\")\n        }\n        \n        var thresholdoldTable = document.getElementById('threshold-table')\n        var header = [\n            'Request Name',\n            'Yellow (ms)',\n            'Red (ms)',\n            'Send to InfluxDB'\n        ];\n        document.getElementById('threshold').removeChild(document.getElementById('threshold-table'))\n        var table = document.createElement('table');\n        table.setAttribute(\"id\", 'threshold-table');\n        var tbody = document.createElement('tbody');\n        var tr_header = document.createElement('tr');\n\n        header.forEach(function (head) {\n            var th = document.createElement('th');\n            th.innerHTML = head;\n            tr_header.appendChild(th);\n        });\n        tbody.appendChild(tr_header);\n        request_names.forEach(function (request) {\n            var thresholds = getThresholds(simulation, request)\n            var tr = document.createElement('tr')\n            var request_name = document.createElement('td')\n            request_name.textContent = request\n            var yellow = document.createElement('td')\n            var red = document.createElement('td')\n            var button = document.createElement('td')\n            var form_id = request.replace(/[^a-zA-Z0-9_]+/g, '_')\n\n            var form = document.createElement('form')\n            form.id = form_id\n            form.method = 'POST'\n            form.setAttribute('onsubmit', `return sendToInflux('${simulation}','${form_id}','${request}')`)\n\n            var input_yellow = document.createElement('input')\n            input_yellow.setAttribute('form', form_id)\n            input_yellow.setAttribute('class', 'thresholds')\n            input_yellow.pattern = '([0-9]+\\.[0-9]+|[0-9]+)'\n            input_yellow.name = 'yellow'\n            if (thresholds[0] == 0) {\n                input_yellow.value = default_yellow\n            } else {\n                input_yellow.value = thresholds[0]\n            }\n            input_yellow.type = 'text'\n            input_yellow.title = 'Lower threshold for request.(Numerals)'\n            input_yellow.required = true\n            input_yellow.style = 'color:orange'\n\n            var input_red = document.createElement('input')\n            input_red.setAttribute('form', form_id)\n            input_red.setAttribute('class', 'thresholds')\n            input_red.pattern = '([0-9]+\\.[0-9]+|[0-9]+)'\n            input_red.name = 'red'\n            if (thresholds[0] == 0) {\n                input_red.value = default_red\n            } else {\n                input_red.value = thresholds[1]\n            }\n            input_red.type = 'text'\n            input_red.title = 'Higher threshold for request.(Numerals)'\n            input_red.required = true\n            input_red.style = 'color:red'\n\n            var send_button = document.createElement('input')\n            send_button.value = 'Write to InfluxDB'\n            send_button.type = 'submit'\n            send_button.setAttribute('class', 'save_button')\n            send_button.setAttribute('form', form_id)\n\n            tr.appendChild(form)\n            tr.appendChild(request_name)\n\n            yellow.appendChild(input_yellow)\n            tr.appendChild(yellow)\n\n            red.appendChild(input_red)\n            tr.appendChild(red)\n\n            button.appendChild(send_button)\n            tr.appendChild(button)\n\n            tbody.appendChild(tr)\n        })\n        table.appendChild(tbody)\n\n        return table\n    }\n\n\n\n    function waitForETGWrapper() {\n        try {\n            var simulation = getVar('test', false)[0];\n            var wrapper = document.getElementById('threshold');\n\n            wrapper.appendChild(renderTable(simulation));\n        } catch (err) {\n            console.log(err)\n        }\n    }\n\n    $(document).ready(function () {\n        waitForETGWrapper();\n    });\n\n    setInterval(function(){\n        var new_simulation = getVar('test', false)[0]\n        if(simulation != new_simulation){\n            simulation = new_simulation\n            waitForETGWrapper();\n        }\n    },1000);\n\n</script>\n\n<style>\n    table[id=threshold-table] {\n        width: 100%;\n        text-align: center;\n        border: 1px solid #f2f2f2;\n    }\n\n    th {\n        text-align: center;\n        border: 1px solid #f2f2f2;\n    }\n\n    tr:hover {\n        background: #292929;\n    }\n\n    input.thresholds[type=text] {\n        width: 100%;\n        text-align: center;\n    }\n\n    .save_button {\n        background-color: #00678b;\n        color: white;\n        border: 2px solid #00678b;\n        border-radius: 4px;\n    }\n\n    .save_button:hover {\n        background-color: #04b3f8;\n    }\n</style>\n<div id='threshold'>\n    <table id='threshold-table'></table>\n</div>",
+      "gridPos": {
+        "h": 16,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 2,
+      "links": [],
+      "mode": "html",
+      "title": "Panel Title",
+      "transparent": true,
+      "type": "text"
+    }
+  ],
+  "refresh": false,
+  "schemaVersion": 16,
+  "style": "dark",
+  "tags": [
+    "content",
+    "benchmark",
+    "fixed load"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allValue": "",
+        "current": {},
+        "datasource": "$datasource",
+        "definition": "SHOW TAG VALUES WITH KEY = \"requestName\" WHERE simulation =~ /(?i)$test/",
+        "hide": 2,
+        "includeAll": true,
+        "label": "",
+        "multi": false,
+        "name": "request_name_jmeter",
+        "options": [],
+        "query": "SHOW TAG VALUES WITH KEY = \"requestName\" WHERE simulation =~ /(?i)$test/",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "$datasource",
+        "definition": "SHOW TAG VALUES WITH KEY = \"request_name\" WHERE simulation =~ /(?i)$test/",
+        "hide": 2,
+        "includeAll": true,
+        "label": null,
+        "multi": false,
+        "name": "request_name_gatling",
+        "options": [],
+        "query": "SHOW TAG VALUES WITH KEY = \"request_name\" WHERE simulation =~ /(?i)$test/",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "$datasource",
+        "definition": "SHOW TAG VALUES WITH KEY = \"page\" WHERE scenario =~ /(?i)$test/",
+        "hide": 2,
+        "includeAll": true,
+        "label": "",
+        "multi": true,
+        "name": "page_name_perfui",
+        "options": [],
+        "query": "SHOW TAG VALUES WITH KEY = \"page\" WHERE scenario =~ /(?i)$test/",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "current": {
+          "value": "http://carrier-influx:8086",
+          "text": "http://carrier-influx:8086"
+        },
+        "hide": 2,
+        "label": "",
+        "name": "db_url",
+        "options": [
+          {
+            "value": "http://carrier-influx:8086",
+            "text": "http://carrier-influx:8086"
+          }
+        ],
+        "query": "http://carrier-influx:8086",
+        "skipUrlSync": false,
+        "type": "constant"
+      },
+      {
+        "current": {
+          "value": "thresholds",
+          "text": "thresholds"
+        },
+        "hide": 0,
+        "label": null,
+        "name": "db_name",
+        "options": [
+          {
+            "value": "thresholds",
+            "text": "thresholds"
+          }
+        ],
+        "query": "thresholds",
+        "skipUrlSync": false,
+        "type": "constant"
+      },
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "$datasource",
+        "definition": "SHOW TAG VALUES WITH KEY =~ /s(c|i)/",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Test",
+        "multi": false,
+        "name": "test",
+        "options": [],
+        "query": "SHOW TAG VALUES WITH KEY =~ /s(c|i)/",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "gatling",
+          "value": "gatling"
+        },
+        "hide": 0,
+        "label": "Datasource",
+        "name": "datasource",
+        "options": [],
+        "query": "influxdb",
+        "refresh": 1,
+        "regex": "(gatling|jmeter|perfui)",
+        "skipUrlSync": false,
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "3000",
+          "value": "3000"
+        },
+        "hide": 0,
+        "label": "Default Red (ms)",
+        "name": "higher_t",
+        "options": [
+          {
+            "selected": true,
+            "text": "3000",
+            "value": "3000"
+          }
+        ],
+        "query": "3000",
+        "skipUrlSync": false,
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "2000",
+          "value": "2000"
+        },
+        "hide": 0,
+        "label": "Default Yellow (ms)",
+        "name": "lower_t",
+        "options": [
+          {
+            "selected": true,
+            "text": "2000",
+            "value": "2000"
+          }
+        ],
+        "query": "2000",
+        "skipUrlSync": false,
+        "type": "textbox"
+      }
+    ]
+  },
+  "time": {
+    "from": "2018-10-01T11:09:11.822Z",
+    "to": "2018-10-01T11:17:31.364Z"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "1s",
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Set Tresholds",
+  "uid": "s_9nCaXmk",
+  "version": 31
+}

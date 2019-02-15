@@ -185,6 +185,7 @@ docker exec carrier-influx bash -c "influx -execute 'create database gatling'"
 docker exec carrier-influx bash -c "influx -execute 'create database prodsec'"
 docker exec carrier-influx bash -c "influx -execute 'create database perfui'"
 docker exec carrier-influx bash -c "influx -execute 'create database telegraf'"
+docker exec carrier-influx bash -c "influx -execute 'create database thresholds'"
 
 echo "Waiting for Jenkins to configure"
 sleep 40
@@ -201,3 +202,4 @@ curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenk
 curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/ui_performance_dashboard.json | curl -X POST "http://${FULLHOST}/grafana/api/dashboards/db" -u admin:${GRAFANA_PASSWORD} --header "Content-Type: application/json" -d @-
 curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/performance_comparison_dashboard.json | curl -X POST "http://${FULLHOST}/grafana/api/dashboards/db" -u admin:${GRAFANA_PASSWORD} --header "Content-Type: application/json" -d @-
 curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/perfgun_performance_dashboard.json | curl -X POST "http://${FULLHOST}/grafana/api/dashboards/db" -u admin:${GRAFANA_PASSWORD} --header "Content-Type: application/json" -d @-
+curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/demo_jenkins/thresholds_dashboard.json | curl -X POST "http://${FULLHOST}/grafana/api/dashboards/db" -u admin:${GRAFANA_PASSWORD} --header "Content-Type: application/json" -d @-
