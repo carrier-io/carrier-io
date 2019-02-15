@@ -185,6 +185,7 @@ docker exec carrier-influx bash -c "influx -execute 'create database gatling'"
 docker exec carrier-influx bash -c "influx -execute 'create database prodsec'"
 docker exec carrier-influx bash -c "influx -execute 'create database perfui'"
 docker exec carrier-influx bash -c "influx -execute 'create database telegraf'"
+docker exec carrier-influx bash -c "influx -execute 'create database thresholds'"
 
 echo "Waiting for Jenkins to configure"
 sleep 40
