@@ -1,0 +1,2779 @@
+{
+  "dashboard": {
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": "-- Grafana --",
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        },
+        {
+          "datasource": "jmeter",
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgb(23, 255, 0)",
+          "name": "Test Start",
+          "query": "SELECT first(*) FROM testStartEnd WHERE status='started' AND \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND $timeFilter",
+          "showIn": 0,
+          "tagsColumn": "status,buildID",
+          "textColumn": "",
+          "titleColumn": ""
+        },
+        {
+          "datasource": "jmeter",
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(255, 96, 96, 1)",
+          "name": "Test End",
+          "query": "SELECT last(*) as \"test_start\" FROM testStartEnd WHERE status='finished' AND \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND $timeFilter",
+          "showIn": 0,
+          "tagsColumn": "status,buildID",
+          "textColumn": "",
+          "titleColumn": ""
+        },
+        {
+          "datasource": "jmeter",
+          "enable": false,
+          "hide": false,
+          "iconColor": "#bf1b00",
+          "limit": 100,
+          "name": "Saturation point",
+          "query": "select responseBytes from requestsRaw where $timeFilter limit 3",
+          "showIn": 0,
+          "tagsColumn": "",
+          "textColumn": "Saturation point",
+          "titleColumn": "",
+          "type": "alert"
+        }
+      ]
+    },
+    "description": "This dashboard shows live load test metrics provided by jMeter.",
+    "editable": true,
+    "gnetId": 1152,
+    "graphTooltip": 1,
+    "id": null,
+    "iteration": 1549011325541,
+    "links": [],
+    "panels": [
+      {
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "id": 39,
+        "panels": [],
+        "title": "General information",
+        "type": "row"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "rgba(245, 54, 54, 0.9)",
+          "rgba(237, 129, 40, 0.89)",
+          "rgba(50, 172, 45, 0.97)"
+        ],
+        "datasource": "jmeter",
+        "decimals": 0,
+        "editable": true,
+        "error": false,
+        "format": "none",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 4,
+          "x": 0,
+          "y": 1
+        },
+        "height": "120",
+        "id": 20,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "30%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "dsType": "influxdb",
+            "groupBy": [],
+            "measurement": "virtualUsers",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT count(\"responseTime\") FROM \"requestsRaw\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND $timeFilter",
+            "rawQuery": true,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "finishedThreads"
+                  ],
+                  "type": "field"
+                }
+              ]
+            ],
+            "tags": []
+          }
+        ],
+        "thresholds": "",
+        "title": "Total request count",
+        "transparent": true,
+        "type": "singlestat",
+        "valueFontSize": "80%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "N/A",
+            "value": "null"
+          }
+        ],
+        "valueName": "current"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "rgba(50, 172, 45, 0.97)",
+          "rgba(237, 129, 40, 0.89)",
+          "rgba(245, 54, 54, 0.9)"
+        ],
+        "datasource": "jmeter",
+        "editable": true,
+        "error": false,
+        "format": "none",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 3,
+          "x": 4,
+          "y": 1
+        },
+        "height": "120",
+        "hideTimeOverride": false,
+        "id": 31,
+        "interval": "",
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "50%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "dsType": "influxdb",
+            "fields": [
+              {
+                "func": "last",
+                "name": "err"
+              }
+            ],
+            "groupBy": [],
+            "measurement": "jmeter_samples",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT sum(\"errorCount\") FROM \"requestsRaw\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND $timeFilter ",
+            "rawQuery": true,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "errorCount"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "sum"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "application",
+                "operator": "=~",
+                "value": "/^[^#]+#$test_name#$test_run_id$/"
+              }
+            ]
+          }
+        ],
+        "thresholds": "1,1",
+        "timeFrom": null,
+        "title": "Total failed requests count",
+        "transparent": true,
+        "type": "singlestat",
+        "valueFontSize": "80%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "0",
+            "value": "null"
+          }
+        ],
+        "valueName": "total"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "rgba(245, 54, 54, 0.9)",
+          "rgba(237, 129, 40, 0.89)",
+          "rgba(50, 172, 45, 0.97)"
+        ],
+        "datasource": "jmeter",
+        "decimals": 1,
+        "editable": true,
+        "error": false,
+        "format": "ops",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 4,
+          "x": 7,
+          "y": 1
+        },
+        "height": "120",
+        "id": 17,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "30%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "dsType": "influxdb",
+            "groupBy": [],
+            "measurement": "virtualUsers",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT mean(\"throughput\") FROM (SELECT count(responseTime) AS \"throughput\" FROM \"requestsRaw\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND $timeFilter GROUP BY time(1s))",
+            "rawQuery": true,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "finishedThreads"
+                  ],
+                  "type": "field"
+                }
+              ]
+            ],
+            "tags": []
+          }
+        ],
+        "thresholds": "",
+        "title": "Average Throughput",
+        "transparent": true,
+        "type": "singlestat",
+        "valueFontSize": "80%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "N/A",
+            "value": "null"
+          }
+        ],
+        "valueName": "current"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "rgba(245, 54, 54, 0.9)",
+          "rgba(237, 129, 40, 0.89)",
+          "rgba(50, 172, 45, 0.97)"
+        ],
+        "datasource": "jmeter",
+        "decimals": 1,
+        "editable": true,
+        "error": false,
+        "format": "ops",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 4,
+          "x": 11,
+          "y": 1
+        },
+        "height": "120",
+        "id": 37,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "30%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "dsType": "influxdb",
+            "groupBy": [],
+            "measurement": "virtualUsers",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"throughput\") FROM (SELECT count(responseTime) AS \"throughput\" FROM \"requestsRaw\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND $timeFilter GROUP BY time(1s))",
+            "rawQuery": true,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "finishedThreads"
+                  ],
+                  "type": "field"
+                }
+              ]
+            ],
+            "tags": []
+          }
+        ],
+        "thresholds": "",
+        "title": "Max Throughput",
+        "transparent": true,
+        "type": "singlestat",
+        "valueFontSize": "80%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "N/A",
+            "value": "null"
+          }
+        ],
+        "valueName": "current"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "#299c46",
+          "rgba(237, 129, 40, 0.89)",
+          "#d44a3a"
+        ],
+        "decimals": 1,
+        "format": "ms",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 3,
+          "x": 15,
+          "y": 1
+        },
+        "hideTimeOverride": true,
+        "id": 33,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "50%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT min(\"responseTime\") FROM \"requestsRaw\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND $timeFilter ",
+            "rawQuery": true,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          }
+        ],
+        "thresholds": "3000,10000",
+        "title": "Min",
+        "transparent": true,
+        "type": "singlestat",
+        "valueFontSize": "80%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "0",
+            "value": "null"
+          }
+        ],
+        "valueName": "current"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "#299c46",
+          "rgba(237, 129, 40, 0.89)",
+          "#d44a3a"
+        ],
+        "format": "ms",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 3,
+          "x": 18,
+          "y": 1
+        },
+        "hideTimeOverride": true,
+        "id": 35,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "50%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT mean(\"responseTime\") FROM \"requestsRaw\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND $timeFilter ",
+            "rawQuery": true,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          }
+        ],
+        "thresholds": "3000,10000",
+        "title": "Median",
+        "transparent": true,
+        "type": "singlestat",
+        "valueFontSize": "80%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "0",
+            "value": "null"
+          }
+        ],
+        "valueName": "current"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "#299c46",
+          "rgba(237, 129, 40, 0.89)",
+          "#d44a3a"
+        ],
+        "decimals": 1,
+        "format": "ms",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 3,
+          "x": 21,
+          "y": 1
+        },
+        "hideTimeOverride": true,
+        "id": 36,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "50%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT percentile(\"responseTime\",95) FROM \"requestsRaw\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND $timeFilter ",
+            "rawQuery": true,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          }
+        ],
+        "thresholds": "3000,10000",
+        "title": "95th percentile",
+        "transparent": true,
+        "type": "singlestat",
+        "valueFontSize": "80%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "0",
+            "value": "null"
+          }
+        ],
+        "valueName": "current"
+      },
+      {
+        "aliasColors": {},
+        "bars": false,
+        "dashLength": 10,
+        "dashes": false,
+        "datasource": "jmeter",
+        "editable": true,
+        "error": false,
+        "fill": 1,
+        "grid": {},
+        "gridPos": {
+          "h": 12,
+          "w": 24,
+          "x": 0,
+          "y": 4
+        },
+        "height": "400",
+        "id": 6,
+        "legend": {
+          "alignAsTable": true,
+          "avg": true,
+          "current": false,
+          "hideEmpty": false,
+          "hideZero": false,
+          "max": true,
+          "min": true,
+          "rightSide": true,
+          "show": true,
+          "sortDesc": false,
+          "total": false,
+          "values": true
+        },
+        "lines": true,
+        "linewidth": 1,
+        "links": [],
+        "nullPointMode": "connected",
+        "percentage": false,
+        "pointradius": 1,
+        "points": true,
+        "renderer": "flot",
+        "seriesOverrides": [
+          {
+            "alias": "/^FAILED*/",
+            "color": "#BF1B00",
+            "lines": false,
+            "points": true
+          },
+          {
+            "alias": "active users",
+            "color": "#fce2de",
+            "fill": 0,
+            "linewidth": 2,
+            "points": false,
+            "yaxis": 2,
+            "zindex": 3
+          }
+        ],
+        "spaceLength": 10,
+        "stack": false,
+        "steppedLine": false,
+        "targets": [
+          {
+            "alias": "$tag_requestName",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "measurement": "requestsRaw",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT mean(\"responseTime\") FROM \"requestsRaw\" WHERE \"errorCount\" = 0 AND \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND \"requestName\" =~ /^$request$/  AND loadGenerator =~ /^$lg$/ AND $timeFilter GROUP BY time($aggregation), \"requestName\" fill(null)",
+            "rawQuery": true,
+            "refId": "C",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "responseTime"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "requestName",
+                "operator": "=~",
+                "value": "/^$request$/"
+              }
+            ]
+          },
+          {
+            "alias": "FAILED $tag_requestName",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "measurement": "requestsRaw",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT mean(\"responseTime\") FROM \"requestsRaw\" WHERE \"errorCount\" = 1 AND \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND \"requestName\" =~ /^$request$/  AND loadGenerator =~ /^$lg$/ AND $timeFilter GROUP BY time($aggregation), \"requestName\" fill(null)",
+            "rawQuery": true,
+            "refId": "D",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "responseTime"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "requestName",
+                "operator": "=~",
+                "value": "/^$request$/"
+              }
+            ]
+          },
+          {
+            "alias": "active users",
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(sum) from (SELECT sum(\"maxActiveThreads\")/10 FROM \"virtualUsers\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND loadGenerator =~ /^$lg$/ AND $timeFilter GROUP BY time(10s)) GROUP BY time($aggregation)",
+            "rawQuery": true,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          }
+        ],
+        "thresholds": [],
+        "timeFrom": null,
+        "timeRegions": [],
+        "timeShift": null,
+        "title": "Response Times Over Time ($aggregation aggregation)",
+        "tooltip": {
+          "msResolution": false,
+          "shared": true,
+          "sort": 0,
+          "value_type": "individual"
+        },
+        "type": "graph",
+        "xaxis": {
+          "buckets": null,
+          "mode": "time",
+          "name": null,
+          "show": true,
+          "values": []
+        },
+        "yaxes": [
+          {
+            "format": "ms",
+            "label": "Response time",
+            "logBase": 1,
+            "max": null,
+            "min": "0",
+            "show": true
+          },
+          {
+            "format": "short",
+            "label": "Active Users",
+            "logBase": 1,
+            "max": null,
+            "min": "0",
+            "show": true
+          }
+        ],
+        "yaxis": {
+          "align": false,
+          "alignLevel": null
+        }
+      },
+      {
+        "aliasColors": {},
+        "bars": false,
+        "dashLength": 10,
+        "dashes": false,
+        "datasource": "jmeter",
+        "fill": 1,
+        "gridPos": {
+          "h": 10,
+          "w": 24,
+          "x": 0,
+          "y": 16
+        },
+        "height": "300",
+        "id": 28,
+        "legend": {
+          "alignAsTable": true,
+          "avg": true,
+          "current": false,
+          "max": true,
+          "min": true,
+          "rightSide": true,
+          "show": true,
+          "total": false,
+          "values": true
+        },
+        "lines": true,
+        "linewidth": 1,
+        "links": [],
+        "nullPointMode": "null",
+        "percentage": false,
+        "pointradius": 5,
+        "points": false,
+        "renderer": "flot",
+        "seriesOverrides": [
+          {
+            "alias": "active users",
+            "color": "#fce2de",
+            "fill": 0,
+            "linewidth": 2,
+            "yaxis": 2,
+            "zindex": 3
+          },
+          {
+            "alias": "max",
+            "bars": true,
+            "color": "#7eb26d",
+            "lines": false,
+            "stack": true,
+            "zindex": 0
+          },
+          {
+            "alias": "failed requests",
+            "bars": true,
+            "color": "#bf1b00",
+            "lines": false,
+            "stack": true
+          },
+          {
+            "alias": "average",
+            "bars": true,
+            "color": "#eab839",
+            "lines": false,
+            "stack": false,
+            "zindex": 3
+          }
+        ],
+        "spaceLength": 10,
+        "stack": false,
+        "steppedLine": false,
+        "targets": [
+          {
+            "alias": "active users",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT sum(\"maxActiveThreads\")/10 FROM \"virtualUsers\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND loadGenerator =~ /^$lg$/ AND $timeFilter GROUP BY time(10s)",
+            "rawQuery": true,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "alias": "max",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"maxCount\") FROM (SELECT count(responseTime) AS \"maxCount\" FROM \"requestsRaw\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"status\" = 'OK' AND \"testType\" =~ /^$testName$/ AND loadGenerator =~ /^$lg$/ AND $timeFilter  GROUP BY time(1s))GROUP BY time($aggregation)",
+            "rawQuery": true,
+            "refId": "C",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "alias": "average",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT mean(\"meanCount\") FROM (SELECT count(responseTime) AS \"meanCount\" FROM \"requestsRaw\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"status\" = 'OK'  AND \"testType\" =~ /^$testName$/ AND loadGenerator =~ /^$lg$/  AND $timeFilter  GROUP BY time(1s))GROUP BY time($aggregation)",
+            "rawQuery": true,
+            "refId": "D",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "alias": "failed requests",
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "none"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "measurement": "virtualUsers",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"maxCount\") FROM (SELECT count(responseTime) AS \"maxCount\" FROM \"requestsRaw\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"status\" = 'KO' AND \"testType\" =~ /^$testName$/  AND loadGenerator =~ /^$lg$/ AND $timeFilter  GROUP BY time(1s))GROUP BY time($aggregation)",
+            "rawQuery": true,
+            "refId": "E",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "maxActiveThreads"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "max"
+                }
+              ]
+            ],
+            "tags": []
+          }
+        ],
+        "thresholds": [],
+        "timeFrom": null,
+        "timeRegions": [],
+        "timeShift": null,
+        "title": "Throughput ($aggregation aggregation)",
+        "tooltip": {
+          "shared": true,
+          "sort": 0,
+          "value_type": "individual"
+        },
+        "type": "graph",
+        "xaxis": {
+          "buckets": null,
+          "mode": "time",
+          "name": null,
+          "show": true,
+          "values": []
+        },
+        "yaxes": [
+          {
+            "format": "none",
+            "label": "Requests per second",
+            "logBase": 1,
+            "max": null,
+            "min": "0",
+            "show": true
+          },
+          {
+            "format": "short",
+            "label": "Active Users",
+            "logBase": 1,
+            "max": null,
+            "min": "0",
+            "show": true
+          }
+        ],
+        "yaxis": {
+          "align": false,
+          "alignLevel": null
+        }
+      },
+      {
+        "aliasColors": {},
+        "bars": true,
+        "dashLength": 10,
+        "dashes": false,
+        "datasource": "jmeter",
+        "fill": 1,
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 26
+        },
+        "height": "300",
+        "id": 50,
+        "legend": {
+          "alignAsTable": true,
+          "avg": false,
+          "current": false,
+          "max": false,
+          "min": false,
+          "rightSide": true,
+          "show": true,
+          "total": true,
+          "values": true
+        },
+        "lines": false,
+        "linewidth": 1,
+        "links": [],
+        "nullPointMode": "null",
+        "percentage": false,
+        "pointradius": 5,
+        "points": false,
+        "renderer": "flot",
+        "seriesOverrides": [
+          {
+            "alias": "t > $high_limit ms",
+            "color": "#c15c17"
+          },
+          {
+            "alias": "failed",
+            "color": "#bf1b00"
+          },
+          {
+            "alias": "t < $low_limit ms",
+            "color": "#7eb26d"
+          },
+          {
+            "alias": "$low_limit  < t < $high_limit",
+            "color": "#f2c96d"
+          }
+        ],
+        "spaceLength": 10,
+        "stack": false,
+        "steppedLine": false,
+        "targets": [
+          {
+            "alias": "t < $low_limit ms",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT COUNT(\"responseTime\") as \"CountA\" FROM \"requestsRaw\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND \"status\" = 'OK' AND \"responseTime\"<=$low_limit AND $timeFilter fill(null)",
+            "rawQuery": true,
+            "refId": "B",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "alias": "$low_limit  < t < $high_limit",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT COUNT(\"responseTime\") as \"CountA\" FROM \"requestsRaw\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND \"status\" = 'OK' AND \"responseTime\">$low_limit AND \"responseTime\"<$high_limit  AND $timeFilter fill(null)",
+            "rawQuery": true,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "alias": "t > $high_limit ms",
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT COUNT(\"responseTime\") as \"CountA\" FROM \"requestsRaw\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND \"status\" = 'OK' AND \"responseTime\">$high_limit AND $timeFilter fill(null)",
+            "rawQuery": true,
+            "refId": "C",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "alias": "failed",
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT COUNT(\"responseTime\") as \"CountA\" FROM \"requestsRaw\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND \"status\" = 'KO' AND $timeFilter fill(null)",
+            "rawQuery": true,
+            "refId": "D",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          }
+        ],
+        "thresholds": [],
+        "timeFrom": null,
+        "timeRegions": [],
+        "timeShift": null,
+        "title": "Response time distribution ($aggregation aggregation)",
+        "tooltip": {
+          "shared": false,
+          "sort": 0,
+          "value_type": "individual"
+        },
+        "type": "graph",
+        "xaxis": {
+          "buckets": null,
+          "mode": "series",
+          "name": null,
+          "show": true,
+          "values": [
+            "total"
+          ]
+        },
+        "yaxes": [
+          {
+            "format": "short",
+            "label": "Request count",
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          },
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          }
+        ],
+        "yaxis": {
+          "align": false,
+          "alignLevel": null
+        }
+      },
+      {
+        "aliasColors": {},
+        "bars": false,
+        "dashLength": 10,
+        "dashes": false,
+        "datasource": "jmeter",
+        "fill": 1,
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 26
+        },
+        "height": "300",
+        "id": 26,
+        "legend": {
+          "alignAsTable": false,
+          "avg": false,
+          "current": false,
+          "max": false,
+          "min": false,
+          "rightSide": false,
+          "show": true,
+          "total": false,
+          "values": false
+        },
+        "lines": true,
+        "linewidth": 1,
+        "links": [],
+        "nullPointMode": "connected",
+        "percentage": false,
+        "pointradius": 5,
+        "points": false,
+        "renderer": "flot",
+        "seriesOverrides": [
+          {
+            "alias": "Total Throughput Bytes/s",
+            "color": "#0A437C",
+            "linewidth": 3
+          }
+        ],
+        "spaceLength": 10,
+        "stack": false,
+        "steppedLine": false,
+        "targets": [
+          {
+            "alias": "Bytes recieved per $aggregation",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT mean(\"responseBytes\") FROM \"requestsRaw\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND $timeFilter GROUP BY time($aggregation)",
+            "rawQuery": true,
+            "refId": "B",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "alias": "Bytes sent per $aggregation",
+            "dsType": "influxdb",
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT mean(\"requestBytes\") FROM \"requestsRaw\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND $timeFilter GROUP BY time($aggregation)",
+            "rawQuery": true,
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          }
+        ],
+        "thresholds": [],
+        "timeFrom": null,
+        "timeRegions": [],
+        "timeShift": null,
+        "title": "Bytes Throughput Over Time, bytes/$aggregation",
+        "tooltip": {
+          "shared": false,
+          "sort": 0,
+          "value_type": "individual"
+        },
+        "type": "graph",
+        "xaxis": {
+          "buckets": null,
+          "mode": "time",
+          "name": null,
+          "show": true,
+          "values": []
+        },
+        "yaxes": [
+          {
+            "format": "bytes",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": "0",
+            "show": true
+          },
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": "0",
+            "show": true
+          }
+        ],
+        "yaxis": {
+          "align": false,
+          "alignLevel": null
+        }
+      },
+      {
+        "collapsed": true,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 34
+        },
+        "id": 49,
+        "panels": [
+          {
+            "columns": [],
+            "datasource": "jmeter",
+            "editable": true,
+            "error": false,
+            "fontSize": "100%",
+            "gridPos": {
+              "h": 18,
+              "w": 24,
+              "x": 0,
+              "y": 35
+            },
+            "height": "",
+            "id": 27,
+            "links": [],
+            "minSpan": 12,
+            "pageSize": 20,
+            "scroll": false,
+            "showHeader": true,
+            "sort": {
+              "col": 1,
+              "desc": false
+            },
+            "styles": [
+              {
+                "alias": "",
+                "dateFormat": "YYYY-MM-DD HH:mm:ss",
+                "pattern": "Time",
+                "type": "hidden"
+              },
+              {
+                "colorMode": "cell",
+                "colors": [
+                  "rgba(0, 0, 0, 0)",
+                  "rgba(183, 84, 26, 0.89)",
+                  "rgba(245, 54, 54, 0.9)"
+                ],
+                "decimals": 2,
+                "pattern": "Error Rate",
+                "thresholds": [
+                  "5",
+                  "10"
+                ],
+                "type": "number",
+                "unit": "percent"
+              },
+              {
+                "alias": "",
+                "colorMode": null,
+                "colors": [
+                  "rgba(245, 54, 54, 0.9)",
+                  "rgba(237, 129, 40, 0.89)",
+                  "rgba(50, 172, 45, 0.97)"
+                ],
+                "dateFormat": "YYYY-MM-DD HH:mm:ss",
+                "decimals": null,
+                "pattern": "Count",
+                "thresholds": [],
+                "type": "number",
+                "unit": "none"
+              },
+              {
+                "alias": "Label",
+                "colorMode": null,
+                "colors": [
+                  "rgba(245, 54, 54, 0.9)",
+                  "rgba(237, 129, 40, 0.89)",
+                  "rgba(50, 172, 45, 0.97)"
+                ],
+                "dateFormat": "YYYY-MM-DD HH:mm:ss",
+                "decimals": 2,
+                "pattern": "requestName",
+                "preserveFormat": false,
+                "thresholds": [],
+                "type": "string",
+                "unit": "short"
+              },
+              {
+                "alias": "",
+                "colorMode": null,
+                "colors": [
+                  "rgba(245, 54, 54, 0.9)",
+                  "rgba(237, 129, 40, 0.89)",
+                  "rgba(50, 172, 45, 0.97)"
+                ],
+                "dateFormat": "YYYY-MM-DD HH:mm:ss",
+                "decimals": 2,
+                "pattern": "Network Throughput",
+                "thresholds": [],
+                "type": "number",
+                "unit": "Bps"
+              },
+              {
+                "alias": "",
+                "colorMode": null,
+                "colors": [
+                  "rgba(245, 54, 54, 0.9)",
+                  "rgba(237, 129, 40, 0.89)",
+                  "rgba(50, 172, 45, 0.97)"
+                ],
+                "dateFormat": "YYYY-MM-DD HH:mm:ss",
+                "decimals": 2,
+                "pattern": "Throughput",
+                "thresholds": [],
+                "type": "number",
+                "unit": "ops"
+              },
+              {
+                "alias": "",
+                "colorMode": null,
+                "colors": [
+                  "rgba(245, 54, 54, 0.9)",
+                  "rgba(237, 129, 40, 0.89)",
+                  "rgba(50, 172, 45, 0.97)"
+                ],
+                "dateFormat": "YYYY-MM-DD HH:mm:ss",
+                "decimals": 2,
+                "pattern": "Standard Deviation",
+                "thresholds": [],
+                "type": "number",
+                "unit": "ms"
+              },
+              {
+                "alias": "",
+                "colorMode": "value",
+                "colors": [
+                  "rgba(50, 172, 45, 0.97)",
+                  "rgba(237, 129, 40, 0.89)",
+                  "rgba(245, 54, 54, 0.9)"
+                ],
+                "dateFormat": "YYYY-MM-DD HH:mm:ss",
+                "decimals": 2,
+                "pattern": "/.*/",
+                "thresholds": [
+                  "2",
+                  "3"
+                ],
+                "type": "number",
+                "unit": "s"
+              }
+            ],
+            "targets": [
+              {
+                "alias": "$tag_requestName",
+                "dsType": "influxdb",
+                "groupBy": [
+                  {
+                    "params": [
+                      "$interval"
+                    ],
+                    "type": "time"
+                  },
+                  {
+                    "params": [
+                      "null"
+                    ],
+                    "type": "fill"
+                  }
+                ],
+                "hide": false,
+                "measurement": "requests",
+                "orderByTime": "ASC",
+                "policy": "default",
+                "query": "SELECT count(responseTime) as Count, mean(responseTime)/1000 as Average, median(responseTime)/1000 as Median, percentile(responseTime, 90)/1000 as \"90% Line\",percentile(responseTime, 95)/1000 as \"95% Line\",percentile(responseTime, 99)/1000 as \"99% Line\", min(responseTime)/1000 as Min, max(responseTime)/1000 as Max, (sum(errorCount)/count(responseTime))*100 as \"Error Rate\", stddev(\"responseTime\") as \"Standard Deviation\",last(tpsRate) as \"Throughput\",last(networkRate) as \"Network Throughput\" FROM \"requestsRaw\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND $timeFilter GROUP BY \"requestName\"",
+                "rawQuery": true,
+                "refId": "A",
+                "resultFormat": "table",
+                "select": [
+                  [
+                    {
+                      "params": [
+                        "value"
+                      ],
+                      "type": "field"
+                    },
+                    {
+                      "params": [],
+                      "type": "mean"
+                    }
+                  ]
+                ],
+                "tags": []
+              }
+            ],
+            "title": "Aggregate Report",
+            "transform": "table",
+            "transparent": false,
+            "type": "table"
+          },
+          {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "jmeter",
+            "fill": 1,
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 0,
+              "y": 53
+            },
+            "height": "300",
+            "id": 29,
+            "legend": {
+              "alignAsTable": false,
+              "avg": false,
+              "current": false,
+              "max": false,
+              "min": false,
+              "rightSide": false,
+              "show": false,
+              "total": false,
+              "values": false
+            },
+            "lines": true,
+            "linewidth": 1,
+            "links": [],
+            "nullPointMode": "connected",
+            "percentage": false,
+            "pointradius": 5,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [
+              {
+                "alias": "/.*/",
+                "fill": 0
+              }
+            ],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+              {
+                "alias": "$tag_requestName",
+                "dsType": "influxdb",
+                "groupBy": [
+                  {
+                    "params": [
+                      "$__interval"
+                    ],
+                    "type": "time"
+                  },
+                  {
+                    "params": [
+                      "null"
+                    ],
+                    "type": "fill"
+                  }
+                ],
+                "hide": false,
+                "orderByTime": "ASC",
+                "policy": "default",
+                "query": "SELECT mean(\"connectTime\") FROM \"requestsRaw\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND $timeFilter GROUP BY time($aggregation), \"requestName\" fill(null)",
+                "rawQuery": true,
+                "refId": "B",
+                "resultFormat": "time_series",
+                "select": [
+                  [
+                    {
+                      "params": [
+                        "value"
+                      ],
+                      "type": "field"
+                    },
+                    {
+                      "params": [],
+                      "type": "mean"
+                    }
+                  ]
+                ],
+                "tags": []
+              }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "HTTP(S) Connect Times Per $aggregation",
+            "tooltip": {
+              "shared": false,
+              "sort": 0,
+              "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+              "buckets": null,
+              "mode": "time",
+              "name": null,
+              "show": true,
+              "values": []
+            },
+            "yaxes": [
+              {
+                "format": "ms",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": "0",
+                "show": true
+              },
+              {
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              }
+            ],
+            "yaxis": {
+              "align": false,
+              "alignLevel": null
+            }
+          },
+          {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "jmeter",
+            "editable": true,
+            "error": false,
+            "fill": 1,
+            "grid": {},
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 12,
+              "y": 53
+            },
+            "height": "300px",
+            "id": 7,
+            "legend": {
+              "alignAsTable": false,
+              "avg": false,
+              "current": false,
+              "max": false,
+              "min": false,
+              "show": true,
+              "total": false,
+              "values": false
+            },
+            "lines": true,
+            "linewidth": 1,
+            "links": [],
+            "nullPointMode": "connected",
+            "percentage": false,
+            "pointradius": 5,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [
+              {
+                "alias": "200",
+                "color": "#3F6833",
+                "linewidth": 3
+              },
+              {
+                "alias": "/4.*/",
+                "color": "#890F02",
+                "linewidth": 1,
+                "points": true
+              },
+              {
+                "alias": "/5.*/",
+                "color": "#C15C17",
+                "linewidth": 1,
+                "points": true
+              }
+            ],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+              {
+                "alias": "$tag_responseCode",
+                "dsType": "influxdb",
+                "groupBy": [
+                  {
+                    "params": [
+                      "10s"
+                    ],
+                    "type": "time"
+                  },
+                  {
+                    "params": [
+                      "null"
+                    ],
+                    "type": "fill"
+                  }
+                ],
+                "measurement": "requestsRaw",
+                "orderByTime": "ASC",
+                "policy": "default",
+                "query": "SELECT count(\"responseTime\") FROM \"requestsRaw\" WHERE projectName =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/  AND \"testType\" =~ /^$testName$/  AND \"responseCode\" =~ /^$responseCode$/  AND $timeFilter GROUP BY time($aggregation), \"responseCode\" fill(null)",
+                "rawQuery": true,
+                "refId": "A",
+                "resultFormat": "time_series",
+                "select": [
+                  [
+                    {
+                      "params": [
+                        "responseTime"
+                      ],
+                      "type": "field"
+                    },
+                    {
+                      "params": [],
+                      "type": "count"
+                    }
+                  ]
+                ],
+                "tags": [
+                  {
+                    "key": "requestName",
+                    "operator": "=~",
+                    "value": "/^$request$/"
+                  }
+                ]
+              }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "Response Codes Over Time with $aggregation granulation",
+            "tooltip": {
+              "msResolution": false,
+              "shared": true,
+              "sort": 0,
+              "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+              "buckets": null,
+              "mode": "time",
+              "name": null,
+              "show": true,
+              "values": []
+            },
+            "yaxes": [
+              {
+                "format": "ops",
+                "label": "",
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              },
+              {
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              }
+            ],
+            "yaxis": {
+              "align": false,
+              "alignLevel": null
+            }
+          }
+        ],
+        "title": "Summary table",
+        "type": "row"
+      },
+      {
+        "collapsed": true,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 35
+        },
+        "id": 41,
+        "panels": [
+          {
+            "columns": [],
+            "datasource": "jmeter",
+            "fontSize": "100%",
+            "gridPos": {
+              "h": 9,
+              "w": 24,
+              "x": 0,
+              "y": 36
+            },
+            "hideTimeOverride": true,
+            "id": 43,
+            "links": [],
+            "pageSize": 8,
+            "scroll": true,
+            "showHeader": true,
+            "sort": {
+              "col": 0,
+              "desc": true
+            },
+            "styles": [
+              {
+                "alias": "Time",
+                "dateFormat": "YYYY-MM-DD HH:mm:ss",
+                "pattern": "Time",
+                "type": "hidden"
+              },
+              {
+                "alias": "",
+                "colorMode": null,
+                "colors": [
+                  "rgba(245, 54, 54, 0.9)",
+                  "rgba(237, 129, 40, 0.89)",
+                  "rgba(50, 172, 45, 0.97)"
+                ],
+                "decimals": 2,
+                "mappingType": 1,
+                "pattern": "/.*/",
+                "thresholds": [],
+                "type": "string",
+                "unit": "short"
+              }
+            ],
+            "targets": [
+              {
+                "groupBy": [
+                  {
+                    "params": [
+                      "$__interval"
+                    ],
+                    "type": "time"
+                  },
+                  {
+                    "params": [
+                      "null"
+                    ],
+                    "type": "fill"
+                  }
+                ],
+                "orderByTime": "ASC",
+                "policy": "default",
+                "query": "SELECT count(\"errorMessage\") AS \"Failed asertion(s)\",  last(\"errorMessage\") AS \"Last Message\" FROM  \"errorMessage\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND $timeFilter GROUP BY  \"requestName\"",
+                "rawQuery": true,
+                "refId": "A",
+                "resultFormat": "table",
+                "select": [
+                  [
+                    {
+                      "params": [
+                        "value"
+                      ],
+                      "type": "field"
+                    },
+                    {
+                      "params": [],
+                      "type": "mean"
+                    }
+                  ]
+                ],
+                "tags": []
+              }
+            ],
+            "title": "Errors",
+            "transform": "table",
+            "type": "table"
+          }
+        ],
+        "title": "Errors",
+        "type": "row"
+      },
+      {
+        "collapsed": true,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 36
+        },
+        "id": 47,
+        "panels": [
+          {
+            "columns": [],
+            "datasource": "jmeter",
+            "fontSize": "100%",
+            "gridPos": {
+              "h": 9,
+              "w": 24,
+              "x": 0,
+              "y": 4
+            },
+            "hideTimeOverride": true,
+            "id": 45,
+            "links": [],
+            "pageSize": 8,
+            "scroll": true,
+            "showHeader": true,
+            "sort": {
+              "col": 0,
+              "desc": true
+            },
+            "styles": [
+              {
+                "alias": "Time",
+                "dateFormat": "YYYY-MM-DD HH:mm:ss",
+                "pattern": "Time",
+                "type": "hidden"
+              },
+              {
+                "alias": "",
+                "colorMode": null,
+                "colors": [
+                  "rgba(245, 54, 54, 0.9)",
+                  "rgba(237, 129, 40, 0.89)",
+                  "rgba(50, 172, 45, 0.97)"
+                ],
+                "decimals": 2,
+                "mappingType": 1,
+                "pattern": "/.*/",
+                "thresholds": [],
+                "type": "string",
+                "unit": "short"
+              }
+            ],
+            "targets": [
+              {
+                "groupBy": [
+                  {
+                    "params": [
+                      "$__interval"
+                    ],
+                    "type": "time"
+                  },
+                  {
+                    "params": [
+                      "null"
+                    ],
+                    "type": "fill"
+                  }
+                ],
+                "orderByTime": "ASC",
+                "policy": "default",
+                "query": "SELECT errorMessage AS \"All Messages\" FROM \"errorMessage\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/ AND $timeFilter GROUP BY  \"requestName\"",
+                "rawQuery": true,
+                "refId": "A",
+                "resultFormat": "table",
+                "select": [
+                  [
+                    {
+                      "params": [
+                        "value"
+                      ],
+                      "type": "field"
+                    },
+                    {
+                      "params": [],
+                      "type": "mean"
+                    }
+                  ]
+                ],
+                "tags": []
+              }
+            ],
+            "title": "All errors",
+            "transform": "table",
+            "type": "table"
+          }
+        ],
+        "title": "Detailed errors info",
+        "type": "row"
+      }
+    ],
+    "refresh": false,
+    "schemaVersion": 16,
+    "style": "dark",
+    "tags": [
+      "performance_test"
+    ],
+    "templating": {
+      "list": [
+        {
+          "allValue": null,
+          "current": {},
+          "datasource": "jmeter",
+          "definition": "",
+          "hide": 0,
+          "includeAll": false,
+          "label": "Project ID",
+          "multi": false,
+          "name": "projectID",
+          "options": [],
+          "query": "SHOW TAG VALUES FROM /.*/ WITH KEY = \"projectName\"",
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "tagValuesQuery": "",
+          "tags": [],
+          "tagsQuery": "",
+          "type": "query",
+          "useTags": false
+        },
+        {
+          "allValue": null,
+          "current": {},
+          "datasource": "jmeter",
+          "definition": "",
+          "hide": 0,
+          "includeAll": false,
+          "label": "Environment Type",
+          "multi": false,
+          "name": "envType",
+          "options": [],
+          "query": "SHOW TAG VALUES FROM /.*/ WITH KEY = \"envType\"  WHERE  \"projectName\" =~ /^$projectID$/",
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "tagValuesQuery": "",
+          "tags": [],
+          "tagsQuery": "",
+          "type": "query",
+          "useTags": false
+        },
+        {
+          "allValue": null,
+          "current": {},
+          "datasource": "jmeter",
+          "definition": "",
+          "hide": 0,
+          "includeAll": false,
+          "label": "Test Type",
+          "multi": false,
+          "name": "testName",
+          "options": [],
+          "query": "SHOW TAG VALUES FROM /.*/ WITH KEY = \"testType\"  WHERE  \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/",
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "tagValuesQuery": "",
+          "tags": [],
+          "tagsQuery": "",
+          "type": "query",
+          "useTags": false
+        },
+        {
+          "allValue": ".*",
+          "current": {},
+          "datasource": "jmeter",
+          "definition": "",
+          "hide": 0,
+          "includeAll": true,
+          "label": "Requests",
+          "multi": true,
+          "name": "request",
+          "options": [],
+          "query": "SHOW TAG VALUES FROM /.*/ WITH KEY = \"requestName\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/",
+          "refresh": 2,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "tagValuesQuery": null,
+          "tags": [],
+          "tagsQuery": null,
+          "type": "query",
+          "useTags": false
+        },
+        {
+          "allValue": null,
+          "current": {},
+          "datasource": "jmeter",
+          "definition": "SHOW TAG VALUES FROM \"requestsRaw\" WITH KEY = \"responseCode\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/",
+          "hide": 2,
+          "includeAll": true,
+          "label": "responseCode",
+          "multi": true,
+          "name": "responseCode",
+          "options": [],
+          "query": "SHOW TAG VALUES FROM \"requestsRaw\" WITH KEY = \"responseCode\" WHERE \"projectName\" =~ /^$projectID$/ AND \"envType\" =~ /^$envType$/ AND \"testType\" =~ /^$testName$/",
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "tagValuesQuery": null,
+          "tags": [],
+          "tagsQuery": null,
+          "type": "query",
+          "useTags": false
+        },
+        {
+          "auto": true,
+          "auto_count": 100,
+          "auto_min": "1s",
+          "current": {
+            "text": "5s",
+            "value": "5s"
+          },
+          "hide": 0,
+          "label": "Aggregation Interval",
+          "name": "aggregation",
+          "options": [
+            {
+              "selected": false,
+              "text": "auto",
+              "value": "$__auto_interval_aggregation"
+            },
+            {
+              "selected": false,
+              "text": "500ms",
+              "value": "500ms"
+            },
+            {
+              "selected": false,
+              "text": "1s",
+              "value": "1s"
+            },
+            {
+              "selected": false,
+              "text": "2s",
+              "value": "2s"
+            },
+            {
+              "selected": false,
+              "text": "3s",
+              "value": "3s"
+            },
+            {
+              "selected": true,
+              "text": "5s",
+              "value": "5s"
+            },
+            {
+              "selected": false,
+              "text": "10s",
+              "value": "10s"
+            },
+            {
+              "selected": false,
+              "text": "15s",
+              "value": "15s"
+            },
+            {
+              "selected": false,
+              "text": "30s",
+              "value": "30s"
+            }
+          ],
+          "query": "500ms,1s,2s,3s,5s,10s,15s,30s",
+          "refresh": 2,
+          "skipUrlSync": false,
+          "type": "interval"
+        },
+        {
+          "allValue": null,
+          "current": {},
+          "datasource": "jmeter",
+          "definition": "show tag values from requestsRaw with key=loadGenerator",
+          "hide": 0,
+          "includeAll": true,
+          "label": null,
+          "multi": true,
+          "name": "lg",
+          "options": [],
+          "query": "show tag values from requestsRaw with key=loadGenerator",
+          "refresh": 2,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "tagValuesQuery": "",
+          "tags": [],
+          "tagsQuery": "",
+          "type": "query",
+          "useTags": false
+        },
+        {
+          "auto": true,
+          "auto_count": 100,
+          "auto_min": "10s",
+          "current": {
+            "text": "auto",
+            "value": "$__auto_interval_grouping"
+          },
+          "hide": 2,
+          "label": null,
+          "name": "grouping",
+          "options": [
+            {
+              "selected": true,
+              "text": "auto",
+              "value": "$__auto_interval_grouping"
+            },
+            {
+              "selected": false,
+              "text": "1s",
+              "value": "1s"
+            },
+            {
+              "selected": false,
+              "text": "10s",
+              "value": "10s"
+            },
+            {
+              "selected": false,
+              "text": "30s",
+              "value": "30s"
+            },
+            {
+              "selected": false,
+              "text": "1m",
+              "value": "1m"
+            },
+            {
+              "selected": false,
+              "text": "10m",
+              "value": "10m"
+            },
+            {
+              "selected": false,
+              "text": "30m",
+              "value": "30m"
+            },
+            {
+              "selected": false,
+              "text": "1h",
+              "value": "1h"
+            }
+          ],
+          "query": "1s,10s,30s,1m,10m,30m,1h",
+          "refresh": 2,
+          "skipUrlSync": false,
+          "type": "interval"
+        },
+        {
+          "current": {
+            "value": "2000",
+            "text": "2000"
+          },
+          "hide": 2,
+          "label": "low_limit",
+          "name": "low_limit",
+          "options": [
+            {
+              "value": "2000",
+              "text": "2000"
+            }
+          ],
+          "query": "2000",
+          "skipUrlSync": false,
+          "type": "constant"
+        },
+        {
+          "current": {
+            "value": "3000",
+            "text": "3000"
+          },
+          "hide": 2,
+          "label": "high_limit",
+          "name": "high_limit",
+          "options": [
+            {
+              "value": "3000",
+              "text": "3000"
+            }
+          ],
+          "query": "3000",
+          "skipUrlSync": false,
+          "type": "constant"
+        }
+      ]
+    },
+    "time": {
+      "from": "now-15m",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "time_options": [
+        "5m",
+        "15m",
+        "1h",
+        "6h",
+        "12h",
+        "24h",
+        "2d",
+        "7d",
+        "30d"
+      ]
+    },
+    "timezone": "browser",
+    "title": "jmeter Load Test",
+    "uid": "lCIqEHbiz",
+    "version": 27
+  }
+}
