@@ -1,0 +1,42 @@
+def get_host(String env_var) {
+    def match = env_var =~ 'http://(.+)/jenkins'
+    return match[0][1]
+}
+
+node {
+    stage("run test application") {
+        deleteDir()
+        sh "docker run -d --name dvna -p 9090:9090 -d appsecco/dvna:sqlite"
+    }
+    stage("scan application") {
+        def dockerParamsString = "--entrypoint=''"
+        def params = [
+            "-t",
+            "--name build_container",
+            "-p 8090:8090",
+            "-v /var/run/docker.sock:/var/run/docker.sock"
+        ]
+        for (param in params) {
+            dockerParamsString += " ${param}"
+        }
+        docker.image("getcarrier/dast:dev").inside(dockerParamsString) {
+            sh "supervisord"
+            docker.image("ubuntu:18.04").inside("--entrypoint=''") {
+                sh "apt-get -qq update && apt-get install -y curl && sleep 60"
+                sh "http_proxy='http://"+get_host(env.BUILD_URL)+":9090' curl -k -H 'Accept-Language: en-US,en;q=0.5' --compressed -H 'Referer: http://"+get_host(env.BUILD_URL)+":9090/register' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Connection: keep-alive' -H 'Upgrade-Insecure-Requests: 1' --data 'name=test&username=test&email=test%40example.com&password=test&cpassword=test' http://"+get_host(env.BUILD_URL)+":9090/register"
+                sh "http_proxy='http://"+get_host(env.BUILD_URL)+":9090' curl -k -H 'Accept-Language: en-US,en;q=0.5' --compressed -H 'Referer: http://"+get_host(env.BUILD_URL)+":9090/login' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Connection: keep-alive' -H 'Upgrade-Insecure-Requests: 1' --data 'username=test&password=test' http://"+get_host(env.BUILD_URL)+":9090/login"
+            }
+			sh "zap-cli spider http://"+get_host(env.BUILD_URL)+":9090"
+			sh "zap-cli active-scan --scanners all --recursive http://"+get_host(env.BUILD_URL)+":9090 || echo 'Seems we have couple of issues'"
+			sh "zap-cli report -o /tmp/zap.xml -f xml"
+			sh "zap_parse"
+            sh "cp /tmp/reports/* $WORKSPACE"
+            archiveArtifacts artifacts: '*.html'
+			junit '*.xml'
+        }
+    }
+    stage("stop test application") {
+        sh "docker stop dvna"
+        sh "docker rm dvna"
+    }
+}

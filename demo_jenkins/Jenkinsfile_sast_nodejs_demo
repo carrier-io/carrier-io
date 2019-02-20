@@ -41,10 +41,8 @@ node {
     devdep: fasle
 """ > /tmp/scan-config.yaml'''
             sh "run -s node_sast"
-            sh "cp -R /tmp/reports $WORKSPACE/"
+            sh "cp /tmp/reports/* $WORKSPACE"
+            junit '*.xml'
         }
-    }
-    stage("publish results") {
-        junit: 'reports/*.xml'
     }
 }

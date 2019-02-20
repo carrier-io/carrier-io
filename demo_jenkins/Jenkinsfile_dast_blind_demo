@@ -1,0 +1,36 @@
+def get_host(String env_var) {
+    def match = env_var =~ 'http://(.+)/jenkins'
+    return match[0][1]
+}
+
+node {
+    stage("run test application") {
+        deleteDir()
+        sh "docker run -d --name dvna -p 9090:9090 -d appsecco/dvna:sqlite"
+    }
+    stage("scan application") {
+        def dockerParamsString = "--entrypoint=''"
+        def params = [
+            "-t",
+            "--name build_container",
+            "-p 8090:8090"
+        ]
+        for (param in params) {
+            dockerParamsString += " ${param}"
+        }
+        docker.image("getcarrier/dast:dev").inside(dockerParamsString) {
+            sh "supervisord"
+			sh "zap-cli spider http://"+get_host(env.BUILD_URL)+":9090"
+			sh "zap-cli active-scan --scanners all --recursive http://"+get_host(env.BUILD_URL)+":9090 || echo 'Seems we have couple of issues'"
+			sh "zap-cli report -o /tmp/zap.xml -f xml"
+			sh "zap_parse"
+            sh "cp /tmp/reports/* $WORKSPACE"
+            archiveArtifacts artifacts: '*.html'
+			junit '*.xml'
+        }
+    }
+    stage("stop test application") {
+        sh "docker stop dvna"
+        sh "docker rm dvna"
+    }
+}
