@@ -1,23 +1,9 @@
 node {
     stage("pulling the project") {
         deleteDir()
-        git branch: "master", url:  "https://github.com/OWASP/NodeGoat.git"
+        git branch: "master", url:  "https://github.com/OWASP/Benchmark.git"
     }
-    stage("build") {
-        def dockerParamsString = "--entrypoint=''"
-        def params = [
-            "-t",
-            "--name build_container"
-        ]
-        for (param in params) {
-            dockerParamsString += " ${param}"
-        }
-        docker.image("getcarrier/sast:latest").inside(dockerParamsString) {
-            sh "ls -la"
-            sh "npm install"
-        }
-    }
-    stage("NodeJS security scan") {
+    stage("Java scan") {
         def dockerParamsString = "--entrypoint=''"
         def params = [
             "-t",
@@ -30,15 +16,11 @@ node {
             sh "cp -R $WORKSPACE /code"
             sh "ls -la /code"
             sh '''echo """node_sast:
-  project_name: nodeGoat
+  project_name: Benchmark
   environment: master
-  language: nodejs
+  language: java
   html_report: true
   junit_report: true
-  npm:
-    devdep: false
-  retirejs:
-    devdep: fasle
 """ > /tmp/scan-config.yaml'''
             sh "run -s node_sast"
             sh "cp /tmp/reports/* $WORKSPACE"
