@@ -3,6 +3,19 @@ node {
         deleteDir()
         git branch: "master", url:  "https://github.com/OWASP/Benchmark.git"
     }
+    stage("build") {
+        def dockerParamsString = "--entrypoint=''"
+        def params = [
+            "-t",
+            "--name build_container"
+        ]
+        for (param in params) {
+            dockerParamsString += " ${param}"
+        }
+        docker.image("getcarrier/sast:latest").inside(dockerParamsString) {
+            sh "mvn compile"
+        }
+    }
     stage("Java scan") {
         def dockerParamsString = "--entrypoint=''"
         def params = [
