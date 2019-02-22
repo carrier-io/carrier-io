@@ -20,6 +20,7 @@ node {
         }
         docker.image("getcarrier/dast:dev").inside(dockerParamsString) {
             sh "supervisord"
+            sh "sleep 60"
 			sh "zap-cli spider http://"+get_host(env.BUILD_URL)+":9090"
 			sh "zap-cli active-scan --scanners all --recursive http://"+get_host(env.BUILD_URL)+":9090 || echo 'Seems we have couple of issues'"
 			sh "zap-cli report -o /tmp/zap.xml -f xml"
