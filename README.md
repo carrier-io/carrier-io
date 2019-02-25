@@ -25,6 +25,11 @@ jenkins on `<public_dns>/jenkins`
 
 grafana on `<public_dns>/grafana`
 
+## Minimal System Requirements
+| Server | CPU | RAM | HDD |
+| persistent | 4 | 16 | 200 Gb |
+| interceptor | 1 | 3 | 20 Gb |
+
 ## Configuration of interceptor (scale unit)
 
 As easy as export couple of vars and run a single container
