@@ -26,9 +26,11 @@ jenkins on `<public_dns>/jenkins`
 grafana on `<public_dns>/grafana`
 
 ## Minimal System Requirements
-| Server | CPU | RAM | HDD |
-| persistent | 4 | 16 | 200 Gb |
-| interceptor | 1 | 3 | 20 Gb |
+
+Server | CPU | RAM | HDD
+------- | ---- | ---- | ----
+persistent | 4 | 16Gb | 200Gb
+interceptor | 1 | 3Gb | 20Gb
 
 ## Configuration of interceptor (scale unit)
 
