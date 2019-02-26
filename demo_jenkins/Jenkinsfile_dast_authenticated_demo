@@ -19,14 +19,26 @@ node {
         for (param in params) {
             dockerParamsString += " ${param}"
         }
+        sh "docker pull getcarrier/dast:latest"
+        sh """echo '''basic:
+  target_host: epuakhaw1400.kyiv.epam.com
+  target_port: 9090
+  protocol: http
+  project_name: ZAP_Auth_Demo
+  environment: demo
+  html_report: true
+  junit_report: true
+''' > scan-config.yaml
+"""
         docker.image("getcarrier/dast:latest").inside(dockerParamsString) {
             sh "supervisord"
+            sh "cp scan-config.yaml /tmp/scan-config.yaml"
             docker.image("ubuntu:18.04").inside("--entrypoint=''") {
                 sh "apt-get -qq update && apt-get install -y curl && sleep 60"
                 sh "http_proxy='http://"+get_host(env.BUILD_URL)+":8090' curl -k -H 'Accept-Language: en-US,en;q=0.5' --compressed -H 'Referer: http://"+get_host(env.BUILD_URL)+":9090/register' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Connection: keep-alive' -H 'Upgrade-Insecure-Requests: 1' --data 'name=test&username=test&email=test%40example.com&password=test&cpassword=test' http://"+get_host(env.BUILD_URL)+":9090/register"
                 sh "http_proxy='http://"+get_host(env.BUILD_URL)+":8090' curl -k -H 'Accept-Language: en-US,en;q=0.5' --compressed -H 'Referer: http://"+get_host(env.BUILD_URL)+":9090/login' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Connection: keep-alive' -H 'Upgrade-Insecure-Requests: 1' --data 'username=test&password=test' http://"+get_host(env.BUILD_URL)+":9090/login"
             }
-			sh "zap_parse"
+			sh "zap_parse -s basic"
             sh "cp /tmp/reports/* $WORKSPACE"
             archiveArtifacts artifacts: '*.html'
 			junit '*.xml'
