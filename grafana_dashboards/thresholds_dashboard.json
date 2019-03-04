@@ -17,7 +17,7 @@
     "gnetId": null,
     "graphTooltip": 1,
     "id": null,
-    "iteration": 1550244805122,
+    "iteration": 1551713903094,
     "links": [],
     "panels": [
       {
@@ -135,7 +135,7 @@
             "value": "thresholds",
             "text": "thresholds"
           },
-          "hide": 0,
+          "hide": 2,
           "label": null,
           "name": "db_name",
           "options": [
@@ -172,9 +172,9 @@
         },
         {
           "current": {
-            "selected": false,
-            "text": "gatling",
-            "value": "gatling"
+            "tags": [],
+            "text": "jmeter",
+            "value": "jmeter"
           },
           "hide": 0,
           "label": "Datasource",
@@ -259,8 +259,8 @@
       ]
     },
     "timezone": "browser",
-    "title": "Set Tresholds",
+    "title": "Set Thresholds",
     "uid": "s_9nCaXmk",
-    "version": 31
+    "version": 3
   }
 }
