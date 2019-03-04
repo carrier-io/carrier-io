@@ -21,7 +21,7 @@ node {
         }
         sh "docker pull getcarrier/dast:latest"
         sh """echo '''basic:
-  target_host: """++get_host(env.BUILD_URL)+"""
+  target_host: """+get_host(env.BUILD_URL)+"""
   target_port: 9090
   protocol: http
   project_name: ZAP_Auth_Demo
