@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Carrier Installation</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/carrier.css') }}">
+	</head>
+	<body>
+		<div class="wrapper">
+			<div class="image-holder">
+                <h1>Carrier | Continuous Test Execution Platform</h1>
+                <h3>Installation Wizard</h3>
+				<img src="{{ url_for('static', filename='img/form-wizard.png') }}" alt="">
+			</div>
+            <form action="">
+            	<div id="wizard">
+            		<!-- SECTION 1 -->
+	                <h4></h4>
+	                <section>
+	                    <div class="form-row">
+	                    	<label for="dns"> Master DNS (DNS or IP you will use to access platform)</label>
+	                    	<input id="dns" type="text" class="form-control">
+	                    </div>
+	                    <div class="form-row">
+	                    	<label for="workers">
+                                How many parallel tasks you want to run on this machine
+	                    	</label>
+                            <p>A task requires at least 1 CPU and 2Gb of RAM</p>
+	                    	<input type="text" id="workers" class="form-control" placeholder="1" style="margin-bottom: 20px">
+	                    </div>
+                        <div class="checkbox" >
+                            <label>
+								<input type="checkbox" id="interceptor"> Configure interceptor
+								<span class="checkmark"></span>
+							</label>
+                        </div>
+                        <br/>
+                        <div class="checkbox" >
+                            <label>
+								<input type="checkbox" id="perfmeter"> Preload PerfMeter
+								<span class="checkmark" ></span>
+							</label>
+                        </div>
+                        <div class="checkbox" >
+                            <label>
+								<input type="checkbox" id="perfgun"> Preload PerfGun
+								<span class="checkmark"></span>
+							</label>
+                        </div>
+                        <br/>
+                        <div class="checkbox" >
+                            <label>
+								<input type="checkbox" id="sast"> Preload SAST
+								<span class="checkmark"></span>
+							</label>
+                        </div>
+                        <div class="checkbox" >
+                            <label>
+								<input type="checkbox" id="dast"> Preload DAST
+								<span class="checkmark"></span>
+							</label>
+                        </div>
+	                </section>
+
+					<!-- SECTION 2 -->
+	                <h4></h4>
+	                <section>
+                        <div class="checkbox" >
+                            <label>
+								<input type="checkbox" id="jenkins"> Install Jenkins
+								<span class="checkmark"></span>
+							</label>
+                        </div>
+                        <br />
+                        <div class="form-row">
+                            <label for="grafana_url">Grafana URL <p>Leave it blank and we will provision it for you</p></label>
+	                    	<input type="text" id="grafana_url" class="form-control">
+	                    </div>
+	                    <div class="form-row form-group">
+	                    	<div class="form-holder">
+	                    		<label for="grafana_login">Grafana Login</label>
+	                    		<input id="grafana_login" type="text" class="form-control">
+	                    	</div>
+	                    	<div class="form-holder">
+	                    		<label for="grafana_password">Grafana Password</label>
+	                    		<input id="grafana_password" type="password" class="form-control">
+	                    	</div>
+                        </div>
+                        <div class="checkbox" >
+                            <label>
+								<input type="checkbox" id="grafana"> Do not create dashboards
+								<span class="checkmark"></span>
+							</label>
+                        </div>
+                        <br />
+	                	<div class="form-row">
+	                    	<label for="influx_url">Influx URL <p>Leave it blank and we will provision it for you</p></label>
+	                    	<input type="text" id="influx_url" class="form-control">
+	                    </div>
+	                    <div class="form-row form-group">
+	                    	<div class="form-holder">
+	                    		<label for="influx_login">Influx Login</label>
+	                    		<input id="influx_login" type="text" class="form-control">
+	                    	</div>
+	                    	<div class="form-holder">
+	                    		<label for="influx_password">Influx Password</label>
+	                    		<input id="influx_password" type="password" class="form-control">
+	                    	</div>
+                        </div>
+                        <div class="checkbox" >
+                            <label>
+								<input type="checkbox" id="influx"> Do not create databases
+								<span class="checkmark"></span>
+							</label>
+                        </div>
+	                </section>
+
+	                <!-- SECTION 3 -->
+	                <h4></h4>
+	                <section>
+	                    <div class="checkout">
+	                    	<div class="total">
+                    			<span class="heading">Public DNS:</span>
+                    			<span class="total-price" id="public_dns_review">http://example.com</span>
+                                <p>This DNS/IP will be used to access your deployment</p>
+                    		</div>
+                            <div class="total">
+                    			<span class="total-price" id="workers_count">10</span>
+                                <span>task slots will be allocated on this machine</span>
+                    		</div>
+                            <br />
+                            <div class="total">
+                                <span class="heading">CI URL:</span>
+                    			<span class="total-price" id="jenkins_review">http://example.com/jenkins</span>
+                    		</div>
+                            <br />
+                            <div class="total">
+                                <span class="heading">Grafana URL:</span>
+                    			<span class="total-price" id="grafana_review">http://example.com/grafana</span>
+                                <span class="heading">with login:</span>
+                    			<span class="total-price" id="grafana_login_review">admin</span>
+                    		</div>
+                            <br />
+                            <div class="total">
+                                <span class="heading">InfluxDB URL:</span>
+                    			<span class="total-price" id="influx_review">http://example.com</span>
+                                <span class="heading">with login:</span>
+                    			<span class="total-price" id="influx_login_review">admin</span>
+                    		</div>
+	                    </div>
+	                </section>
+
+	                <!-- SECTION 4 -->
+	                <h4></h4>
+	                <section>
+                        <div id='install_status'>
+                        </div>
+	                    <!--<div class="checkbox-circle">-->
+							<!--<label class="active">-->
+								<!--<input type="radio" name="billing method" value="Direct bank transfer" checked>Direct bank transfer>-->
+								<!--<span class="checkmark"></span>-->
+								<!--<div class="tooltip">-->
+									<!--Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order will not be shipped until the funds have cleared in our account.-->
+								<!--</div>-->
+							<!--</label>-->
+							<!--<label>-->
+								<!--<input type="radio" name="billing method" value="Check payments">Check payments-->
+								<!--<span class="checkmark"></span>-->
+								<!--<div class="tooltip">-->
+									<!--Please send a check to Store Name, Store Street, Store Town, Store State / County, Store Postcode.-->
+								<!--</div>-->
+							<!--</label>-->
+							<!--<label>-->
+								<!--<input type="radio" name="billing method" value="Cash on delivery">Cash on delivery-->
+								<!--<span class="checkmark"></span>-->
+								<!--<div class="tooltip">-->
+									<!--Pay with cash upon delivery.-->
+								<!--</div>-->
+							<!--</label>-->
+						<!--</div>-->
+	                </section>
+            	</div>
+            </form>
+		</div>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<!-- JQUERY STEP -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-steps/1.1.0/jquery.steps.min.js"></script>
+		<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <!-- Template created and distributed by Colorlib -->
+    </body>
+</html>
