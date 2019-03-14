@@ -38,9 +38,9 @@ $(function(){
                     grafana_url: $("#grafana_url")[0].value,
                     grafana_user: $("#grafana_login")[0].value,
                     grafana_password: $("#grafana_password")[0].value,
-                    influx_url: $("#influx_url")[0].value,
-                    influx_user: $("#influx_login")[0].value,
-                    influx_password: $("#influx_password")[0].value
+                    influx_url: $("#influx_url")[0].value
+                    // influx_user: $("#influx_login")[0].value,
+                    // influx_password: $("#influx_password")[0].value
                   },
                   success: function(result){ console.log(result) },
                   dataType: 'json'

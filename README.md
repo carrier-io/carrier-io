@@ -1,36 +1,39 @@
 # Carrier | Continuous test execution platform
 
-## Platform Configuration. Standalone Deployment. Clean OS 
-### Ubuntu 16.04
-as a root user 
-
-```curl https://raw.githubusercontent.com/carrier-io/carrier-io/master/ubuntu/install.sh | bash```
-
-### CentOS 7
-as a root user 
-
-```curl https://raw.githubusercontent.com/carrier-io/carrier-io/master/centos/install.sh | bash```
-
-### Amazon Linux 2
-as a root user 
-
-```curl https://raw.githubusercontent.com/carrier-io/carrier-io/master/amazon2/install.sh | bash```
 
 
-during installation you will be asked to input preferred amount of workers and public DNS name
+## Standalone Deployment on server with Docker Installed
 
-one installation is done you can find:
+### Installing Carrier instance
 
-jenkins on `<public_dns>/jenkins`
+1. Run the docker command
+   
+   `docker run -it --rm -p 9999:9999 -v //var/run/docker.sock://var/run/docker.sock getcarrier/carrier-io:latest`
 
-grafana on `<public_dns>/grafana`
+2. Open `http://localhost:9999` in your browser
 
-## Minimal System Requirements
+3. Fill DNS and amount of worker slots you want be available on this server 
 
-Server | CPU | RAM | HDD
-------- | ---- | ---- | ----
-persistent | 4 | 16Gb | 200Gb
-interceptor | 1 | 3Gb | 20Gb
+   Mark all images you want to be seeded (Perfmeter, Perfgun, SAST and DAST) 
+
+   ![alt text](https://raw.githubusercontent.com/carrier-io/carrier-io/master/images/installation_step_1.png)
+
+4. Fill Grafana and Influx data in second screen
+
+   _Note: Leave Grafana and Influx URLs blank in case you need it filled_ 
+
+   ![alt text](https://raw.githubusercontent.com/carrier-io/carrier-io/master/images/installation_step_2.png)
+
+5. Review comfiguration and proceed with installation
+
+   ![alt text](https://raw.githubusercontent.com/carrier-io/carrier-io/master/images/installation_progress.png)
+
+6. Once installation is done you will see `Installation complete ...` message
+
+Jenkins will is available at `<public_dns>/jenkins` (only in case you choose an option to install it)
+
+Grafana will is available at `<public_dns>/grafana` (only in case you choose an option to install it)  
+ 
 
 ## Configuration of interceptor (scale unit)
 
@@ -46,3 +49,18 @@ docker run -d --rm -v /var/run/docker.sock:/var/run/docker.sock \
      -e REDIS_HOST=$FULLHOST getcarrier/interceptor:latest
 ```
        
+## Minimal System Requirements
+
+Server | CPU | RAM | HDD
+------- | ---- | ---- | ----
+carrier | 4 | 16Gb | 200Gb
+interceptor | 1 | 3Gb | 20Gb
+
+
+## Uninstall Carrier
+
+1. Run the docker command
+   
+   `docker run -it --rm -p 9999:9999 -v //var/run/docker.sock://var/run/docker.sock getcarrier/carrier-io:latest`
+
+2. Open `http://localhost:9999/uninstall` in your browser

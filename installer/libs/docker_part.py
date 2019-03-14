@@ -1,3 +1,17 @@
+#   Copyright 2018 getcarrier.io
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
 import docker
 from requests import get, post
 from time import sleep
@@ -112,6 +126,20 @@ class ProvisionDocker(object):
                  headers=constants.GRAFANA_HEADERS, data=db_data,
                  auth=(self.data['grafana_user'], self.data['grafana_password']))
 
+    def seed_docker_images(self):
+        if self.data['perfmeter']:
+            yield "Pulling Perfmeter image...\n"
+            self.client.images.pull('getcarrier/perfmeter', tag='latest')
+        if self.data['perfgun']:
+            yield "Pulling Perfgun image...\n"
+            self.client.images.pull('getcarrier/perfgun', tag='latest')
+        if self.data['dast']:
+            yield "Pulling DAST image...\n"
+            self.client.images.pull('getcarrier/dast', tag='latest')
+        if self.data['sast']:
+            yield "Pulling SAST image...\n"
+            self.client.images.pull('getcarrier/sast', tag='latest')
+
     def install(self):
         yield "Compiling Installation Configuration ... \n"
         install_traefik = False
@@ -144,6 +172,8 @@ class ProvisionDocker(object):
             self.seed_influx_dbs()
             yield "Installing Grafana dashboards... \n"
             self.seed_grafana_dashboards()
+        for line in self.seed_docker_images():
+            yield line
         yield "Installation complete ... \n"
 
     def uninstall(self):

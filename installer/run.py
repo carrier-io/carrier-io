@@ -1,3 +1,17 @@
+#   Copyright 2018 getcarrier.io
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
 from json import dumps
 
 from installer.libs.docker_part import ProvisionDocker
@@ -32,9 +46,7 @@ def install():
                 grafana_user='admin' if not request.form['grafana_user'] else request.form['grafana_user'],
                 grafana_password=request.form['grafana_password'],
                 install_influx=True if not request.form['influx_url'] else False,
-                influx_url=request.form['influx_url'],
-                influx_user=request.form['influx_user'],
-                influx_password=request.form['influx_password'])
+                influx_url=request.form['influx_url'])
     global cache
     cache.set("install_data", data)
     return dumps(data)
