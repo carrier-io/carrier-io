@@ -29,7 +29,7 @@
                                 How many parallel tasks you want to run on this machine
 	                    	</label>
                             <p>A task requires at least 1 CPU and 2Gb of RAM</p>
-	                    	<input type="text" id="workers" class="form-control" placeholder="1" style="margin-bottom: 20px">
+	                    	<input type="text" id="workers" class="form-control" placeholder="Put a number here" style="margin-bottom: 20px">
 	                    </div>
                         <div class="checkbox" >
                             <label>
@@ -75,10 +75,17 @@
 							</label>
                         </div>
                         <br />
-                        <div class="form-row">
-                            <label for="grafana_url">Grafana URL <p>Leave it blank and we will provision it for you</p></label>
+						<div class="checkbox" >
+                            <label>
+								<input type="checkbox" id="is_grafana" onclick="displayUrl('#grafana_url_div')"> I have Grafana
+								<span class="checkmark"></span>
+							</label>
+                        </div>
+                        <div class="form-row hidden" id="grafana_url_div">
+                            <label for="grafana_url">Grafana URL <p>Leave it blank and we will provision it for you. Fill it and we will use yours</p></label>
 	                    	<input type="text" id="grafana_url" class="form-control">
 	                    </div>
+						<br />
 	                    <div class="form-row form-group">
 	                    	<div class="form-holder">
 	                    		<label for="grafana_login">Grafana Login</label>
@@ -96,7 +103,13 @@
 							</label>
                         </div>
                         <br />
-	                	<div class="form-row">
+						<div class="checkbox" >
+                            <label>
+								<input type="checkbox" id="is_influx" onclick="displayUrl('#influx_url_div')"> I have Influx
+								<span class="checkmark"></span>
+							</label>
+                        </div>
+	                	<div class="form-row hidden" id="influx_url_div">
 	                    	<label for="influx_url">Influx URL <p>Leave it blank and we will provision it for you</p></label>
 	                    	<input type="text" id="influx_url" class="form-control">
 	                    </div>
@@ -147,8 +160,6 @@
                             <div class="total">
                                 <span class="heading">InfluxDB URL:</span>
                     			<span class="total-price" id="influx_review">http://example.com</span>
-                                <span class="heading">with login:</span>
-                    			<span class="total-price" id="influx_login_review">admin</span>
                     		</div>
 	                    </div>
 	                </section>

@@ -16,6 +16,10 @@ $(function(){
             if ( newIndex === 2 ) {
                 $('#public_dns_review').text($("#dns")[0].value);
                 $('#workers_count').text($("#workers")[0].value);
+                $('#jenkins_review').html("http://"+$("#dns")[0].value+"/jenkins");
+                $('#grafana_review').html("http://"+$("#dns")[0].value+"/grafana");
+                $('#grafana_login_review').html($("#grafana_login")[0].value);
+                $('#influx_review').html("http://"+$("#dns")[0].value+"/jenkins");
                 $('.steps ul').addClass('step-3');
             } else {
                 $('.steps ul').removeClass('step-3');
@@ -78,3 +82,11 @@ $(function(){
         $(this).addClass('active');
     })
 })
+
+function displayUrl(elem) {
+    if ($(elem).hasClass('hidden')) {
+        $(elem).removeClass('hidden');
+    } else {
+        $(elem).addClass('hidden');
+    }
+}

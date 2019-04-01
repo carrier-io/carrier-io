@@ -46,7 +46,8 @@ def install():
                 grafana_user='admin' if not request.form['grafana_user'] else request.form['grafana_user'],
                 grafana_password=request.form['grafana_password'],
                 install_influx=True if not request.form['influx_url'] else False,
-                influx_url=request.form['influx_url'])
+                influx_url=request.form['influx_url'],
+                redis_password=request.form.get('redis_password', 'password'))
     global cache
     cache.set("install_data", data)
     return dumps(data)
@@ -70,7 +71,7 @@ def stream_uninstall():
 def main():
     host = "0.0.0.0"
     port = 9999
-    app.run(host=host, port=port)
+    app.run(host=host, port=port, debug=True)
 
 
 if __name__ == "__main__":

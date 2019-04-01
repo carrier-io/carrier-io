@@ -197,7 +197,48 @@ REDIS_COMPOSE = """  redis:
     entrypoint:
       - redis-server
       - --requirepass
-      - ${password}
+      - {password}
+  
+  galloper:
+    image: getcarrier/galloper:latest
+    restart: unless-stopped
+    volumes:
+      - //var/run/docker.sock://var/run/docker.sock
+    networks:
+      - carrier
+    links:
+      - "redis:redis"
+    container_name: carrier-galloper
+    environment:
+      - REDIS_PASSWORD={password}
+      - REDIS_HOST=redis
+      - APP_HOST={host}
+      - CPU_CORES={cpu_cores}
+    depends_on:
+      - redis
+    expose:
+      - "5000"
+    labels:
+      - 'traefik.backend=galloper'
+      - 'traefic.port=5000'
+      - 'traefik.frontend.rule=PathPrefix: /'
+      - 'traefik.frontend.passHostHeader=true'
+      - 'carrier=galloper 
+      
+  interceptor:
+    image: getcarrier/interceptor:latest
+    restart: unless-stopped
+    labels:
+      - 'traefik.enable=false'
+      - 'carrier=interceptor'
+    depends_on:
+      - redis
+    volumes:
+      - //var/run/docker.sock://var/run/docker.sock
+    environment:
+      - CPU_CORES={cpu_cores}
+      - REDIS_PASSWORD={password}
+      - REDIS_HOST={host}
 """
 
 NETWORK_PIECE = """\nnetworks:

@@ -72,7 +72,9 @@ class ProvisionDocker(object):
                                                             volume=constants.INFLUX_VOLUME_NAME)
 
     def prepare_redis(self):
-        self.redis_piece = constants.REDIS_COMPOSE.format(password=self.data['redis_password'])
+        self.redis_piece = constants.REDIS_COMPOSE.format(password=self.data['redis_password'],
+                                                          host=self.data['dns'],
+                                                          cpu_cores=self.data['workers'])
 
     def _popen_yield(self, cmd):
         popen = Popen(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True, cwd=constants.WORKDIR)
@@ -81,10 +83,11 @@ class ProvisionDocker(object):
         popen.stdout.close()
         return_code = popen.wait()
         if return_code:
-            raise CalledProcessError(return_code, cmd)
+            return f'ERROR: \n{popen.stderr.read()}'
 
     def compose_build(self):
         self.create_network()
+        self.prepare_redis()
         with open(path.join(constants.WORKDIR, 'docker-compose.yaml'), 'w') as f:
             f.write(constants.DOCKER_COMPOSE)
             for each in [self.traefik_piece, self.jenkins_piece,
@@ -107,6 +110,7 @@ class ProvisionDocker(object):
             job_data = get(jobfile).content
             post(constants.JENKINS_URL.format(host=self.data['dns'], job=job),
                  headers=constants.JENKINS_HEADERS, data=job_data)
+
     def create_databases(self):
         influx_container = self.client.containers.list(filters={"label": "carrier=influx"})[0]
         for db in constants.INFLUX_DATABASES:

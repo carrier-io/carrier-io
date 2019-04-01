@@ -481,4 +481,8 @@ textarea.form-control {
   .item .purchase {
     margin-left: 11px; } }
 
+.hidden {
+    display: none;
+}
+
 /*# sourceMappingURL=style.css.map */
