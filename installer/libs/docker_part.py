@@ -18,6 +18,7 @@ from time import sleep
 from os import mkdir, path
 from installer import constants
 from subprocess import Popen, PIPE, CalledProcessError
+from traceback import format_exc
 
 
 class ProvisionDocker(object):
@@ -83,7 +84,8 @@ class ProvisionDocker(object):
         popen.stdout.close()
         return_code = popen.wait()
         if return_code:
-            return f'ERROR: \n{popen.stderr.read()}'
+            yield f'ERROR: \n{popen.stderr.read()}'
+            raise CalledProcessError(return_code, cmd, popen.stderr.read())
 
     def compose_build(self):
         self.create_network()
@@ -146,17 +148,21 @@ class ProvisionDocker(object):
 
     def install(self):
         yield "Compiling Installation Configuration ... \n"
-        install_traefik = False
-        if self.data['install_jenkins']:
-            install_traefik = True
-            self.prepare_jenkins()
-        if self.data['install_grafana']:
-            install_traefik = True
-            self.prepare_grafana()
-        if install_traefik:
-            self.prepare_traefik()
-        if self.data['install_influx']:
-            self.prepare_influx()
+        try:
+            install_traefik = False
+            if self.data['install_jenkins']:
+                install_traefik = True
+                self.prepare_jenkins()
+            if self.data['install_grafana']:
+                install_traefik = True
+                self.prepare_grafana()
+            if install_traefik:
+                self.prepare_traefik()
+            if self.data['install_influx']:
+                self.prepare_influx()
+        except:
+            yield format_exc()
+            raise
         yield "Installation Configuration Done, Preparing Containers ... \n"
         for line in self.compose_build():
             yield line
