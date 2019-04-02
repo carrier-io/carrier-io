@@ -30,6 +30,7 @@ class ProvisionDocker(object):
         self.grafana_piece = ''
         self.influx_piece = ''
         self.redis_piece = ''
+        self.vault_piece = ''
         self.volumes_piece = 'volumes:'
         self.network_piece = constants.NETWORK_PIECE
 
@@ -77,6 +78,11 @@ class ProvisionDocker(object):
                                                           host=self.data['dns'],
                                                           cpu_cores=self.data['workers'])
 
+    def prepare_vault(self):
+        self.client.volumes.create(constants.VAULT_VOLUME_NAME, labels={"carrier": "jenkins"})
+        self.volumes_piece += f'\n  {constants.VAULT_VOLUME_NAME}:\n    external: true'
+        self.vault_piece = constants.VAULT_COMPOSE % constants.VAULT_VOLUME_NAME
+
     def _popen_yield(self, cmd):
         popen = Popen(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True, cwd=constants.WORKDIR)
         for stdout_line in iter(popen.stdout.readline, ""):
@@ -90,12 +96,13 @@ class ProvisionDocker(object):
     def compose_build(self):
         self.create_network()
         self.prepare_redis()
+        self.prepare_vault()
         with open(path.join(constants.WORKDIR, 'docker-compose.yaml'), 'w') as f:
             f.write(constants.DOCKER_COMPOSE)
             for each in [self.traefik_piece, self.jenkins_piece,
                          self.influx_piece, self.grafana_piece,
-                         self.redis_piece, self.volumes_piece,
-                         self.network_piece]:
+                         self.redis_piece, self.vault_piece,
+                         self.volumes_piece, self.network_piece]:
                 if each:
                     f.write(each)
         cmd = ['docker-compose', 'build']

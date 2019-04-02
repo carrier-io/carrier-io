@@ -12,6 +12,7 @@ JENKINS_HOME = "/var/jenkins_home"
 INFLUX_VOLUME_NAME = "carrier_influx_volume"
 GRAFANA_VOLUME_NAME = "carrier_grafana_volume"
 JENKINS_VOLUME_NAME = "carrier_jenkins_volume"
+VAULT_VOLUME_NAME = "carrier_vault_volume"
 
 # Dockerfiles
 JENKINSFILE = f"""FROM jenkins/jenkins:lts
@@ -134,6 +135,27 @@ JENKINS_COMPOSE = """  jenkins:
       - 'carrier=jenkins'
 """
 
+VAULT_COMPOSE = """  vault:
+    image: vault:1.1.0
+    restart: unless-stopped
+    environment:
+      - 'VAULT_DEV_ROOT_TOKEN_ID=vault_token' 
+      - 'VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200'
+      - 'VAULT_LOCAL_CONFIG={"backend": {"file": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h"}'
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - %s:/vault
+    ports:
+      - 8200:8200
+    networks:
+      - carrier
+    container_name: carrier-vault
+    labels:
+      - 'traefik.enable=false'
+      - 'carrier=vault'
+"""
+
 INFLUX_COMPOSE = '''  influx:
     build: {path}
     restart: unless-stopped
@@ -160,6 +182,7 @@ GRAFANA_COMPOSE = '''  grafana:
       - GF_SERVER_ROOT_URL=http://{host}/grafana
     networks:
       - carrier
+    container_name: carrier-grafana
     labels:
       - 'traefik.backend=grafana'
       - 'traefic.port=3000'
@@ -176,6 +199,7 @@ TRAEFIC_COMPOSE = """  traefik:
       - //var/run/docker.sock://var/run/docker.sock
     networks:
       - carrier
+    container_name: carrier-traefik
     labels:
         - 'carrier=traefik'
     ports:
@@ -223,11 +247,12 @@ REDIS_COMPOSE = """  redis:
       - 'traefic.port=5000'
       - 'traefik.frontend.rule=PathPrefix: /'
       - 'traefik.frontend.passHostHeader=true'
-      - 'carrier=galloper 
+      - 'carrier=galloper' 
       
   interceptor:
     image: getcarrier/interceptor:latest
     restart: unless-stopped
+    container_name: interceptor
     labels:
       - 'traefik.enable=false'
       - 'carrier=interceptor'
