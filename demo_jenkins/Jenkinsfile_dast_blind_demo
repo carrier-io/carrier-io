@@ -10,21 +10,35 @@ node {
     }
     stage("scan application") {
         def dockerParamsString = "--entrypoint=''"
+		        sh """echo '''basic:
+  target_host: """+get_host(env.BUILD_URL)+"""
+  target_port: 9090
+  protocol: http
+  project_name: ZAP_Auth_Demo
+  environment: demo
+  html_report: true
+  junit_report: true
+  reportportal:
+    rp_host: https://rp.epam.com
+    rp_token: 71028817-4f1f-4546-9574-bd4b72949989
+    rp_project_name: artem_rozumenko_personal
+    rp_launch_name: blind_dast
+  sslyze: true
+  zap:
+    scan_types: xss,sqli
+''' > scan-config.yaml
+		"""
+
         def params = [
             "-t",
-            "--name build_container",
-            "-p 8090:8090"
+            "--name dast_blind"
         ]
         for (param in params) {
             dockerParamsString += " ${param}"
         }
-        docker.image("getcarrier/dast:dev").inside(dockerParamsString) {
-            sh "supervisord"
-            sh "sleep 60"
-			sh "zap-cli spider http://"+get_host(env.BUILD_URL)+":9090"
-			sh "zap-cli active-scan --scanners all --recursive http://"+get_host(env.BUILD_URL)+":9090 || echo 'Seems we have couple of issues'"
-			sh "zap-cli report -o /tmp/zap.xml -f xml"
-			sh "zap_parse"
+        docker.image("getcarrier/dast:latest").inside(dockerParamsString) {
+            sh "cp scan-config.yaml /tmp/scan-config.yaml"
+            sh "run -s basic"
             sh "cp /tmp/reports/* $WORKSPACE"
             archiveArtifacts artifacts: '*.html'
 			junit '*.xml'
