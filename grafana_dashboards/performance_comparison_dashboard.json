@@ -93,7 +93,6 @@
                   "type": "fill"
                 }
               ],
-              "orderByTime": "ASC",
               "policy": "default",
               "query": "SELECT mean($calculation) FROM api_comparison WHERE simulation = '$simulation' AND \"request_name\" =~ /^$request_name$/  AND $timeFilter GROUP BY time($grouping), \"request_name\" fill(null)",
               "rawQuery": true,
