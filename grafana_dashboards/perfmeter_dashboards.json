@@ -1774,7 +1774,10 @@
           "y": 34
         },
         "id": 49,
-        "panels": [
+        "panels": [],
+        "title": "Summary table",
+        "type": "row"
+      },
           {
             "columns": [],
             "datasource": "jmeter",
@@ -1795,8 +1798,8 @@
             "scroll": false,
             "showHeader": true,
             "sort": {
-              "col": 1,
-              "desc": false
+              "col": 10,
+              "desc": true
             },
             "styles": [
               {
@@ -2128,18 +2131,18 @@
             "renderer": "flot",
             "seriesOverrides": [
               {
-                "alias": "200",
+                "alias": "/^2.*/",
                 "color": "#3F6833",
                 "linewidth": 3
               },
               {
-                "alias": "/4.*/",
+                "alias": "/^4.*/",
                 "color": "#890F02",
                 "linewidth": 1,
                 "points": true
               },
               {
-                "alias": "/5.*/",
+                "alias": "/^5.*/",
                 "color": "#C15C17",
                 "linewidth": 1,
                 "points": true
@@ -2237,10 +2240,6 @@
               "align": false,
               "alignLevel": null
             }
-          }
-        ],
-        "title": "Summary table",
-        "type": "row"
       },
       {
         "collapsed": true,
@@ -2248,7 +2247,7 @@
           "h": 1,
           "w": 24,
           "x": 0,
-          "y": 35
+          "y": 61
         },
         "id": 41,
         "panels": [
@@ -2260,7 +2259,7 @@
               "h": 9,
               "w": 24,
               "x": 0,
-              "y": 36
+              "y": 62
             },
             "hideTimeOverride": true,
             "id": 43,
@@ -2348,7 +2347,7 @@
           "h": 1,
           "w": 24,
           "x": 0,
-          "y": 36
+          "y": 62
         },
         "id": 47,
         "panels": [
@@ -2360,7 +2359,7 @@
               "h": 9,
               "w": 24,
               "x": 0,
-              "y": 4
+              "y": 63
             },
             "hideTimeOverride": true,
             "id": 45,
@@ -2651,6 +2650,7 @@
           "auto_count": 100,
           "auto_min": "10s",
           "current": {
+            "selected": true,
             "text": "auto",
             "value": "$__auto_interval_grouping"
           },
@@ -2774,6 +2774,6 @@
     "timezone": "browser",
     "title": "jmeter Load Test",
     "uid": "lCIqEHbiz",
-    "version": 27
+    "version": 4
   }
 }
