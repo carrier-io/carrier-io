@@ -4,7 +4,7 @@
 
 ## Standalone Deployment on server with Docker Installed
 
-### Installing Carrier instance
+### Installing Carrier instance (web UI based, seems less reliable for now - see CLI method in the bottom of the page).
 
 1. Run the docker command
    
@@ -64,3 +64,10 @@ interceptor | 1 | 3Gb | 20Gb
    `docker run -it --rm -p 9999:9999 -v //var/run/docker.sock://var/run/docker.sock getcarrier/carrier-io:latest`
 
 2. Open `http://localhost:9999/uninstall` in your browser
+
+### Installing Carrier instance from CLI.
+If you are using AWS Amazon Linux 2 to try carrier.io out, just run following under root:
+https://github.com/dzavalei/carrier-io/blob/master/amazon2/install.sh
+
+For Ubuntu and Centos there are corresponding subfolders in https://github.com/dzavalei/carrier-io/ folder.
+
