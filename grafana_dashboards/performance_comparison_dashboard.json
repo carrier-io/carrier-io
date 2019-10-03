@@ -581,7 +581,7 @@
                 }
               ],
               "policy": "default",
-              "query": "SELECT \"sum_1xx1\" AS \"1xx t1\", \"sum_1xx2\" AS \"1xx t2\", \"sum_2xx1\" AS \"2xx t1\", \"sum_2xx2\" AS \"2xx t2\",         \"sum_3xx1\" AS \"3xx t1\", \"sum_3xx2\" AS \"3xx t2\", \"sum_4xx1\" AS \"4xx t1\", \"sum_4xx2\" AS \"4xx t2\",         \"sum_5xx1\" AS \"5xx t1\", \"sum_5xx2\" AS \"5xx t2\", \"sum_NaN1\" AS \"NaN t1\", \"sum_NaN2\" AS \"NaN t2\"           FROM (SELECT sum(*) FROM \t(SELECT last(\"1xx\"::float) AS \"1xx1\", last(\"2xx\"::float) AS \"2xx1\",      \t\t         last(\"3xx\"::float) AS \"3xx1\", last(\"4xx\"::float) AS \"4xx1\", \t\t\t         last(\"5xx\"::float) AS \"5xx1\", last(\"NaN\"::float) AS \"NaN1\"  \t\t\t         from api_comparison where build_id = '$build1' AND \"request_name\" =~ /^$request_name$/), \t         (SELECT last(\"1xx\"::float) AS \"1xx2\", last(\"2xx\"::float) AS \"2xx2\",      \t\t         last(\"3xx\"::float) AS \"3xx2\", last(\"4xx\"::float) AS \"4xx2\", \t\t\t         last(\"5xx\"::float) AS \"5xx2\", last(\"NaN\"::float) AS \"NaN2\"  \t\t\t         from api_comparison where build_id = '$build2' AND \"request_name\" =~ /^$request_name$/) ) GROUP BY request_name",
+              "query": "SELECT \"sum_1xx1\" AS \"1xx t1\", \"sum_1xx2\" AS \"1xx t2\", \"sum_2xx1\" AS \"2xx t1\", \"sum_2xx2\" AS \"2xx t2\",         \"sum_3xx1\" AS \"3xx t1\", \"sum_3xx2\" AS \"3xx t2\", \"sum_4xx1\" AS \"4xx t1\", \"sum_4xx2\" AS \"4xx t2\",         \"sum_5xx1\" AS \"5xx t1\", \"sum_5xx2\" AS \"5xx t2\", \"sum_NaN1\" AS \"NaN t1\", \"sum_NaN2\" AS \"NaN t2\"           FROM (SELECT sum(*) FROM \t(SELECT sum(\"1xx\"::float) AS \"1xx1\", sum(\"2xx\"::float) AS \"2xx1\",      \t\t         sum(\"3xx\"::float) AS \"3xx1\", sum(\"4xx\"::float) AS \"4xx1\", \t\t\t         sum(\"5xx\"::float) AS \"5xx1\", sum(\"NaN\"::float) AS \"NaN1\"  \t\t\t         from api_comparison where build_id = '$build1' AND \"request_name\" =~ /^$request_name$/), \t         (SELECT sum(\"1xx\"::float) AS \"1xx2\", sum(\"2xx\"::float) AS \"2xx2\",      \t\t         sum(\"3xx\"::float) AS \"3xx2\", sum(\"4xx\"::float) AS \"4xx2\", \t\t\t         sum(\"5xx\"::float) AS \"5xx2\", sum(\"NaN\"::float) AS \"NaN2\"  \t\t\t         from api_comparison where build_id = '$build2' AND \"request_name\" =~ /^$request_name$/) ) GROUP BY request_name",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "table",
@@ -685,7 +685,7 @@
                 }
               ],
               "policy": "default",
-              "query": "SELECT ((\"sum_check2\"-\"sum_check1\")/\"sum_check2\")*100 FROM (SELECT sum(*) FROM (SELECT last(\"$calculation\"::float) AS \"check1\" from api_comparison where build_id = '$build1'), (SELECT last(\"$calculation\"::float) AS \"check2\" from api_comparison where build_id = '$build2') )",
+              "query": "SELECT ((\"sum_check2\"-\"sum_check1\")/\"sum_check2\")*100 FROM (SELECT sum(*) FROM (SELECT mean(\"$calculation\"::float) AS \"check1\" from api_comparison where build_id = '$build1'), (SELECT mean(\"$calculation\"::float) AS \"check2\" from api_comparison where build_id = '$build2') )",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "time_series",
@@ -801,7 +801,7 @@
                 }
               ],
               "policy": "default",
-              "query": "SELECT \"sum_First Total\" AS \"Total Req t1\", \"sum_Second Total\" AS \"Total Req t2\",          \"sum_First Min\" AS \"Min t1\", \"sum_Second Min\" AS \"Min t2\",         \"sum_First PCT95\" AS \"Pct95 t1\", \"sum_Second PCT95\" AS \"Pct95 t2\",  \t    \"sum_First Max\" AS \"Max t1\", \"sum_Second Max\" AS \"Max t2\", \t    \"sum_First Success\" AS \"Success t1\", \"sum_Second Success\" AS \"Success t2\",  \t    \"sum_First Failed\" AS \"Failed t1\", \"sum_Second Failed\" AS \"Failed t2\"  FROM (SELECT sum(*) from \t(SELECT last(\"total\"::float) AS \"First Total\", last(\"min\"::float) AS \"First Min\",      \t\t last(\"pct95\"::float) AS \"First PCT95\", last(\"max\"::float) AS \"First Max\",  \t\t\t last(\"ok\"::float) AS \"First Success\", last(\"ko\"::float) AS \"First Failed\"  \t\t\t from api_comparison where build_id = '$build1' AND \"request_name\" =~ /^$request_name$/), \t (SELECT last(\"total\"::float) AS \"Second Total\", last(\"min\"::float) AS \"Second Min\",      \t\t last(\"pct95\"::float) AS \"Second PCT95\", last(\"max\"::float) AS \"Second Max\",  \t\t\t last(\"ok\"::float) AS \"Second Success\", last(\"ko\"::float) AS \"Second Failed\"  \t\t\t from api_comparison where build_id = '$build2' AND \"request_name\" =~ /^$request_name$/) ) GROUP BY request_name",
+              "query": "SELECT \"sum_First Total\" AS \"Total Req t1\", \"sum_Second Total\" AS \"Total Req t2\",          \"sum_First Min\" AS \"Min t1\", \"sum_Second Min\" AS \"Min t2\",         \"sum_First PCT95\" AS \"Pct95 t1\", \"sum_Second PCT95\" AS \"Pct95 t2\",  \t    \"sum_First Max\" AS \"Max t1\", \"sum_Second Max\" AS \"Max t2\", \t    \"sum_First Success\" AS \"Success t1\", \"sum_Second Success\" AS \"Success t2\",  \t    \"sum_First Failed\" AS \"Failed t1\", \"sum_Second Failed\" AS \"Failed t2\"  FROM (SELECT sum(*) from \t(SELECT sum(\"total\"::float) AS \"First Total\", mean(\"min\"::float) AS \"First Min\",      \t\t mean(\"pct95\"::float) AS \"First PCT95\", mean(\"max\"::float) AS \"First Max\",  \t\t\t sum(\"ok\"::float) AS \"First Success\", sum(\"ko\"::float) AS \"First Failed\"  \t\t\t from api_comparison where build_id = '$build1' AND \"request_name\" =~ /^$request_name$/), \t (SELECT sum(\"total\"::float) AS \"Second Total\", mean(\"min\"::float) AS \"Second Min\",      \t\t mean(\"pct95\"::float) AS \"Second PCT95\", mean(\"max\"::float) AS \"Second Max\",  \t\t\t sum(\"ok\"::float) AS \"Second Success\", sum(\"ko\"::float) AS \"Second Failed\"  \t\t\t from api_comparison where build_id = '$build2' AND \"request_name\" =~ /^$request_name$/) ) GROUP BY request_name",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "table",
@@ -883,7 +883,7 @@
                 }
               ],
               "policy": "default",
-              "query": "SELECT \"sum_pct501\" AS \"p50 t1\", \"sum_pct502\" AS \"p50 t2\",         \"sum_pct751\" AS \"p75 t1\", \"sum_pct752\" AS \"p75 t2\", \t    \"sum_pct901\" AS \"p90 t1\", \"sum_pct902\" AS \"p90 t2\", \t    \"sum_pct951\" AS \"p95 t1\", \"sum_pct952\" AS \"p95 t2\", \t    \"sum_pct991\" AS \"p99 t1\", \"sum_pct992\" AS \"p99 t2\" FROM (SELECT sum(*) FROM \t (SELECT last(\"pct50\"::float) AS \"pct501\", last(\"pct75\"::float) AS \"pct751\",      \t\t last(\"pct90\"::float) AS \"pct901\", last(\"pct95\"::float) AS \"pct951\", \t\t\t last(\"pct99\"::float) AS \"pct991\"  \t\t\t from api_comparison where build_id = '$build1' AND \"request_name\" =~ /^$request_name$/), \t (SELECT last(\"pct50\"::float) AS \"pct502\", last(\"pct75\"::float) AS \"pct752\",      \t\t last(\"pct90\"::float) AS \"pct902\", last(\"pct95\"::float) AS \"pct952\", \t\t\t last(\"pct99\"::float) AS \"pct992\"  \t\t\t from api_comparison where build_id = '$build2'  AND \"request_name\" =~ /^$request_name$/) ) GROUP BY request_name",
+              "query": "SELECT \"sum_pct501\" AS \"p50 t1\", \"sum_pct502\" AS \"p50 t2\",         \"sum_pct751\" AS \"p75 t1\", \"sum_pct752\" AS \"p75 t2\", \t    \"sum_pct901\" AS \"p90 t1\", \"sum_pct902\" AS \"p90 t2\", \t    \"sum_pct951\" AS \"p95 t1\", \"sum_pct952\" AS \"p95 t2\", \t    \"sum_pct991\" AS \"p99 t1\", \"sum_pct992\" AS \"p99 t2\" FROM (SELECT sum(*) FROM \t (SELECT mean(\"pct50\"::float) AS \"pct501\", mean(\"pct75\"::float) AS \"pct751\",      \t\t mean(\"pct90\"::float) AS \"pct901\", mean(\"pct95\"::float) AS \"pct951\", \t\t\t mean(\"pct99\"::float) AS \"pct991\"  \t\t\t from api_comparison where build_id = '$build1' AND \"request_name\" =~ /^$request_name$/), \t (SELECT mean(\"pct50\"::float) AS \"pct502\", mean(\"pct75\"::float) AS \"pct752\",      \t\t mean(\"pct90\"::float) AS \"pct902\", mean(\"pct95\"::float) AS \"pct952\", \t\t\t mean(\"pct99\"::float) AS \"pct992\"  \t\t\t from api_comparison where build_id = '$build2'  AND \"request_name\" =~ /^$request_name$/) ) GROUP BY request_name",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "table",
@@ -1043,37 +1043,37 @@
           },
           {
             "current": {
-              "value": "http://epuakhaw1400.kyiv.epam.com",
-              "text": "http://epuakhaw1400.kyiv.epam.com"
+              "text": "http://carrier-influx",
+              "value": "http://carrier-influx"
             },
             "hide": 2,
             "label": "",
             "name": "db_url",
             "options": [
               {
-                "value": "http://epuakhaw1400.kyiv.epam.com",
-                "text": "http://epuakhaw1400.kyiv.epam.com"
+                "text": "http://carrier-influx",
+                "value": "http://carrier-influx"
               }
             ],
-            "query": "http://epuakhaw1400.kyiv.epam.com",
+            "query": "http://carrier-influx",
             "skipUrlSync": false,
             "type": "constant"
           },
           {
             "current": {
-              "value": "http://epuakhaw1400.kyiv.epam.com",
-              "text": "http://epuakhaw1400.kyiv.epam.com"
+              "text": "http://carrier-influx",
+              "value": "http://carrier-influx"
             },
             "hide": 2,
             "label": "",
             "name": "perf_host",
             "options": [
               {
-                "value": "http://epuakhaw1400.kyiv.epam.com",
-                "text": "http://epuakhaw1400.kyiv.epam.com"
+                "text": "http://carrier-influx",
+                "value": "http://carrier-influx"
               }
             ],
-            "query": "http://epuakhaw1400.kyiv.epam.com",
+            "query": "http://carrier-influx",
             "skipUrlSync": false,
             "type": "constant"
           },
@@ -1267,4 +1267,3 @@
       "version": 2
     }
   }
-}
