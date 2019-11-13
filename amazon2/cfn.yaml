@@ -1,0 +1,380 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Reporting Instance'
+
+Parameters:
+
+  KeyName:
+    Description: The EC2 Key Pair to allow SSH access to the instance
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: !Ref AWSKey
+  
+  Image:
+    Description: EC2 imageid for instance
+    Type: String
+    #Default: ami-00dc79254d0461090
+    #Default: ami-040ba9174949f6de4
+    Default: !Ref AMI
+
+  InstanceType:
+    Description: EC2 instance type for the instance
+    Type: String
+    Default: !Ref shape
+    AllowedValues:
+    - t2.micro
+    - t2.small
+    - t2.medium
+    - t2.large
+    - t2.xlarge
+    - t2.2xlarge
+    - t3.large
+    - m3.medium
+    - m3.large
+    - m3.xlarge
+    - m3.2xlarge
+    - m4.large
+    - m4.xlarge
+    - m4.2xlarge
+    - m4.4xlarge
+    - m4.10xlarge
+    - m5.large
+    - m5.xlarge
+    - m5.2xlarge
+    - m5.4xlarge
+    - m5.12xlarge
+    - m5.24xlarge
+    - c4.large
+    - c4.xlarge
+    - c4.2xlarge
+    - c4.4xlarge
+    - c4.8xlarge
+    - c5.large
+    - c5.xlarge
+    - c5.2xlarge
+    - c5.4xlarge
+    - c5.9xlarge
+    - c5.18xlarge
+    - i3.large
+    - i3.xlarge
+    - i3.2xlarge
+    - i3.4xlarge
+    - i3.8xlarge
+    - i3.16xlarge
+    - r3.xlarge
+    - r3.2xlarge
+    - r3.4xlarge
+    - r3.8xlarge
+    - r4.large
+    - r4.xlarge
+    - r4.2xlarge
+    - r4.4xlarge
+    - r4.8xlarge
+    - r4.16xlarge
+    - x1.16xlarge
+    - x1.32xlarge
+    - p2.xlarge
+    - p2.8xlarge
+    - p2.16xlarge
+    - p3.2xlarge
+    - p3.8xlarge
+    - p3.16xlarge
+    ConstraintDescription: must be a valid EC2 instance type
+
+  VpcId:
+    Description: The VPC of the instance
+    Type: AWS::EC2::VPC::Id
+    Default: !Ref VPC
+
+  Subnets:
+    Description: The subnet of the instance
+    Type: List<AWS::EC2::Subnet::Id>
+    Default: !Ref Subnet
+
+Resources:
+  EC2SecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupName:
+        !Join [ "-", [ !Ref "AWS::StackName", SG] ]
+      GroupDescription: EC2 Security Group for Reporting Instance
+      VpcId: !Ref VpcId
+
+  EC2SecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: EC2SecurityGroup
+    Properties:
+      Description: Allow connection to Reporting Web UI
+      GroupId: !GetAtt EC2SecurityGroup.GroupId
+      CidrIp: 0.0.0.0/0
+      IpProtocol: 'tcp'
+      FromPort: 80
+      ToPort: 80
+  
+  EC2SecurityGroupIngress8080:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: EC2SecurityGroup
+    Properties:
+      Description: Allow connection to Reporting Web UI
+      GroupId: !GetAtt EC2SecurityGroup.GroupId
+      CidrIp: 0.0.0.0/0
+      IpProtocol: 'tcp'
+      FromPort: 8080
+      ToPort: 8080
+  
+  EC2SecurityGroupIngress8080:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: EC2SecurityGroup
+    Properties:
+      Description: Allow connection to MinIO
+      GroupId: !GetAtt EC2SecurityGroup.GroupId
+      CidrIp: 0.0.0.0/0
+      IpProtocol: 'tcp'
+      FromPort: 9000
+      ToPort: 9000
+
+  EC2SecurityGroupIngress8086:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: EC2SecurityGroup
+    Properties:
+      Description: Allow connection to InfluxDB
+      GroupId: !GetAtt EC2SecurityGroup.GroupId
+      CidrIp: 0.0.0.0/0
+      IpProtocol: 'tcp'
+      FromPort: 8086
+      ToPort: 8086
+  
+  EC2SecurityGroupIngress2003:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: EC2SecurityGroup
+    Properties:
+      Description: Allow connection to Graphite
+      GroupId: !GetAtt EC2SecurityGroup.GroupId
+      CidrIp: 0.0.0.0/0
+      IpProtocol: 'tcp'
+      FromPort: 2003
+      ToPort: 2003
+
+  EC2SecurityGroupIngress6379:
+      Type: AWS::EC2::SecurityGroupIngress
+      DependsOn: EC2SecurityGroup
+      Properties:
+        Description: Allow connection to Redis
+        GroupId: !GetAtt EC2SecurityGroup.GroupId
+        CidrIp: 0.0.0.0/0
+        IpProtocol: 'tcp'
+        FromPort: 6379
+        ToPort: 6379
+
+  EC2SecurityGroupIngress3100:
+      Type: AWS::EC2::SecurityGroupIngress
+      DependsOn: EC2SecurityGroup
+      Properties:
+        Description: Allow connection to Loki
+        GroupId: !GetAtt EC2SecurityGroup.GroupId
+        CidrIp: 0.0.0.0/0
+        IpProtocol: 'tcp'
+        FromPort: 3100
+        ToPort: 3100
+
+  EC2SecurityGroupIngress22:
+      Type: AWS::EC2::SecurityGroupIngress
+      DependsOn: EC2SecurityGroup
+      Properties:
+        Description: Allow connection to SSH
+        GroupId: !GetAtt EC2SecurityGroup.GroupId
+        CidrIp: 0.0.0.0/0
+        IpProtocol: 'tcp'
+        FromPort: 22
+        ToPort: 22
+
+  ReportingInstance:
+      Type: AWS::EC2::Instance
+      Metadata:
+        AWS::CloudFormation::Init:
+          configSets:
+            main:
+              - "docker"
+          docker:
+            packages:
+              yum:
+                jq: []
+            files:
+              /tmp/docker-install.sh:
+                content:
+                  Fn::Join: ["",
+                    [
+                    "#!/bin/bash", "\n",
+                    "sudo yum update -y", "\n",
+                    "sudo amazon-linux-extras install -y docker", "\n",
+                    "sudo service docker start", "\n",
+                    "sudo usermod -a -G docker ec2-user", "\n",
+                    "sudo docker info", "\n",
+                    "sudo curl -L \"https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)\" -o /usr/local/bin/docker-compose", "\n",
+                    "sudo chmod +x /usr/local/bin/docker-compose", "\n",
+                    "sudo mkdir /opt/carrier_traefik", "\n",
+                    "sudo mkdir /opt/carrier_influx", "\n",
+                    "sudo mkdir /opt/carrier_grafana", "\n",
+                    "sudo mkdir /opt/carrier_minio", "\n",
+                    "sudo chmod -R 777 /opt/carrier_traefik", "\n",
+                    "sudo chmod -R 777 /opt/carrier_influx", "\n",
+                    "sudo chmod -R 777 /opt/carrier_grafana", "\n",
+                    "sudo chmod -R 777 /opt/carrier_minio", "\n",
+                    "echo '[api]' > /opt/carrier_traefik/traefik.toml", "\n",
+                    "echo '[docker]' >> /opt/carrier_traefik/traefik.toml", "\n",
+                    "echo 'endpoint = \"unix:///var/run/docker.sock\"' >> /opt/carrier_traefik/traefik.toml", "\n",
+                    "echo 'domain = \"docker.local\"' >> /opt/carrier_traefik/traefik.toml", "\n",
+                    "echo 'watch = true' >> /opt/carrier_traefik/traefik.toml", "\n",
+                    "sudo chmod 666 /var/run/docker.sock", "\n"
+                    ]
+                  ]
+                mode: "000777"
+                owner: "root"
+                group: "root"
+              /tmp/docker-compose:
+                content:
+                  Fn::Join: ["",
+                    [
+                    "version: '3'", "\n",
+                    "services:", "\n",
+                    "  traefik:", "\n",
+                    "    image: traefik:1.7", "\n",
+                    "    restart: unless-stopped", "\n",
+                    "    volumes:", "\n",
+                    "      - /opt/carrier_traefik/traefik.toml:/etc/traefik/traefik.toml", "\n",
+                    "      - /var/run/docker.sock:/var/run/docker.sock", "\n",
+                    "    ports:", "\n",
+                    "      - 8080:8080", "\n",
+                    "      - 80:80", "\n",
+                    "    container_name: carrier-traefic", "\n",
+                    "  galloper:", "\n",
+                    "    image: getcarrier/galloper:latest", "\n",
+                    "    volumes:", "\n",
+                    "      - /var/run/docker.sock:/var/run/docker.sock", "\n",
+                    "    environment:", "\n",
+                    "      - REDIS_DB=2", "\n",
+                    "      - REDIS_HOST=carrier-redis", "\n",
+                    "      - CPU_CORES=1", "\n",
+                    "      - APP_HOST=PUBLIC_IP", "\n",
+                    "    labels:", "\n",
+                    "      - 'traefik.backend=galoper'", "\n",
+                    "      - 'traefic.port=5000'", "\n",
+                    "      - 'traefik.frontend.rule=PathPrefixStrip: /'", "\n",
+                    "      - 'traefik.frontend.passHostHeader=true'", "\n",
+                    "    container_name: carrier-galloper", "\n",
+                    "  influx:", "\n",
+                    "    image: influxdb:1.7", "\n",
+                    "    restart: unless-stopped", "\n",
+                    "    environment:", "\n", 
+                    "      - INFLUXDB_META_DIR=\"/var/lib/influxdb/meta\"", "\n",
+                    "      - INFLUXDB_DATA_DIR=\"/var/lib/influxdb/data\"", "\n",
+                    "      - INFLUXDB_DATA_WAL_DIR=\"/var/lib/influxdb/wal\"", "\n",
+                    "      - INFLUXDB_HTTP_ENABLED=true", "\n",
+                    "    volumes:", "\n",
+                    "      - /opt/carrier_influx:/var/lib/influxdb/data", "\n",
+                    "    ports:", "\n",
+                    "      - 2003:2003", "\n",
+                    "      - 8086:8086", "\n",
+                    "    labels:", "\n",
+                    "      - 'traefik.enable=false'", "\n",
+                    "    container_name: carrier-influx", "\n",
+                    "  grafana:", "\n",
+                    "    image: grafana/grafana:6.4.4", "\n",
+                    "    restart: unless-stopped", "\n",
+                    "    depends_on:", "\n",
+                    "      - influx", "\n",
+                    "    volumes:", "\n",
+                    "      - /opt/carrier_grafana:/var/lib/grafana", "\n",
+                    "    environment:", "\n",
+                    "      - GF_PANELS_DISABLE_SANITIZE_HTML=true", "\n",
+                    "      - GF_SECURITY_ADMIN_PASSWORD=password", "\n",
+                    "      - GF_INSTALL_PLUGINS=natel-influx-admin-panel", "\n",
+                    "      - GF_SERVER_ROOT_URL=http://PUBLIC_IP/grafana", "\n",
+                    "    labels:", "\n",
+                    "      - 'traefik.backend=grafana'", "\n",
+                    "      - 'traefic.port=3000'", "\n",
+                    "      - 'traefik.frontend.rule=PathPrefixStrip: /grafana'", "\n",
+                    "      - 'traefik.frontend.passHostHeader=true'", "\n",
+                    "    user: root", "\n",
+                    "    container_name: carrier-grafana", "\n",
+                    "  loki:", "\n",
+                    "    image: grafana/loki:latest", "\n",
+                    "    restart: unless-stopped", "\n",
+                    "    ports:", "\n",
+                    "      - \"3100:3100\"", "\n",
+                    "    command: -config.file=/etc/loki/local-config.yaml", "\n",
+                    "    labels:", "\n",
+                    "      - 'traefik.enable=false'", "\n",
+                    "    container_name: carrier-loki", "\n",
+                    "  minio:", "\n",
+                    "    image: minio/minio:RELEASE.2019-10-12T01-39-57Z", "\n",
+                    "    environment:", "\n",
+                    "      - MINIO_ACCESS_KEY=admin", "\n",
+                    "      - MINIO_SECRET_KEY=password", "\n",
+                    "    volumes:", "\n",
+                    "      - /opt/carrier_minio:/data", "\n",
+                    "    ports:", "\n",
+                    "      - 9000:9000", "\n",
+                    "    labels:", "\n",
+                    "      - 'traefik.enable=false'", "\n",
+                    "    container_name: carrier-minio", "\n",
+                    "    command: server /data", "\n",
+                    "  redis:", "\n",
+                    "    image: redis:5.0.3", "\n",
+                    "    restart: unless-stopped", "\n",
+                    "    ports:", "\n",
+                    "      - 6379:6379", "\n",
+                    "    container_name: carrier-redis", "\n",
+                    "    entrypoint:", "\n",
+                    "      - redis-server", "\n",
+                    "      - --requirepass", "\n",
+                    "      - password", "\n",
+                    "    labels:", "\n",
+                    "      - 'traefik.enable=false'", "\n"
+                    ]      
+                  ]          
+                mode: "000777"
+                owner: "root"
+                group: "root"
+            commands:
+              a-replace-public-ip:
+                command: "sed -e \"s/PUBLIC_IP/$(curl http://169.254.169.254/latest/meta-data/public-ipv4)/\" /tmp/docker-compose > /tmp/docker-compose.yaml"
+              b-docker-install:
+                command: "/tmp/docker-install.sh"
+              c-carrier-install:
+                command: !Join ["",["cd /tmp && docker-compose up -d"]]
+      Properties:
+        ImageId: !Ref Image
+        KeyName: !Ref KeyName
+        InstanceType: !Ref InstanceType
+        BlockDeviceMappings:
+        - DeviceName: "/dev/xvda"
+          Ebs:
+            VolumeSize: 20
+            DeleteOnTermination: true
+            VolumeType: gp2
+        SecurityGroupIds:
+        - !Ref EC2SecurityGroup
+        SubnetId: !Select [ 0, !Ref Subnets ]
+        Tags:
+        - Key: Name
+          Value: "Carrier-Control-Tower"
+        - Key: Project
+          Value: "Performance testing"
+        UserData:
+          Fn::Base64:
+            Fn::Join: [
+              "",
+              [
+                "#!/bin/bash -xe", "\n",
+                "/opt/aws/bin/cfn-init -v -c main -s ", !Ref "AWS::StackName", " -r ReportingInstance", " --region ", !Ref "AWS::Region", "\n",
+              ]
+            ]
+
+Outputs:
+  EC2InstanceID:
+    Description: Performance Reporting Instance ID
+    Value: !Ref ReportingInstance
+
+  EC2PrivateIP:
+    Description: Performance Reporting private IP
+    Value: !GetAtt ReportingInstance.PrivateIp

@@ -1,0 +1,96 @@
+version: '3'
+services:
+  traefik:
+    image: traefik:1.7
+    restart: unless-stopped
+    volumes:
+      - /opt/carrier_traefik/traefik.toml:/etc/traefik/traefik.toml
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 8080:8080
+      - 80:80
+    container_name: carrier-traefic
+  galloper:
+    image: getcarrier/galloper:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - REDIS_DB=2
+      - REDIS_HOST=carrier-redis
+      - CPU_CORES=1
+      - APP_HOST=PUBLIC_IP
+    labels:
+      - 'traefik.backend=galoper'
+      - 'traefic.port=5000'
+      - 'traefik.frontend.rule=PathPrefixStrip: /'
+      - 'traefik.frontend.passHostHeader=true'
+    container_name: carrier-galloper
+  influx:
+    image: influxdb:1.7
+    restart: unless-stopped
+    environment: 
+      - INFLUXDB_META_DIR="/var/lib/influxdb/meta"
+      - INFLUXDB_DATA_DIR="/var/lib/influxdb/data"
+      - INFLUXDB_DATA_WAL_DIR="/var/lib/influxdb/wal"
+      - INFLUXDB_HTTP_ENABLED=true
+    volumes:
+      - /opt/carrier_influx:/var/lib/influxdb/data
+    ports:
+      - 2003:2003
+      - 8086:8086
+    labels:
+      - 'traefik.enable=false'
+    container_name: carrier-influx
+  grafana:
+    image: grafana/grafana:6.4.4
+    restart: unless-stopped
+    depends_on:
+      - influx
+    volumes:
+      - /opt/carrier_grafana:/var/lib/grafana
+    environment:
+      - GF_PANELS_DISABLE_SANITIZE_HTML=true
+      - GF_SECURITY_ADMIN_PASSWORD=password
+      - GF_INSTALL_PLUGINS=natel-influx-admin-panel
+      - GF_SERVER_ROOT_URL=http://PUBLIC_IP/grafana
+    labels:
+      - 'traefik.backend=grafana'
+      - 'traefic.port=3000'
+      - 'traefik.frontend.rule=PathPrefixStrip: /grafana'
+      - 'traefik.frontend.passHostHeader=true'
+    user: root
+    container_name: carrier-grafana
+  loki:
+    image: grafana/loki:latest
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    labels:
+      - 'traefik.enable=false'
+    container_name: carrier-loki
+  minio:
+    image: minio/minio:RELEASE.2019-10-12T01-39-57Z
+    environment:
+      - MINIO_ACCESS_KEY=admin
+      - MINIO_SECRET_KEY=password
+    volumes:
+      - /opt/carrier_minio:/data
+    ports:
+      - "9000:9000"
+    labels:
+      - 'traefik.enable=false'
+    container_name: carrier-minio
+    command: server /data
+  redis:
+    image: redis:5.0.3
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    container_name: carrier-redis
+    entrypoint:
+      - redis-server
+      - --requirepass
+      - password
+    labels:
+      - 'traefik.enable=false'
