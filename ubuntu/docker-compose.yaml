@@ -19,6 +19,10 @@ services:
       - REDIS_HOST=carrier-redis
       - CPU_CORES=1
       - APP_HOST=PUBLIC_IP
+      - MINIO_HOST=http://carrier-minio:9000
+      - MINIO_ACCESS_KEY=admin
+      - MINIO_SECRET_KEY=password
+      - MINIO_REGION=us-east-1
     labels:
       - 'traefik.backend=galoper'
       - 'traefic.port=5000'
@@ -76,8 +80,6 @@ services:
       - MINIO_SECRET_KEY=password
     volumes:
       - /opt/carrier_minio:/data
-    ports:
-      - "9000:9000"
     labels:
       - 'traefik.enable=false'
     container_name: carrier-minio

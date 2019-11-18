@@ -255,6 +255,10 @@ Resources:
                     "      - REDIS_HOST=carrier-redis", "\n",
                     "      - CPU_CORES=1", "\n",
                     "      - APP_HOST=PUBLIC_IP", "\n",
+                    "      - MINIO_HOST=http://carrier-minio:9000", "\n",
+                    "      - MINIO_ACCESS_KEY=admin", "\n",
+                    "      - MINIO_SECRET_KEY=password", "\n",
+                    "      - MINIO_REGION=us-east-1", "\n",
                     "    labels:", "\n",
                     "      - 'traefik.backend=galoper'", "\n",
                     "      - 'traefic.port=5000'", "\n",
@@ -312,8 +316,6 @@ Resources:
                     "      - MINIO_SECRET_KEY=password", "\n",
                     "    volumes:", "\n",
                     "      - /opt/carrier_minio:/data", "\n",
-                    "    ports:", "\n",
-                    "      - 9000:9000", "\n",
                     "    labels:", "\n",
                     "      - 'traefik.enable=false'", "\n",
                     "    container_name: carrier-minio", "\n",
@@ -342,6 +344,8 @@ Resources:
                 command: "/tmp/docker-install.sh"
               c-carrier-install:
                 command: !Join ["",["cd /tmp && docker-compose up -d"]]
+              d-carrier-seed:
+                 command: "curl -XPOST -d bucket=tests http://localhost/artifacts/bucket"
       Properties:
         ImageId: !Ref Image
         KeyName: !Ref KeyName
@@ -378,3 +382,7 @@ Outputs:
   EC2PrivateIP:
     Description: Performance Reporting private IP
     Value: !GetAtt ReportingInstance.PrivateIp
+  
+  EC2PublicIP:
+    Description: Performance Reporting public IP
+    Value: !GetAtt ReportingInstance.PublicIP
