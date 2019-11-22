@@ -1,0 +1,16 @@
+{
+    "id": 7,
+    "orgId": 1,
+    "name": "Loki",
+    "type": "loki",
+    "typeLogoUrl": "public/app/plugins/datasource/loki/img/loki_icon.svg",
+    "access": "proxy",
+    "url": "http://carrier-influx:3100",
+    "password": "",
+    "user": "",
+    "database": "",
+    "basicAuth": false,
+    "isDefault": true,
+    "jsonData":{"keepCookies":[]},
+    "readOnly":false
+}

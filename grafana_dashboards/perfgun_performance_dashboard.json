@@ -16,8 +16,8 @@
     "editable": true,
     "gnetId": null,
     "graphTooltip": 0,
-    "id": null,
-    "iteration": 1549373424628,
+    "id": 1,
+    "iteration": 1573034645100,
     "links": [],
     "panels": [
       {
@@ -61,6 +61,7 @@
         "maxDataPoints": 100,
         "nullPointMode": "connected",
         "nullText": null,
+        "options": {},
         "postfix": "",
         "postfixFontSize": "50%",
         "prefix": "",
@@ -98,7 +99,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT SUM(count) FROM  \"$test_type\"  WHERE  \"request_name\"= 'allRequests' AND \"simulation\"= '$test' AND \"status\" = 'all'  AND \"user_count\" = '$users' AND \"env\"='$env' AND $timeFilter GROUP BY count",
+            "query": "SELECT COUNT(response_time) FROM  \"$test\"  WHERE  \"simulation\"= '$test' AND \"test_type\"='$test_type' AND  \"env\"='$env' AND $timeFilter ",
             "rawQuery": true,
             "refId": "A",
             "resultFormat": "time_series",
@@ -174,6 +175,7 @@
         "maxDataPoints": 100,
         "nullPointMode": "connected",
         "nullText": null,
+        "options": {},
         "postfix": "",
         "postfixFontSize": "50%",
         "prefix": "",
@@ -211,7 +213,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT SUM(count) FROM  \"$test_type\"  WHERE  \"request_name\"= 'allRequests' AND \"simulation\"= '$test' AND \"status\" = 'ko'  AND \"user_count\" = '$users' AND \"env\"='$env' AND $timeFilter GROUP BY count",
+            "query": "SELECT COUNT(response_time) FROM  \"$test\"  WHERE  \"simulation\"= '$test' AND \"test_type\"='$test_type' AND  \"env\"='$env' AND \"status\" = 'KO'  AND $timeFilter GROUP BY count",
             "rawQuery": true,
             "refId": "A",
             "resultFormat": "time_series",
@@ -287,6 +289,7 @@
         "maxDataPoints": 100,
         "nullPointMode": "connected",
         "nullText": null,
+        "options": {},
         "postfix": "",
         "postfixFontSize": "50%",
         "prefix": "",
@@ -324,7 +327,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT MEAN(count) FROM  \"$test_type\"  WHERE  \"request_name\"= 'allRequests' AND \"simulation\"= '$test' AND \"status\" = 'all'  AND \"user_count\" = '$users' AND \"env\"='$env' AND $timeFilter GROUP BY time(1s)",
+            "query": "SELECT MEAN(\"throughput\") FROM  (SELECT count(\"response_time\") AS \"throughput\"  from \"$test\"  WHERE \"simulation\"= '$test' AND \"test_type\"='$test_type' AND  \"env\"='$env' AND $timeFilter GROUP BY time(1s))",
             "rawQuery": true,
             "refId": "A",
             "resultFormat": "time_series",
@@ -400,6 +403,7 @@
         "maxDataPoints": 100,
         "nullPointMode": "connected",
         "nullText": null,
+        "options": {},
         "postfix": "",
         "postfixFontSize": "50%",
         "prefix": "",
@@ -437,7 +441,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT min(min) FROM  \"$test_type\"  WHERE  \"request_name\"= 'allRequests' AND \"simulation\"= '$test' AND \"status\" = 'ok'  AND \"user_count\" = '$users' AND \"env\"='$env' AND $timeFilter GROUP BY count",
+            "query": "SELECT min(\"response_time\") FROM  \"$test\"  WHERE  \"simulation\"= '$test' AND \"status\" = 'OK'  AND  \"env\"='$env' AND $timeFilter ",
             "rawQuery": true,
             "refId": "A",
             "resultFormat": "time_series",
@@ -513,6 +517,7 @@
         "maxDataPoints": 100,
         "nullPointMode": "connected",
         "nullText": null,
+        "options": {},
         "postfix": "",
         "postfixFontSize": "50%",
         "prefix": "",
@@ -550,7 +555,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT mean(percentiles50) FROM  \"$test_type\"  WHERE  \"request_name\"= 'allRequests' AND \"simulation\"= '$test' AND \"status\" = 'ok'  AND \"user_count\" = '$users' AND \"env\"='$env' AND $timeFilter GROUP BY count",
+            "query": "SELECT median(\"response_time\") FROM  \"$test\"  WHERE  \"simulation\"= '$test' AND \"status\" = 'OK'  AND  \"env\"='$env' AND $timeFilter ",
             "rawQuery": true,
             "refId": "A",
             "resultFormat": "time_series",
@@ -626,6 +631,7 @@
         "maxDataPoints": 100,
         "nullPointMode": "connected",
         "nullText": null,
+        "options": {},
         "postfix": "",
         "postfixFontSize": "50%",
         "prefix": "",
@@ -663,7 +669,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT max($aggregation) FROM  \"$test_type\"  WHERE  \"request_name\"= 'allRequests' AND \"simulation\"= '$test' AND \"status\" = 'ok'  AND \"user_count\" = '$users' AND \"env\"='$env' AND $timeFilter GROUP BY count",
+            "query": "SELECT percentile(\"response_time\", $percentile) FROM  \"$test\"  WHERE  \"simulation\"= '$test' AND \"status\" = 'OK'  AND  \"env\"='$env' AND $timeFilter ",
             "rawQuery": true,
             "refId": "A",
             "resultFormat": "time_series",
@@ -685,7 +691,7 @@
           }
         ],
         "thresholds": "",
-        "title": "$aggregation, ms",
+        "title": "Percentile $percentile, ms",
         "transparent": true,
         "type": "singlestat",
         "valueFontSize": "80%",
@@ -706,6 +712,7 @@
         "datasource": "gatling",
         "decimals": 2,
         "fill": 1,
+        "fillGradient": 0,
         "gridPos": {
           "h": 11,
           "w": 24,
@@ -730,6 +737,9 @@
         "linewidth": 1,
         "links": [],
         "nullPointMode": "null",
+        "options": {
+          "dataLinks": []
+        },
         "percentage": false,
         "pointradius": 3,
         "points": false,
@@ -764,49 +774,12 @@
                 "type": "fill"
               }
             ],
+            "hide": false,
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT max(\"$aggregation\") FROM \"$test_type\" WHERE env='$env' AND simulation='$test' AND user_count='$users' and status='ok' AND request_name != 'allRequests' AND $timeFilter GROUP BY time($grouping), request_name fill(null)",
+            "query": "SELECT percentile(\"response_time\", $percentile) FROM \"$test\" WHERE \"simulation\"='$test' AND \"test_type\"='$test_type' AND  \"env\"='$env' and \"status\"='OK' AND $timeFilter GROUP BY time($grouping), request_name fill(null)",
             "rawQuery": true,
             "refId": "A",
-            "resultFormat": "time_series",
-            "select": [
-              [
-                {
-                  "params": [
-                    "value"
-                  ],
-                  "type": "field"
-                },
-                {
-                  "params": [],
-                  "type": "mean"
-                }
-              ]
-            ],
-            "tags": []
-          },
-          {
-            "alias": "active users",
-            "groupBy": [
-              {
-                "params": [
-                  "$__interval"
-                ],
-                "type": "time"
-              },
-              {
-                "params": [
-                  "null"
-                ],
-                "type": "fill"
-              }
-            ],
-            "orderByTime": "ASC",
-            "policy": "default",
-            "query": "SELECT max(\"active\") FROM \"users\" WHERE  env='$env' AND simulation='$test' AND user_count='$users' AND $timeFilter GROUP BY time($grouping) fill(none)",
-            "rawQuery": true,
-            "refId": "B",
             "resultFormat": "time_series",
             "select": [
               [
@@ -840,11 +813,51 @@
                 "type": "fill"
               }
             ],
+            "hide": false,
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT max(\"$aggregation\") FROM \"$test_type\" WHERE env='$env' AND simulation='$test' AND user_count='$users' and status='ko' AND request_name != 'allRequests' AND $timeFilter GROUP BY time($grouping), request_name fill(null)",
+            "query": "SELECT percentile(\"response_time\", $percentile) FROM \"$test\" WHERE \"simulation\"='$test' AND \"test_type\"='$test_type' AND  \"env\"='$env' and \"status\"='KO' AND $timeFilter GROUP BY time($grouping), request_name fill(null)",
             "rawQuery": true,
             "refId": "C",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "alias": "active users",
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "select sum(\"max\") from (select max(\"active\") from \"users\" where \"test_type\"='$test_type' AND  \"env\"='$env' group by lg_id) WHERE $timeFilter GROUP BY time($grouping) fill(0)",
+            "rawQuery": true,
+            "refId": "E",
             "resultFormat": "time_series",
             "select": [
               [
@@ -873,7 +886,6 @@
           "sort": 0,
           "value_type": "individual"
         },
-        "transparent": false,
         "type": "graph",
         "xaxis": {
           "buckets": null,
@@ -913,6 +925,7 @@
         "dashes": false,
         "datasource": "gatling",
         "fill": 1,
+        "fillGradient": 0,
         "gridPos": {
           "h": 11,
           "w": 24,
@@ -933,6 +946,9 @@
         "linewidth": 1,
         "links": [],
         "nullPointMode": "null",
+        "options": {
+          "dataLinks": []
+        },
         "percentage": false,
         "pointradius": 5,
         "points": false,
@@ -988,7 +1004,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT max(\"active\") FROM \"users\" WHERE test_type='$test_type' AND simulation='$test' AND user_count='$users' AND env='$env' AND $timeFilter GROUP BY time($grouping) fill(none)",
+            "query": "select sum(\"max\") from (select max(\"active\") from \"users\" group by lg_id) WHERE $timeFilter GROUP BY time($grouping) fill(0)",
             "rawQuery": true,
             "refId": "A",
             "resultFormat": "time_series",
@@ -1026,7 +1042,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT max(\"count\") as \"max_1s\" FROM \"$test_type\" WHERE simulation='$test'  AND status = 'ok' AND user_count='$users' AND env='$env' AND  \"request_name\" = 'allRequests' AND $timeFilter GROUP BY time($grouping)",
+            "query": "SELECT max(\"throughputt\") FROM (SELECT count(\"response_time\") AS \"throughputt\"  from \"$test\"  WHERE \"simulation\"= '$test' AND \"test_type\"='$test_type' AND  \"env\"='$env' AND \"status\" = 'OK'  AND $timeFilter GROUP BY time(1s)) GROUP BY time($grouping)",
             "rawQuery": true,
             "refId": "B",
             "resultFormat": "time_series",
@@ -1064,7 +1080,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT mean(\"count\") as \"avg_1s\" FROM \"$test_type\" WHERE simulation='$test'  AND status = 'ok' AND user_count='$users' AND env='$env' AND  \"request_name\" = 'allRequests' AND $timeFilter GROUP BY time($grouping)",
+            "query": "SELECT mean(\"throughput\") FROM (SELECT count(\"response_time\") AS \"throughput\"  from \"$test\"  WHERE \"simulation\"= '$test' AND \"test_type\"='$test_type' AND  \"env\"='$env' AND \"status\" = 'OK'  AND $timeFilter GROUP BY time(1s)) GROUP BY time($grouping)",
             "rawQuery": true,
             "refId": "C",
             "resultFormat": "time_series",
@@ -1102,7 +1118,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT max(\"count\") as \"ko_tps\" FROM \"$test_type\" WHERE simulation='$test'  AND status = 'ko' AND user_count='$users' AND env='$env' AND  \"request_name\" = 'allRequests' AND $timeFilter GROUP BY time($grouping)",
+            "query": "SELECT max(\"throughputt\") FROM (SELECT count(\"response_time\") AS \"throughputt\"  from \"$test\"  WHERE \"simulation\"= '$test' AND \"test_type\"='$test_type' AND  \"env\"='$env' AND \"status\" = 'KO' AND $timeFilter GROUP BY time(1s)) GROUP BY time($grouping)",
             "rawQuery": true,
             "refId": "D",
             "resultFormat": "time_series",
@@ -1173,6 +1189,7 @@
         "datasource": "gatling",
         "decimals": 0,
         "fill": 1,
+        "fillGradient": 0,
         "gridPos": {
           "h": 9,
           "w": 12,
@@ -1195,6 +1212,9 @@
         "linewidth": 1,
         "links": [],
         "nullPointMode": "null",
+        "options": {
+          "dataLinks": []
+        },
         "percentage": false,
         "pointradius": 5,
         "points": false,
@@ -1228,7 +1248,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT SUM(count) FROM \"$test_type\" WHERE request_name='allRequests'  AND simulation='$test' AND user_count='$users' AND status='ok' AND \"$aggregation\"<=$low_limit AND env ='$env' AND $timeFilter GROUP BY time($grouping) fill(null)",
+            "query": "SELECT COUNT(\"response_time\") FROM \"$test\" WHERE simulation='$test' AND status='OK' AND \"response_time\"<=$low_limit AND env ='$env' AND $timeFilter GROUP BY time($grouping) fill(null)",
             "rawQuery": true,
             "refId": "A",
             "resultFormat": "time_series",
@@ -1266,7 +1286,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT SUM(count) FROM \"$test_type\" WHERE request_name='allRequests'  AND simulation='$test' AND user_count='$users' AND status='ok' AND \"$aggregation\">$low_limit AND \"$aggregation\"<$high_limit  AND env ='$env' AND $timeFilter GROUP BY time($grouping) fill(null)",
+            "query": "SELECT COUNT(\"response_time\") FROM \"$test\" WHERE simulation='$test' AND status='OK' AND \"response_time\">$low_limit AND \"response_time\"<$high_limit  AND env ='$env' AND $timeFilter GROUP BY time($grouping) fill(null)",
             "rawQuery": true,
             "refId": "B",
             "resultFormat": "time_series",
@@ -1304,7 +1324,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT SUM(count) FROM \"$test_type\" WHERE request_name='allRequests'  AND simulation='$test' AND user_count='$users' AND status='ok' AND \"$aggregation\">=$high_limit  AND env ='$env' AND $timeFilter GROUP BY time($grouping) fill(null)",
+            "query": "SELECT COUNT(\"response_time\")  FROM \"$test\" WHERE simulation='$test' AND status='OK' AND \"response_time\">=$high_limit  AND env ='$env' AND $timeFilter GROUP BY time($grouping) fill(null)",
             "rawQuery": true,
             "refId": "C",
             "resultFormat": "time_series",
@@ -1342,7 +1362,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT SUM(count) FROM \"$test_type\" WHERE request_name='allRequests'  AND simulation='$test' AND user_count='$users' AND status='ko' AND env ='$env' AND $timeFilter GROUP BY time($grouping) fill(null)",
+            "query": "SELECT COUNT(\"response_time\") FROM \"$test\" WHERE simulation='$test' AND status='KO' AND env ='$env' AND $timeFilter GROUP BY time($grouping) fill(null)",
             "rawQuery": true,
             "refId": "D",
             "resultFormat": "time_series",
@@ -1414,6 +1434,7 @@
         "datasource": "gatling",
         "decimals": 0,
         "fill": 1,
+        "fillGradient": 0,
         "gridPos": {
           "h": 9,
           "w": 12,
@@ -1436,6 +1457,9 @@
         "linewidth": 1,
         "links": [],
         "nullPointMode": "null",
+        "options": {
+          "dataLinks": []
+        },
         "percentage": false,
         "pointradius": 5,
         "points": false,
@@ -1463,7 +1487,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT count FROM  \"$test_type\"  WHERE  \"request_name\"!= 'allRequests' AND \"simulation\"= '$test' AND \"status\" = 'ok'  AND \"user_count\" = '$users' AND \"env\"='$env' AND $timeFilter GROUP BY request_name",
+            "query": "SELECT count(\"response_time\") FROM  \"$test\"  WHERE \"simulation\"= '$test' AND \"status\" = 'OK' AND \"env\"='$env' AND $timeFilter GROUP BY request_name",
             "rawQuery": true,
             "refId": "A",
             "resultFormat": "time_series",
@@ -1528,22 +1552,108 @@
         }
       },
       {
-        "content": "<script type=\"text/javascript\" language=\"javascript\" src=\"//cdn.jsdelivr.net/gh/carrier-io/carrier-io/grafana_libs/grafana_wrapper.js\" />\n<script type=\"text/javascript\" language=\"javascript\" src=\"//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js \"/>\n<script>\nfunction generateQuery(wrapper){\n    function appendValues(name,arr){\n        return (arr.length) ? (name + '=~ /^(' + arr.join('|') + ')$/ AND ') : '';\n    }\n\n    var AND  = ' AND ';\n    var WHERE = ' WHERE ';\n    var GROUP_BY = ' GROUP BY request_name; ';\n    var query;\n    var testTypes = wrapper.getVar('test_type', onAllEmpty=false).toString();\n    var environments = appendValues('env', wrapper.getVar('env'));\n    var userCounts = appendValues('user_count', wrapper.getVar('users'));\n\n    var simulation = ' simulation=\\'' +  wrapper.getVar('test')[0] + '\\'';\n    var timeFilter = wrapper.getTime()['filter'];\n    var from_block =  testTypes + WHERE + simulation + AND + userCounts + environments;\n\n    query = 'SELECT SUM(count) AS \"total\" FROM ' + from_block + 'status= \\'all\\'' + AND +  timeFilter + GROUP_BY;\n    query += 'SELECT SUM(count) AS \"ok\" FROM ' + from_block +  'status= \\'ok\\'' + AND + timeFilter + GROUP_BY;\n\n    duplicate_part =  from_block +  'status= \\'all\\'' + AND +  timeFilter + GROUP_BY;\n    query += 'SELECT MEAN(avrg_rps) AS \"rps\" FROM (SELECT MEAN(count) AS \"avrg_rps\" FROM ' + from_block +' status= \\'ok\\' AND ' + timeFilter+ ' GROUP BY time(1s)) GROUP BY request_name;'\n\n    query += 'SELECT MIN(min) AS \"min\", MEAN(mean) AS \"average\", MAX(max) AS \"max\"  FROM ' + duplicate_part;\n    query += 'SELECT STDDEV(mean)        AS \"stddev\" FROM ' + duplicate_part;\n    query += 'SELECT MEDIAN(mean)        AS \"median\" FROM ' + duplicate_part;\n    query += 'SELECT PERCENTILE(mean,75) AS \"perc75\" FROM ' + duplicate_part;\n    query += 'SELECT PERCENTILE(mean,95) AS \"perc95\" FROM ' + duplicate_part;\n    query += 'SELECT PERCENTILE(mean,99) AS \"perc99\" FROM ' + duplicate_part;\n\n    return query;\n};\n\nfunction formatDataset(data){\n    rows = {};\n    results = data.results;\n    results.forEach(function(result, i) {\n        series = result.series;\n        series.forEach(function(serie, s) {\n            var request_name = serie.tags.request_name\n            var keys = serie.columns.slice(1);\n            var values = serie.values[0].slice(1);\n            var row = (request_name in rows) ? rows[request_name] : {};\n            values.forEach( function(value, v) {\n                row[keys[v]] = value!=null ? value : 0;\n            });\n            rows[request_name] = row;\n        });\n    });\n    return rows\n}\n\nfunction appendSTRow(row){\n    $('#summary-table').DataTable().row.add(row).draw()\n}\n\nfunction retrieveData(db_name, query){\n    $.get(\"/grafana/api/datasources/proxy/4/query\", { q: query, db: \"$db_name\", epoch: EPOCH},\n        function(data, status){\n            if(status == 'success'){\n                var series = data.results[0].series\n                if(typeof series == 'undefined'){\n                    showErrMessage(\"No datapoints in selected time range. Try to change filter parameters.\")\n                }else{\n                    removeSpinner()\n                    var rows = formatDataset(data)\n                    generateSummaryDataTable()\n                    for (request_name in rows){\n                        request = rows[request_name]\n                        var total =  request['total']\n                        var ok = request['ok']\n                        var ko =  total > ok  ? total - ok : 0\n\n                        var ko_perc = ko > 0 ? parseFloat((ko/total) * 100).toFixed(ROUND_FLOAT_FACTOR) : 0.00\n                        var rps = request['rps'] ==null ? 0.0 : parseFloat(request['rps']).toFixed(3)\n                        var min = request['min'] ==null ? 0.0 : parseFloat(request['min']/1000).toFixed(ROUND_FLOAT_FACTOR)\n                        var median = request['median'] ==null ? 0.0 : parseFloat(request['median']/1000).toFixed(ROUND_FLOAT_FACTOR)\n                        var perc75 = request['perc75'] ==null ? 0.0 : parseFloat(request['perc75']/1000).toFixed(ROUND_FLOAT_FACTOR)\n                        var perc95 = request['perc95'] ==null ? 0.0 : parseFloat(request['perc95']/1000).toFixed(ROUND_FLOAT_FACTOR)\n                        var perc99 = request['perc99'] ==null ? 0.0 : parseFloat(request['perc99']/1000).toFixed(ROUND_FLOAT_FACTOR)\n                        var max = request['max'] ==null ? 0.0 : parseFloat(request['max']/1000).toFixed(ROUND_FLOAT_FACTOR)\n                        var average = request['average'] ==null ? 0.0 : parseFloat(request['average']/1000).toFixed(ROUND_FLOAT_FACTOR)\n                        var stddev = request['stddev'] ==null ? 0.0 : parseFloat(request['stddev']/1000).toFixed(ROUND_FLOAT_FACTOR)\n                        row = [request_name, total, ok, ko, ko_perc, rps, min, median, perc75, perc95, perc99, max, average, stddev]\n\n                        appendSTRow(row)\n                    }\n                }\n            }else{\n                showErrMessage(\"Error occured during quering data. Check your datasource settings.\")\n            }\n        });\n}\n\nfunction emptySummaryTable(){\n    $(\"#summary\").empty();\n}\n\nfunction addSpinner(){\n    if ($('div.spinner').length == 0){\n        var spinner = $('<div>')\n        spinner.attr(\"class\",\"spinner\");\n        spinner.html(\"<div  style=\\\"text-align: center;\\\"> <i class=\\\"fa fa-spinner fa-spin\\\" style=\\\" font-size: xx-large;\\\"></i> </div>\")\n        $(\"#summary\").append(spinner)\n    }\n}\nfunction removeSpinner(){\n    $('#summary div.spinner').remove()\n}\n\nfunction initSummaryDataTable(table){\n    table.DataTable({\n        \"empty\": true,\n        \"iDisplayLength\": 10,\n        \"lengthMenu\": [[5, 10, 20, 40, -1], [5, 10, 20, 40, \"All\"]],\n        \"order\": [[ 0, \"asc\" ]],\n        \"pagingType\": \"full_numbers\",\n        \"responsive\": true,\n        \"rowCallback\": function(row, data, index){\n            // errors\n            if(data[4] > 0. && data[4] <= ERROR_PERC_TRESHOLD){\n                $(row).find('td:eq(3)').css('color', 'orange');\n                $(row).find('td:eq(4)').css('color', 'orange');\n            }else if(data[4] > ERROR_PERC_TRESHOLD){\n                $(row).find('td:eq(3)').css('color', 'red');\n                $(row).find('td:eq(4)').css('color', 'red');\n            }\n            // response times\n            for (var i = 6; i <= 13; i++){\n\n                if(data[i] < LOWER_RT_TRESHOLD){\n                    $(row).find('td:eq('+i+')').css('color', 'green');\n                    $(row).find('td:eq('+i+')').css('color', 'green');\n                }else if(data[i] > HIGHER_RT_TRESHOLD){\n\n                    $(row).find('td:eq('+i+')').css('color', 'red');\n                    $(row).find('td:eq('+i+')').css('color', 'red');\n                }else{\n                    $(row).find('td:eq('+i+')').css('color', 'orange');\n                    $(row).find('td:eq('+i+')').css('color', 'orange');\n                }\n            }\n        }\n    });\n}\n\nfunction generateSummaryDataTable(){\n    emptySummaryTable();\n    var table = $('<table>');\n    table.attr(\"id\",\"summary-table\");\n    table.append(generateSTHead());\n    table.append(generateSTBody());\n    $('#summary').append(table);\n    initSummaryDataTable(table);\n    addSTSelectionFeature();\n}\n\nfunction generateSTHead(){\n    var cellNames = [\"Requests\",\"Total\",\"OK\",\"KO\",\"% KO\",\"Req/s\",\"Min\",\"50th pct\",\"75th pct\",\"95th pct\",\"99th pct\",\"Max\",\"Average\",\"Std Dev\"];\n    tHead = $('<thead>');\n    tHead.attr(\"id\",\"summary-table-head\");\n    tRow = $('<tr>');\n    for (var i = 0; i < cellNames.length; i++){\n        tHeadCell = $('<th>');\n        tHeadCell.text(cellNames[i])\n        tRow.append(tHeadCell);\n    }\n    tHead.append(tRow);\n\n    return tHead;\n}\nfunction generateSTBody(){\n    var tBody = $('<tbody>');\n    tBody.attr(\"id\",\"summary-table-body\");\n\n    return tBody;\n}\n\nfunction addSTSelectionFeature(){\n    var table = $('#summary-table').DataTable();\n    $('#summary-table tbody').on( 'click', 'tr', function () {\n        if ($(this).hasClass('selected')) {\n            $(this).removeClass('selected');\n        }\n        else {\n            table.$('tr.selected').removeClass('selected');\n            $(this).addClass('selected');\n        }\n    } );\n\n    $('#button').click( function () {\n        table.row('.selected').remove().draw( false );\n    } );\n}\n\nfunction showErrMessage(errMessage){\n    removeSpinner();\n    $(\"#summary\").empty();\n    message = $('<span>');\n    message.attr(\"id\",\"summary-table-message\");\n    message.text(errMessage);\n    $(\"#summary\").append(message);\n}\n\nfunction waitForSTGWrapper(){\n    addSpinner();\n    try{\n        var wrapper = new GWrapper(\"API_Summary_Table\");\n        checkSTIsLoaded(wrapper)\n    }catch(err){\n        setTimeout(function() { waitForSTGWrapper()}, 500);\n    }\n}\n\nfunction checkSTIsLoaded(wrapper){\n    if($.fn.DataTable){\n        query = generateQuery(wrapper);\n        db_name = wrapper.getVar('db_name');\n        retrieveData(db_name, query);\n    }else{\n        setTimeout(function() { checkSTIsLoaded()}, 500);\n    }\n}\n\nEPOCH = \"ms\";\nTABLE_TIME_EPOCH = 's'; //s for seconds, any other value for milliseconds\n\nLOWER_RT_TRESHOLD = parseFloat(\"$low_limit\")/1000.0\nHIGHER_RT_TRESHOLD = parseFloat(\"$high_limit\")/1000.0\nERROR_PERC_TRESHOLD = 1.0;\nROUND_FLOAT_FACTOR = 3;\n\nwindow.onload = waitForSTGWrapper();\nangular.element('grafana-app').injector().get('$rootScope').$on('refresh',function(){waitForSTGWrapper()});\n</script>\n\n\n<style type=\"text/css\">\n    #summary-table-body>tr.selected{ background: #292929; font-weight: 600;} #summary-table-body>tr:hover{ background: #292929;} #summary-table td{text-align:center} #summary-table-body > tr>:nth-child(1) {text-align:left}\n    #summary-table_filter,.dataTables_length{display:inline-block}.dataTables_length{padding-bottom:20px;padding-right:23px}input[type=search]{border-radius:5px}select[name=summary-table_length]{height:23px;width:65px;border-radius:5px}.paging_full_numbers>a,.paging_full_numbers>span>a{padding-right:10px}#summary-table-message{display:table;margin-left:auto;margin-right:auto}#summary-table{width:100%!important}th{text-align:center}\n</style>\n<div id = \"summary\"></div>",
+        "collapsed": true,
+        "datasource": null,
         "gridPos": {
-          "h": 13,
+          "h": 1,
           "w": 24,
           "x": 0,
           "y": 35
         },
-        "id": 8,
-        "links": [],
-        "mode": "html",
-        "title": "Summary Table",
-        "type": "text"
+        "id": 23,
+        "panels": [
+          {
+            "content": "<script type=\"text/javascript\" language=\"javascript\" src=\"//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js \"/>\n<script>\nfunction generateQuery(){\n    var AND  = ' AND ';\n    var WHERE = ' WHERE ';\n    var GROUP_BY = ' GROUP BY request_name; ';\n    var query;\n    var measurement = getVar('test');\n    var environments = ' env=\\'' +  getVar('env') + '\\'';\n    var test_type = ' test_type=\\'' +  getVar('test_type') + '\\'';\n    var simulation = ' simulation=\\'' +  getVar('test') + '\\'';\n\n    var timeFilter = ' time > ' + $__from + 'ms AND time < ' + $__to + 'ms'\n    var from_block =  measurement + WHERE + simulation + AND + environments + AND + test_type;\n\n    query = 'SELECT COUNT(response_time) AS \"total\" FROM ' + from_block + AND +  timeFilter + GROUP_BY;\n    query += 'SELECT COUNT(response_time) AS \"ok\" FROM ' + from_block + AND + 'status= \\'OK\\'' + AND + timeFilter + GROUP_BY;\n\n    duplicate_part =  from_block + AND +  timeFilter + GROUP_BY;\n    query += 'SELECT MEAN(count) AS \"rps\" FROM (SELECT COUNT(response_time) from ' + from_block + AND + ' status= \\'OK\\' AND ' + timeFilter+ ' GROUP BY time(1s), request_name) GROUP BY request_name;'\n    query += 'SELECT MIN(response_time) AS \"min\", MEAN(response_time) AS \"average\", MAX(response_time) AS \"max\"  FROM ' + duplicate_part;\n    query += 'SELECT MEDIAN(response_time)        AS \"median\" FROM ' + duplicate_part;\n    query += 'SELECT PERCENTILE(response_time,75) AS \"perc75\" FROM ' + duplicate_part;\n    query += 'SELECT PERCENTILE(response_time,95) AS \"perc95\" FROM ' + duplicate_part;\n    query += 'SELECT PERCENTILE(response_time,99) AS \"perc99\" FROM ' + duplicate_part;\n\n    return query;\n};\n\n\nfunction getVar(varName, onAllEmpty = true) {\n        var vars = angular.element('dashboard-submenu').injector().get('variableSrv').variables;\n        var result = [];\n        vars.forEach(function (variable) {\n            if (variable.name == varName) {\n                if (variable.options[0].value == \"$__all\" && variable.options[0].selected) {\n                    if (onAllEmpty) { return []; } else {\n                        for (var i = 1; i < variable.options.length; i++) {\n                            result.push(variable.options[i].value);\n                        }\n                        return result\n                    }\n                } else {\n                    variable.options.forEach(function (option) {\n                        if (option.selected) { result.push(option.value); }\n                    });\n                }\n            };\n        });\n\n        return result\n    };\n\nfunction formatDataset(data){\n    rows = {};\n    results = data.results;\n    results.forEach(function(result, i) {\n        series = result.series;\n        series.forEach(function(serie, s) {\n            var request_name = serie.tags.request_name\n            var keys = serie.columns.slice(1);\n            var values = serie.values[0].slice(1);\n            var row = (request_name in rows) ? rows[request_name] : {};\n            values.forEach( function(value, v) {\n                row[keys[v]] = value!=null ? value : 0;\n            });\n            rows[request_name] = row;\n        });\n    });\n    return rows\n}\n\nfunction appendSTRow(row){\n    $('#summary-table').DataTable().row.add(row).draw()\n}\n\nfunction retrieveData(db_name, query){\n    $.get(\"/grafana/api/datasources/proxy/4/query\", { q: query, db: \"$db_name\", epoch: EPOCH},\n        function(data, status){\n            if(status == 'success'){\n                var series = data.results[0].series\n                if(typeof series == 'undefined'){\n                    showErrMessage(\"No datapoints in selected time range. Try to change filter parameters.\")\n                }else{\n                    removeSpinner()\n                    var rows = formatDataset(data)\n                    generateSummaryDataTable()\n                    for (request_name in rows){\n                        request = rows[request_name]\n                        var total =  request['total']\n                        var ok = request['ok']\n                        var ko =  total > ok  ? total - ok : 0\n\n                        var ko_perc = ko > 0 ? parseFloat((ko/total) * 100).toFixed(ROUND_FLOAT_FACTOR) : 0.00\n                        var rps = request['rps'] ==null ? 0.0 : parseFloat(request['rps']).toFixed(3)\n                        var min = request['min'] ==null ? 0.0 : parseFloat(request['min']/1000).toFixed(ROUND_FLOAT_FACTOR)\n                        var median = request['median'] ==null ? 0.0 : parseFloat(request['median']/1000).toFixed(ROUND_FLOAT_FACTOR)\n                        var perc75 = request['perc75'] ==null ? 0.0 : parseFloat(request['perc75']/1000).toFixed(ROUND_FLOAT_FACTOR)\n                        var perc95 = request['perc95'] ==null ? 0.0 : parseFloat(request['perc95']/1000).toFixed(ROUND_FLOAT_FACTOR)\n                        var perc99 = request['perc99'] ==null ? 0.0 : parseFloat(request['perc99']/1000).toFixed(ROUND_FLOAT_FACTOR)\n                        var max = request['max'] ==null ? 0.0 : parseFloat(request['max']/1000).toFixed(ROUND_FLOAT_FACTOR)\n                        var average = request['average'] ==null ? 0.0 : parseFloat(request['average']/1000).toFixed(ROUND_FLOAT_FACTOR)\n                        row = [request_name, total, ok, ko, ko_perc, rps, min, median, perc75, perc95, perc99, max, average]\n\n                        appendSTRow(row)\n                    }\n                }\n            }else{\n                showErrMessage(\"Error occured during quering data. Check your datasource settings.\")\n            }\n        });\n}\n\nfunction emptySummaryTable(){\n    $(\"#summary\").empty();\n}\n\nfunction addSpinner(){\n    if ($('div.spinner').length == 0){\n        var spinner = $('<div>')\n        spinner.attr(\"class\",\"spinner\");\n        spinner.html(\"<div  style=\\\"text-align: center;\\\"> <i class=\\\"fa fa-spinner fa-spin\\\" style=\\\" font-size: xx-large;\\\"></i> </div>\")\n        $(\"#summary\").append(spinner)\n    }\n}\nfunction removeSpinner(){\n    $('#summary div.spinner').remove()\n}\n\nfunction initSummaryDataTable(table){\n    table.DataTable({\n        \"empty\": true,\n        \"iDisplayLength\": 10,\n        \"lengthMenu\": [[5, 10, 20, 40, -1], [5, 10, 20, 40, \"All\"]],\n        \"order\": [[ 0, \"asc\" ]],\n        \"pagingType\": \"full_numbers\",\n        \"responsive\": true,\n        \"rowCallback\": function(row, data, index){\n            // errors\n            if(data[4] > 0. && data[4] <= ERROR_PERC_TRESHOLD){\n                $(row).find('td:eq(3)').css('color', 'orange');\n                $(row).find('td:eq(4)').css('color', 'orange');\n            }else if(data[4] > ERROR_PERC_TRESHOLD){\n                $(row).find('td:eq(3)').css('color', 'red');\n                $(row).find('td:eq(4)').css('color', 'red');\n            }\n            // response times\n            for (var i = 6; i <= 13; i++){\n\n                if(data[i] < LOWER_RT_TRESHOLD){\n                    $(row).find('td:eq('+i+')').css('color', 'green');\n                    $(row).find('td:eq('+i+')').css('color', 'green');\n                }else if(data[i] > HIGHER_RT_TRESHOLD){\n\n                    $(row).find('td:eq('+i+')').css('color', 'red');\n                    $(row).find('td:eq('+i+')').css('color', 'red');\n                }else{\n                    $(row).find('td:eq('+i+')').css('color', 'orange');\n                    $(row).find('td:eq('+i+')').css('color', 'orange');\n                }\n            }\n        }\n    });\n}\n\nfunction generateSummaryDataTable(){\n    emptySummaryTable();\n    var table = $('<table>');\n    table.attr(\"id\",\"summary-table\");\n    table.append(generateSTHead());\n    table.append(generateSTBody());\n    $('#summary').append(table);\n    initSummaryDataTable(table);\n    addSTSelectionFeature();\n}\n\nfunction generateSTHead(){\n    var cellNames = [\"Requests\",\"Total\",\"OK\",\"KO\",\"% KO\",\"Req/s\",\"Min\",\"50th pct\",\"75th pct\",\"95th pct\",\"99th pct\",\"Max\",\"Average\"];\n    tHead = $('<thead>');\n    tHead.attr(\"id\",\"summary-table-head\");\n    tRow = $('<tr>');\n    for (var i = 0; i < cellNames.length; i++){\n        tHeadCell = $('<th>');\n        tHeadCell.text(cellNames[i])\n        tRow.append(tHeadCell);\n    }\n    tHead.append(tRow);\n\n    return tHead;\n}\nfunction generateSTBody(){\n    var tBody = $('<tbody>');\n    tBody.attr(\"id\",\"summary-table-body\");\n\n    return tBody;\n}\n\nfunction addSTSelectionFeature(){\n    var table = $('#summary-table').DataTable();\n    $('#summary-table tbody').on( 'click', 'tr', function () {\n        if ($(this).hasClass('selected')) {\n            $(this).removeClass('selected');\n        }\n        else {\n            table.$('tr.selected').removeClass('selected');\n            $(this).addClass('selected');\n        }\n    } );\n\n    $('#button').click( function () {\n        table.row('.selected').remove().draw( false );\n    } );\n}\n\nfunction showErrMessage(errMessage){\n    removeSpinner();\n    $(\"#summary\").empty();\n    message = $('<span>');\n    message.attr(\"id\",\"summary-table-message\");\n    message.text(errMessage);\n    $(\"#summary\").append(message);\n}\n\n\nfunction start(){\n    addSpinner();\n    query = generateQuery();\n    db_name = getVar('db_name');\n    retrieveData(db_name, query);\n}\n\nEPOCH = \"ms\";\nTABLE_TIME_EPOCH = 's'; //s for seconds, any other value for milliseconds\n\nLOWER_RT_TRESHOLD = parseFloat(\"$low_limit\")/1000.0\nHIGHER_RT_TRESHOLD = parseFloat(\"$high_limit\")/1000.0\nERROR_PERC_TRESHOLD = 1.0;\nROUND_FLOAT_FACTOR = 3;\n\n$(document).ready(function () {\n    console.log(angular.element('grafana-app').injector().get('$rootScope'))\n    start();\n});\nangular.element('grafana-app').injector().get('$rootScope').$on('refresh', function () { start() });\n</script>\n\n\n<style type=\"text/css\">\n    #summary-table-body>tr.selected{ background: #292929; font-weight: 600;} #summary-table-body>tr:hover{ background: #292929;} #summary-table td{text-align:center} #summary-table-body > tr>:nth-child(1) {text-align:left}\n    #summary-table_filter,.dataTables_length{display:inline-block}.dataTables_length{padding-bottom:20px;padding-right:23px}input[type=search]{border-radius:5px}select[name=summary-table_length]{height:23px;width:65px;border-radius:5px}.paging_full_numbers>a,.paging_full_numbers>span>a{padding-right:10px}#summary-table-message{display:table;margin-left:auto;margin-right:auto}#summary-table{width:100%!important}th{text-align:center}\n</style>\n<div id = \"summary\"></div>",
+            "datasource": "gatling",
+            "gridPos": {
+              "h": 13,
+              "w": 24,
+              "x": 0,
+              "y": 36
+            },
+            "id": 8,
+            "links": [],
+            "mode": "html",
+            "options": {},
+            "targets": [
+              {
+                "groupBy": [
+                  {
+                    "params": [
+                      "$__interval"
+                    ],
+                    "type": "time"
+                  },
+                  {
+                    "params": [
+                      "null"
+                    ],
+                    "type": "fill"
+                  }
+                ],
+                "orderByTime": "ASC",
+                "policy": "default",
+                "refId": "A",
+                "resultFormat": "time_series",
+                "select": [
+                  [
+                    {
+                      "params": [
+                        "value"
+                      ],
+                      "type": "field"
+                    },
+                    {
+                      "params": [],
+                      "type": "mean"
+                    }
+                  ]
+                ],
+                "tags": []
+              }
+            ],
+            "title": "Summary Table",
+            "type": "text"
+          }
+        ],
+        "title": "Summary table",
+        "type": "row"
+      },
+      {
+        "collapsed": true,
+        "datasource": null,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 36
+        },
+        "id": 21,
+        "panels": [
+          {
+            "content": "<script type=\"text/javascript\" charset=\"utf8\" src=\"https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js\"></script>\n<script>\n\n    function getVar(varName, onAllEmpty = true) {\n        var vars = angular.element('dashboard-submenu').injector().get('variableSrv').variables;\n        var result = [];\n        vars.forEach(function (variable) {\n            if (variable.name == varName) {\n                if (variable.options[0].value == \"$__all\" && variable.options[0].selected) {\n                    if (onAllEmpty) { return []; } else {\n                        for (var i = 1; i < variable.options.length; i++) {\n                            result.push(variable.options[i].value);\n                        }\n                        return result\n                    }\n                } else {\n                    variable.options.forEach(function (option) {\n                        if (option.selected) { result.push(option.value); }\n                    });\n                }\n            };\n        });\n\n        return result\n    };\n\n    function getData() {\n       var test = getVar('test')\n        $.ajax({\n            type: \"GET\",\n            url: '/grafana/api/datasources/proxy/7/api/prom/query',\n            async: false,\n            data: {\n                direction: \"BACKWARD\",\n                limit: 100000,\n                query: '{filename=\"/opt/gatling/bin/logs/errors/'+test+'.log\"}',\n                start: $__from + \"000000\",\n                end: $__to + \"000000\"\n            },\n            success: function (data) {\n                test = JSON.parse(data)\n            },\n            error: function (json, code) {\n                console.log(\"Some error occured: \")\n                console.error(json)\n            }\n        });\n        var error_entries = []\n        var streams = test.streams\n        if (streams == null){\n          return null\n        }\n        \n        for (var stream of test.streams) {\n            Array.prototype.push.apply(error_entries, stream.entries);\n            console.log(error_entries)\n        }\n        return error_entries\n    }\n\n    function agregateRecivedData() {\n        var records = getData()\n        if (records == null) {\n          return []\n        }\n        console.log(records)\n        var errorCollection = []\n        var resultMap = new Map()\n\n        for (var record of records) {\n            var test = record.line\n            errorCollection.push(test)\n        }\n        for (var error of errorCollection) {\n            try {\n                var errorKey = error.match(\"Error key: (.+?)\\t\")[1]\n                var errorJson = {}\n                errorJson.errorCount = 1\n                if (resultMap.has(errorKey)) {\n                    var temp = resultMap.get(errorKey).errorCount\n                    errorJson.errorCount += temp\n                }\n                errorJson.method = error.match(\"Method: (.+?)\\t\")[1]\n                if (errorJson.method == 'TRANSACTION'){\n                    continue;\n                }\n                console.log()\n            \n                errorJson.requestName = error.match(\"Request name: (.+?)\\t\")[1]\n                errorJson.responceCode = error.match(\"Response code: (.+?)\\t\")[1]\n                errorJson.URL = error.match(\"URL: (.+?)\\t\")[1]\n                errorJson.errorMessage = error.match(\"Error message: (.+?)\\t\")[1]\n                errorJson.headers = error.match(\"Headers: (.+?)\\t\")[1]\n                errorJson.requestParams = error.match(\"Request params: (.+?)\\t\")[1]\n                errorJson.responceBody = error.match(\"Response body: (.+?)\\t\")[1]\n                resultMap.set(errorKey, errorJson)\n            } catch {\n              continue;\n            }\n            \n        }\n        return resultMap\n    }\n\n    function parseRecivedData() {\n        var data = agregateRecivedData()\n        \n\n        for (var [errorId, errorDetail] of data) {\n            console.log(errorId + ' = ' + errorDetail);\n            var errorDetailRow = generateDetailBox(errorId,errorDetail)\n            appendRow(errorDetailRow, errorDetail.errorCount)\n        }\n        \n    }\n\n    function appendRow(errorDetails, errorCount) {\n        $('#error-table').DataTable().row.add([errorDetails, errorCount]).draw()\n        initAccordeon()\n    }\n    function initAccordeon() {\n        $('.accordeon-title').on('click', function () {\n            var title = $(this);\n            if (title.hasClass('is-opened')) {\n                title.next('.accordeon-content').slideUp(function () {\n                    $(this).prev('.accordeon-title').removeClass('is-opened');\n                })\n            } else {\n                var content = title.next('.accordeon-content');\n                if (!content.is(':visible')) {\n                    content.slideDown(function () { title.addClass('is-opened') });\n                }\n            }\n        })\n        $('div[id=\"error-table_wrapper\"]').change(function () { initAccordeon() })\n        $('#error-table_paginate a').click(function () { initAccordeon() })\n    }\n\n    function generateDetailBox(errorId, errorDetail) {\n        var box = \"<div class=\\\"accordeon\\\"> <div class=\\\"accordeon-title\\\"><div id=\\\"title-wrapper\\\" data-title=\\\"\" + errorDetail.errorMessage + \"\\\">\"\n            + errorId + \"</div> </div > <div class=\\\"accordeon-content\\\"> <div class=\\\"separator\\\"> <div id=\\\"detail-data\\\">\"\n            + \"Request URL: \"+errorDetail.URL + \" </div> </div> <div class=\\\"separator\\\"> <div id=\\\"detail-data\\\">\"\n            +\"Request method: \"+ errorDetail.method + \" </div> </div> \" + paramMatch(errorDetail.requestParams)\n            + headersMatch(errorDetail.headers, 'errorId') + \" <div class=\\\"separator\\\"> <div id=\\\"detail-data\\\">\"\n            + \"Response code: \"+errorDetail.responceCode + \" </div> </div> <div class=\\\"separator\\\"> <div id=\\\"detail-data\\\">\"\n            + \"Error message: \"+errorDetail.errorMessage + \" </div> </div>\" + respMatch(errorDetail.responceBody, errorId) + \"</div>\"\n\n        return box;\n    }\n\n    function paramMatch(param) {\n        var req_arr = param.match(/Request params \\d+: .*?/g)\n        html = ''\n        if (req_arr == null) {\n            return \"<div class=\\\"separator\\\"> <div id=\\\"detail-data\\\">\"\n                    + \" Request parameters: \"+ param + \" </div> </div>\"\n        } else {\n            req_arr.forEach(function (req_param) {\n                html += \"<div class=\\\"separator\\\"> <div id=\\\"detail-data\\\">\"\n                    + req_param + \" </div> </div>\"\n            })\n        }\n        return html\n    }\n\n    function headersMatch(headers, error_type) {\n        var resp_arr = headers.match(/Headers \\d+: .*?/g)\n        html = ''\n        if (resp_arr == null) {\n            headers = formatErrorDetails(headers)\n            return \"<div class=\\\"separator\\\"> <div id=\\\"detail-data\\\" \"\n                + \"onclick=\\\"openPopUp('\" + error_type + \"')\\\" class=\\\"\" + error_type + \"\\\">\" \n                + \"Request headers: \"+ headers + \" </div> </div><div class=\\\"err-popup\\\" id=\\\"\" + error_type\n                + \"\\\" onclick=\\\"closePopUp('\" + error_type + \"')\\\">\"\n                + \" <div id=\\\"err-popup-inner\\\" onclick=\\\"event.stopPropagation()\\\">\"\n                + \"<div class=\\\"err-popup-content-\" + error_type + \"\\\" id=\\\"err-popup-content\\\"> </div> \"\n                + \"<span class=\\\"err-popup-close\\\" onclick=\\\"closePopUp('\" + error_type + \"')\\\">&#10006;</span></div></div>\"\n        } /*else {\n            resp_arr.forEach(function (res, index) {\n                res = formatErrorDetails(res)\n                html += \"<div class=\\\"separator\\\"> <div id=\\\"detail-data\\\" \"\n                    + \"onclick=\\\"openPopUp('\" + error_type + index + \"')\\\" class=\\\"\" + error_type + index + \"\\\">\"\n                    + res + \" </div> </div><div class=\\\"err-popup\\\" id=\\\"\" + error_type + index\n                    + \"\\\" onclick=\\\"closePopUp('\" + error_type + index + \"')\\\">\"\n                    + \" <div id=\\\"err-popup-inner\\\" onclick=\\\"event.stopPropagation()\\\">\"\n                    + \"<div class=\\\"err-popup-content-\" + error_type + index + \"\\\" id=\\\"err-popup-content\\\"> </div> \"\n                    + \"<span class=\\\"err-popup-close\\\" onclick=\\\"closePopUp('\" + error_type + index + \"')\\\">&#10006;</span></div></div>\"\n            })\n        } */\n        return html\n    }\n\n    function respMatch(response, error_type) {\n        var resp_arr = response.match(/Response \\d+: .*?/g)\n        html = ''\n        if (resp_arr == null) {\n            response = formatErrorDetails(response)\n            return \"<div class=\\\"separator\\\"> <div id=\\\"detail-data\\\" \"\n                + \"onclick=\\\"openPopUp('\" + error_type + \"')\\\" class=\\\"\" + error_type + \"\\\">\" \n                + \"Response body: \"+ response + \" </div> </div></div><div class=\\\"err-popup\\\" id=\\\"\" + error_type\n                + \"\\\" onclick=\\\"closePopUp('\" + error_type + \"')\\\">\"\n                + \" <div id=\\\"err-popup-inner\\\" onclick=\\\"event.stopPropagation()\\\">\"\n                + \"<div class=\\\"err-popup-content-\" + error_type + \"\\\" id=\\\"err-popup-content\\\"> </div> \"\n                + \"<span class=\\\"err-popup-close\\\" onclick=\\\"closePopUp('\" + error_type + \"')\\\">&#10006;</span></div></div>\"\n        } else {\n            resp_arr.forEach(function (res, index) {\n                res = formatErrorDetails(res)\n                html += \"<div class=\\\"separator\\\"> <div id=\\\"detail-data\\\" \"\n                    + \"onclick=\\\"openPopUp('\" + error_type + index + \"')\\\" class=\\\"\" + error_type + index + \"\\\">\"\n                    + res + \" </div> </div><div class=\\\"err-popup\\\" id=\\\"\" + error_type + index\n                    + \"\\\" onclick=\\\"closePopUp('\" + error_type + index + \"')\\\">\"\n                    + \" <div id=\\\"err-popup-inner\\\" onclick=\\\"event.stopPropagation()\\\">\"\n                    + \"<div class=\\\"err-popup-content-\" + error_type + index + \"\\\" id=\\\"err-popup-content\\\"> </div> \"\n                    + \"<span class=\\\"err-popup-close\\\" onclick=\\\"closePopUp('\" + error_type + index + \"')\\\">&#10006;</span></div></div>\"\n            })\n        }\n        return html + \"</div>\"\n    }\n\n    function formatErrorDetails(str) {\n        str = str.replace(/</g, '&lt');\n        str = str.replace(/>/g, '&gt');\n        return str;\n    }\n    function openPopUp(err_type) {\n        $('#' + err_type).fadeIn(350);\n        $('.err-popup-content-' + err_type).text($('.' + err_type).text());\n    }\n\n    function closePopUp(err_type) {\n        $('#' + err_type).fadeOut(350);\n        $('.err-popup-content-' + err_type).text(\"\");\n    }\n\n    \n\n    function generateErrorTable() {\n        emptyErrorTable()\n        var table = $('<table>');\n        table.attr(\"id\", \"error-table\");\n        table.append(generateErrorTableHead());\n        table.append(generateErrorTableBody());\n        $('#errors').append(table);\n        initDataTable(table);\n        addSelectionFeature();\n    }\n\n    function emptyErrorTable() {\n        if ($('#error-table').length > 0) {\n            if ($.fn.DataTable.isDataTable('#error-table')) {\n                $('#error-table').DataTable().destroy();\n            }\n        }\n        $(\"#errors\").empty();\n    }\n\n    function generateErrorTableHead() {\n        var cellNames = [\"Error ID\", \"Count\"];\n        tHead = $('<thead>')\n        tHead.attr(\"id\", \"error-table-head\");\n        tRow = $('<tr>');\n        for (var i = 0; i < cellNames.length; i++) {\n            tHeadCell = $('<th>');\n            tHeadCell.attr(\"id\", cellNames[i])\n            tHeadCell.text(cellNames[i])\n            tRow.append(tHeadCell);\n        }\n        tHead.append(tRow);\n        return tHead;\n    }\n\n    function generateErrorTableBody() {\n        var tBody = $('<tbody>');\n        tBody.attr(\"id\", \"error-table-body\");\n        return tBody;\n    }\n\n    function initDataTable(table) {\n        table.DataTable({\n            \"empty\": true,\n            \"lengthMenu\": [[5, 10, 20, -1], [5, 10, 20, \"All\"]],\n            \"order\": [[1, \"desc\"]],\n            \"pagingType\": \"full_numbers\",\n            \"responsive\": true,\n            \"initComplete\": function (settings, json) {\n                console.log('DataTables initialised.');\n            }\n        });\n    }\n\n    function addSelectionFeature() {\n        var table = $('#error-table').DataTable();\n        $('#error-table tbody').on('click', 'tr', function () {\n            if ($(this).hasClass('selected')) {\n                $(this).removeClass('selected');\n            }\n            else {\n                table.$('tr.selected').removeClass('selected');\n                $(this).addClass('selected');\n            }\n        });\n        $('#button').click(function () {\n            table.row('.selected').remove().draw(false);\n        });\n    }\n\n    function run(){\n        generateErrorTable()\n        parseRecivedData()\n    }\n\n    $(document).ready(function () {\n        run();\n    });\n    angular.element('grafana-app').injector().get('$rootScope').$on('refresh', function () { console.log(\"Hello\"); });\n</script>\n\n<style>\n    #mark_button {\n        background-color: #00678b;\n        color: white;\n        border: 2px solid #00678b;\n        border-radius: 12px;\n    }\n\n    #mark_button:hover {\n        background-color: #04b3f8;\n    }\n</style>\n<style>\n        input[type=text],\n        input[type=password] {\n            width: 100%;\n            padding: 5px 10px;\n            ;\n            margin: 4px 2px;\n            display: inline-block;\n            border: 1px solid #ccc;\n            border-radius: 4px;\n            box-sizing: border-box;\n        }\n    \n        input[type=submit] {\n            width: 100%;\n            background-color: #e7e7e7;\n            color: black;\n            padding: 4px 10px;\n            ;\n            margin: 8px 0;\n            border: none;\n            border-radius: 4px;\n            cursor: pointer;\n        }\n    \n    \n        input[type=submit]:hover {\n            background-color: #e7e7e7;\n        }\n    \n        .button {\n            background-color: #e7e7e7;\n            border: none;\n            color: white;\n            padding: 4px 10px;\n            text-align: center;\n            text-decoration: none;\n            display: inline-block;\n            font-size: 15px;\n            margin: 4px 2px;\n            -webkit-transition-duration: 0.5s;\n            transition-duration: 0.5s;\n            cursor: pointer;\n        }\n    \n        .jira_button {\n            background-color: #00678b;\n            color: white;\n            border: 2px solid #00678b;\n            border-radius: 4px;\n        }\n    \n        .jira_button:hover {\n            background-color: #04b3f8;\n        }\n    \n        .err-popup {\n            width: 100%;\n            height: 100%;\n            display: none;\n            position: fixed;\n            top: 0;\n            left: 0;\n            background: rgba(9, 9, 9, .75);\n            z-index: 9999\n        }\n    \n        #error-table_filter,\n        .dataTables_length,\n        .err-popup-close {\n            display: inline-block\n        }\n    \n        #err-popup-inner {\n            max-height: 90%;\n            overflow-y: scroll;\n            width: 90%;\n            padding: 40px;\n            position: absolute;\n            top: 50%;\n            left: 50%;\n            -webkit-transform: translate(-50%, -50%);\n            transform: translate(-50%, -50%);\n            box-shadow: 0 2px 6px rgba(0, 0, 0, 1);\n            border-radius: 3px;\n            background: #1f1d1d;\n            color: #e3e3e3;\n            font-weight: 500\n        }\n    \n        #err-popup-content {\n            word-wrap: break-word;\n            word-break: break-all;\n            max-height: 90%;\n            overflow-y: scroll\n        }\n    \n        .err-popup-close:hover {\n            color: #fff\n        }\n    \n        .err-popup-close {\n            font-size: 15px !important;\n            width: 30px;\n            height: 30px;\n            padding-top: 4px;\n            position: absolute;\n            top: 20px;\n            right: 15px;\n            transition: ease .25s all;\n            -webkit-transform: translate(50%, -50%);\n            transform: translate(50%, -50%);\n            border-radius: 1000px;\n            font-family: Arial, Sans-Serif;\n            text-align: center;\n            line-height: 100%;\n            color: #e3e3e3;\n            text-decoration: none\n        }\n    \n        .dataTables_length {\n            padding-bottom: 20px;\n            padding-right: 23px\n        }\n    \n        input[type=search] {\n            border-radius: 5px\n        }\n    \n        select[name=error-table_length] {\n            height: 23px;\n            width: 65px;\n            border-radius: 5px\n        }\n    \n        .paging_full_numbers>a,\n        .paging_full_numbers>span>a {\n            padding-right: 10px\n        }\n    \n        #errors-table-message {\n            display: table;\n            margin-left: auto;\n            margin-right: auto\n        }\n    \n        #error-table {\n            width: 100%\n        }\n    \n        th {\n            text-align: center\n        }\n    \n        table[id=error-table]>*>tr>td:nth-child(1) {\n            width: 50%;\n            word-break: break-all\n        }\n    \n        table[id=error-table]>*>tr>td:nth-child(2) {\n            width: 5%;\n            text-align: center\n        }\n    \n        table[id=error-table]>*>tr>td:nth-child(3) {\n            width: 15%;\n            text-align: center\n        }\n    \n        .accordeon {\n            width: 100%;\n            font-family: helvetica, sans-serif;\n            margin: -7px -7px -7px 0\n        }\n    \n        .accordeon-title {\n            background-color: #1f1d1d;\n            padding-top: 10px;\n            cursor: pointer;\n            padding-bottom: 10px\n        }\n    \n        .accordeon-title:before {\n            content: \"+\";\n            float: left;\n            font-size: 20px;\n            color: #f2f2f2;\n            border: 1px solid #f2f2f2;\n            width: 20px;\n            height: 20px;\n            line-height: 17px;\n            text-align: center;\n            margin-right: 10px\n        }\n    \n        .accordeon-title.is-opened:before {\n            content: \"-\"\n        }\n    \n        table[class=error-details-table]>*>tr>td:nth-child(1) {\n            width: 12%;\n            border-right-color: #fff\n        }\n    \n        .accordeon-content>.separator:last-child {\n            border-bottom: 0;\n            margin-bottom: 0\n        }\n    \n        table[class=error-details-table] {\n            border: none\n        }\n    \n        .accordeon-content {\n            display: none;\n            padding-left: 20px;\n            padding-bottom: 10px\n        }\n    \n        #detail-data,\n        #detail-label {\n            display: inline-block;\n            padding: 10px\n        }\n    \n        #detail-label {\n            vertical-align: top;\n            width: 10%;\n            max-width: 135px;\n            word-break: break-word;\n            border-right: 1px solid #292929\n        }\n        \n        #detail-data {\n            border-left: 1px solid #292929;\n            word-break: break-all;\n            width: 100%;\n            margin-left: -1px;\n            max-height: 75px;\n            overflow: hidden\n        }\n    \n        #title-wrapper {\n            height: 20px;\n            overflow: hidden\n        }\n    \n        .separator {\n            display: block;\n            border-bottom: 1px solid #292929;\n            margin-bottom: -7px\n        }\n    </style>\n\n<div id=\"errors\">",
+            "datasource": null,
+            "gridPos": {
+              "h": 8,
+              "w": 24,
+              "x": 0,
+              "y": 37
+            },
+            "id": 19,
+            "mode": "html",
+            "options": {},
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "Panel Title",
+            "type": "text"
+          }
+        ],
+        "title": "Error table",
+        "type": "row"
       }
     ],
     "refresh": false,
-    "schemaVersion": 16,
+    "schemaVersion": 20,
     "style": "dark",
     "tags": [],
     "templating": {
@@ -1551,67 +1661,63 @@
         {
           "allValue": null,
           "current": {
-            "text": "percentiles95",
-            "value": "percentiles95"
+            "selected": true,
+            "tags": [],
+            "text": "95",
+            "value": "95"
           },
           "hide": 0,
           "includeAll": false,
           "label": null,
           "multi": false,
-          "name": "aggregation",
+          "name": "percentile",
           "options": [
             {
+              "selected": false,
+              "text": "50",
+              "value": "50"
+            },
+            {
+              "selected": false,
+              "text": "75",
+              "value": "75"
+            },
+            {
+              "selected": false,
+              "text": "90",
+              "value": "90"
+            },
+            {
               "selected": true,
-              "text": "percentiles95",
-              "value": "percentiles95"
+              "text": "95",
+              "value": "95"
             },
             {
               "selected": false,
-              "text": "max",
-              "value": "max"
-            },
-            {
-              "selected": false,
-              "text": "mean",
-              "value": "mean"
-            },
-            {
-              "selected": false,
-              "text": "min",
-              "value": "min"
-            },
-            {
-              "selected": false,
-              "text": "percentiles50",
-              "value": "percentiles50"
-            },
-            {
-              "selected": false,
-              "text": "percentiles75",
-              "value": "percentiles75"
-            },
-            {
-              "selected": false,
-              "text": "percentiles99",
-              "value": "percentiles99"
+              "text": "99",
+              "value": "99"
             }
           ],
-          "query": "percentiles95, max, mean, min, percentiles50, percentiles75, percentiles99",
+          "query": "50,75,90,95,99",
           "skipUrlSync": false,
           "type": "custom"
         },
         {
           "allValue": null,
-          "current": {},
+          "current": {
+            "tags": [],
+            "text": "demo",
+            "value": "demo"
+          },
           "datasource": "gatling",
-          "definition": "show measurements",
+          "definition": "SHOW TAG VALUES FROM /.*/ WITH KEY = \"test_type\"",
           "hide": 0,
           "includeAll": false,
           "label": "Test Type",
           "multi": false,
           "name": "test_type",
           "options": [],
-          "query": "show measurements",
+          "query": "SHOW TAG VALUES FROM /.*/ WITH KEY = \"test_type\"",
           "refresh": 1,
           "regex": "/[^users]/",
           "skipUrlSync": false,
@@ -1624,7 +1730,11 @@
         },
         {
           "allValue": null,
-          "current": {},
+          "current": {
+            "selected": true,
+            "text": "flood",
+            "value": "flood"
+          },
           "datasource": "gatling",
           "definition": "SHOW TAG VALUES FROM /.*/ WITH KEY = \"simulation\"",
           "hide": 0,
@@ -1646,29 +1756,12 @@
         },
         {
           "allValue": null,
-          "current": {},
-          "datasource": "gatling",
-          "definition": "SHOW TAG VALUES FROM /.*/ WITH KEY = \"user_count\"",
-          "hide": 0,
-          "includeAll": false,
-          "label": "Users",
-          "multi": false,
-          "name": "users",
-          "options": [],
-          "query": "SHOW TAG VALUES FROM /.*/ WITH KEY = \"user_count\"",
-          "refresh": 1,
-          "regex": "",
-          "skipUrlSync": false,
-          "sort": 0,
-          "tagValuesQuery": "",
-          "tags": [],
-          "tagsQuery": "",
-          "type": "query",
-          "useTags": false
-        },
-        {
-          "allValue": null,
-          "current": {},
+          "current": {
+            "selected": false,
+            "tags": [],
+            "text": "demo",
+            "value": "demo"
+          },
           "datasource": "gatling",
           "definition": "SHOW TAG VALUES FROM /.*/ WITH KEY = \"env\"",
           "hide": 0,
@@ -1693,6 +1786,7 @@
           "auto_count": 1,
           "auto_min": "1s",
           "current": {
+            "tags": [],
             "text": "1s",
             "value": "1s"
           },
@@ -1773,6 +1867,7 @@
         },
         {
           "current": {
+            "selected": true,
             "text": "250",
             "value": "250"
           },
@@ -1792,6 +1887,7 @@
         },
         {
           "current": {
+            "selected": true,
             "text": "700",
             "value": "700"
           },
@@ -1811,16 +1907,17 @@
         },
         {
           "current": {
-            "value": "gatling",
-            "text": "gatling"
+            "text": "gatling",
+            "value": "gatling"
           },
           "hide": 2,
           "label": null,
           "name": "db_name",
           "options": [
             {
-              "value": "gatling",
-              "text": "gatling"
+              "selected": true,
+              "text": "gatling",
+              "value": "gatling"
             }
           ],
           "query": "gatling",
@@ -1830,7 +1927,7 @@
       ]
     },
     "time": {
-      "from": "now-15m",
+      "from": "now-5m",
       "to": "now"
     },
     "timepicker": {
@@ -1861,6 +1958,6 @@
     "timezone": "",
     "title": "Gatling Performance",
     "uid": "q68rYQlik",
-    "version": 2
+    "version": 50
   }
 }
