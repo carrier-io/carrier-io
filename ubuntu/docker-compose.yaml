@@ -12,12 +12,13 @@ services:
     container_name: carrier-traefic
   galloper:
     image: getcarrier/galloper:latest
+    restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - REDIS_DB=2
       - REDIS_HOST=carrier-redis
-      - CPU_CORES=1
+      - CPU_CORES=2
       - APP_HOST=http://PUBLIC_IP
       - MINIO_HOST=http://carrier-minio:9000
       - MINIO_ACCESS_KEY=admin
@@ -94,5 +95,13 @@ services:
       - redis-server
       - --requirepass
       - password
+    labels:
+      - 'traefik.enable=false'
+  observer_chrome:
+    image: getcarrier/observer-chrome:latest
+    restart: unless-stopped
+    ports:
+      - 4444:4444
+    container_name: observer-chrome
     labels:
       - 'traefik.enable=false'

@@ -253,8 +253,8 @@ Resources:
                     "    environment:", "\n",
                     "      - REDIS_DB=2", "\n",
                     "      - REDIS_HOST=carrier-redis", "\n",
-                    "      - CPU_CORES=1", "\n",
-                    "      - APP_HOST=PUBLIC_IP", "\n",
+                    "      - CPU_CORES=2", "\n",
+                    "      - APP_HOST=http://PUBLIC_IP", "\n",
                     "      - MINIO_HOST=http://carrier-minio:9000", "\n",
                     "      - MINIO_ACCESS_KEY=admin", "\n",
                     "      - MINIO_SECRET_KEY=password", "\n",
@@ -331,7 +331,48 @@ Resources:
                     "      - --requirepass", "\n",
                     "      - password", "\n",
                     "    labels:", "\n",
-                    "      - 'traefik.enable=false'", "\n"
+                    "      - 'traefik.enable=false'", "\n",
+                    "  observer_chrome:", "\n",
+                    "    image: getcarrier/observer-chrome:latest", "\n",
+                    "    restart: unless-stopped", "\n",
+                    "    ports:", "\n",
+                    "      - 4444:4444", "\n",
+                    "    container_name: observer-chrome", "\n",
+                    "    labels:", "\n",
+                    "      - 'traefik.enable=false'"
+                    ]      
+                  ]          
+                mode: "000777"
+                owner: "root"
+                group: "root"
+            /tmp/configure_carrier:
+                content:
+                  Fn::Join: ["",
+                    [ 
+                      "#!/bin/bash", "\n",
+                      "sleep 20", "\n",
+                      "docker exec carrier-influx bash -c \"influx -execute 'create database jmeter'\"", "\n",
+                      "docker exec carrier-influx bash -c \"influx -execute 'create database comparison'\"", "\n",
+                      "docker exec carrier-influx bash -c \"influx -execute 'create database gatling'\"", "\n",
+                      "docker exec carrier-influx bash -c \"influx -execute 'create database prodsec'\"", "\n",
+                      "docker exec carrier-influx bash -c \"influx -execute 'create database perfui'\"", "\n",
+                      "docker exec carrier-influx bash -c \"influx -execute 'create database telegraf'\"", "\n",
+                      "docker exec carrier-influx bash -c \"influx -execute 'create database thresholds'\"", "\n",
+                      "curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/influx_datasources/datasource_comparison | curl -X POST \"http://PUBLIC_IP/grafana/api/datasources\" -u admin:password --header \"Content-Type: application/json\" -d @-", "\n",
+                      "curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/influx_datasources/datasource_jmeter | curl -X POST \"http://PUBLIC_IP/grafana/api/datasources\" -u admin:password --header \"Content-Type: application/json\" -d @-", "\n",
+                      "curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/influx_datasources/datasource_gatling | curl -X POST \"http://PUBLIC_IP/grafana/api/datasources\" -u admin:password --header \"Content-Type: application/json\" -d @-", "\n",
+                      "curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/influx_datasources/datasource_perfui | curl -X POST \"http://PUBLIC_IP/grafana/api/datasources\" -u admin:password --header \"Content-Type: application/json\" -d @-", "\n",
+                      "curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/influx_datasources/datasource_prodsec | curl -X POST \"http://PUBLIC_IP/grafana/api/datasources\" -u admin:password --header \"Content-Type: application/json\" -d @-", "\n",
+                      "curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/influx_datasources/datasource_telegraf | curl -X POST \"http://PUBLIC_IP/grafana/api/datasources\" -u admin:password --header \"Content-Type: application/json\" -d @-", "\n",
+                      "curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/influx_datasources/loki | curl -X POST \"http://PUBLIC_IP/grafana/api/datasources\" -u admin:password --header \"Content-Type: application/json\" -d @-", "\n",
+                      "curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/grafana_dashboards/ui_performance_dashboard.json | curl -X POST \"http://PUBLIC_IP/grafana/api/dashboards/db\" -u admin:password --header \"Content-Type: application/json\" -d @-", "\n",
+                      "curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/grafana_dashboards/performance_comparison_dashboard.json | curl -X POST \"http://PUBLIC_IP/grafana/api/dashboards/db\" -u admin:password --header \"Content-Type: application/json\" -d @-", "\n",
+                      "curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/grafana_dashboards/perfgun_performance_dashboard.json | curl -X POST \"http://PUBLIC_IP/grafana/api/dashboards/db\" -u admin:password --header \"Content-Type: application/json\" -d @-", "\n",
+                      "curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/grafana_dashboards/perfmeter_dashboards.json | curl -X POST \"http://PUBLIC_IP/grafana/api/dashboards/db\" -u admin:password --header \"Content-Type: application/json\" -d @-", "\n",
+                      "curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/grafana_dashboards/thresholds_dashboard.json | curl -X POST \"http://PUBLIC_IP/grafana/api/dashboards/db\" -u admin:password --header \"Content-Type: application/json\" -d @-", "\n",
+                      "curl -s https://raw.githubusercontent.com/carrier-io/carrier-io/master/grafana_dashboards/telegraph_dashboard.json | curl -X POST \"http://PUBLIC_IP/grafana/api/dashboards/db\" -u admin:password --header \"Content-Type: application/json\" -d @-", "\n",
+                      "curl -XPOST -d bucket=jmeter http://PUBLIC_IP/artifacts/bucket", "\n",
+                      "curl -XPOST -d bucket=reports http://PUBLIC_IP/artifacts/bucket", "\n"
                     ]      
                   ]          
                 mode: "000777"
@@ -340,12 +381,14 @@ Resources:
             commands:
               a-replace-public-ip:
                 command: "sed -e \"s/PUBLIC_IP/$(curl http://169.254.169.254/latest/meta-data/public-ipv4)/\" /tmp/docker-compose > /tmp/docker-compose.yaml"
-              b-docker-install:
+              b-replace-public-ip:
+                command: "sed -e \"s/PUBLIC_IP/$(curl http://169.254.169.254/latest/meta-data/public-ipv4)/\" /tmp/configure_carrier > /tmp/configure_carrier.sh"
+              c-docker-install:
                 command: "/tmp/docker-install.sh"
-              c-carrier-install:
+              d-carrier-install:
                 command: !Join ["",["cd /tmp && docker-compose up -d"]]
-              d-carrier-seed:
-                 command: "curl -XPOST -d bucket=tests http://localhost/artifacts/bucket"
+              e-carrier-seed:
+                 command: "/tmp/configure_carrier.sh"
       Properties:
         ImageId: !Ref Image
         KeyName: !Ref KeyName
@@ -353,7 +396,7 @@ Resources:
         BlockDeviceMappings:
         - DeviceName: "/dev/xvda"
           Ebs:
-            VolumeSize: 20
+            VolumeSize: 200
             DeleteOnTermination: true
             VolumeType: gp2
         SecurityGroupIds:
