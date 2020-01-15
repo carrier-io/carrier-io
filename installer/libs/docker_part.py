@@ -200,8 +200,7 @@ class ProvisionDocker(object):
             yield line
         yield "Creating object buckets ... \n"
         for bucket in constants.BUCKETS:
-            yield post(f"http://{self.data['dns']}/artifacts/bucket", data={"bucket": bucket}).content
-
+            post(f"http://{self.data['dns']}/artifacts/bucket", data={"bucket": bucket})
         yield "Installation complete ... \n"
 
     def uninstall(self):
