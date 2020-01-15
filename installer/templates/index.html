@@ -12,8 +12,8 @@
 		<div class="wrapper">
 			<div class="image-holder">
                 <h1>Carrier | Continuous Test Execution Platform</h1>
-                <h3>Installation Wizard</h3>
-				<img src="{{ url_for('static', filename='img/form-wizard.png') }}" alt="">
+                <h3>Quick Start Installation Wizard</h3>
+				<img src="{{ url_for('static', filename='img/bg.png') }}" alt="">
 			</div>
             <form action="">
             	<div id="wizard">
@@ -21,50 +21,60 @@
 	                <h4></h4>
 	                <section>
 	                    <div class="form-row">
-	                    	<label for="dns"> Master DNS (DNS or IP you will use to access platform)</label>
+	                    	<label for="dns"> Public IP (IP that will be used to access this server)</label>
 	                    	<input id="dns" type="text" class="form-control">
 	                    </div>
 	                    <div class="form-row">
 	                    	<label for="workers">
-                                How many parallel tasks you want to run on this machine
+                                How many parallel tasks / tests you want to run on this machine
 	                    	</label>
-                            <p>A task requires at least 1 CPU and 2Gb of RAM</p>
+                            <p>Tasks - operation of data aggregation, email and chat notifications, tests executions, etc.</p>
 	                    	<input type="text" id="workers" class="form-control" placeholder="Put a number here" style="margin-bottom: 20px">
 	                    </div>
-                        <div class="checkbox" >
-                            <label>
-								<input type="checkbox" id="interceptor"> Configure interceptor
-								<span class="checkmark"></span>
-							</label>
-                        </div>
-                        <br/>
-                        <div class="checkbox" >
-                            <label>
-								<input type="checkbox" id="perfmeter"> Preload PerfMeter
-								<span class="checkmark" ></span>
-							</label>
-                        </div>
-                        <div class="checkbox" >
-                            <label>
-								<input type="checkbox" id="perfgun"> Preload PerfGun
-								<span class="checkmark"></span>
-							</label>
-                        </div>
-                        <br/>
-                        <div class="checkbox" >
-                            <label>
-								<input type="checkbox" id="sast"> Preload SAST
-								<span class="checkmark"></span>
-							</label>
-                        </div>
-                        <div class="checkbox" >
-                            <label>
-								<input type="checkbox" id="dast"> Preload DAST
-								<span class="checkmark"></span>
-							</label>
-                        </div>
+						<table>
+							<tr>
+								<td colspan="3">Prefetch Containers</td>
+							</tr>
+							<tr>
+								<td>
+									<div class="checkbox">
+										<label>
+											<input type="checkbox" id="perfmeter"> Preload jMeter
+											<span class="checkmark" ></span>
+										</label>
+									</div>
+								</td>
+								<td style="min-width: 20px"></td>
+								<td>
+									<div class="checkbox" >
+										<label>
+											<input type="checkbox" id="perfgun"> Preload Gatling
+											<span class="checkmark"></span>
+										</label>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div class="checkbox" >
+										<label>
+											<input type="checkbox" id="sast"> Preload SAST
+											<span class="checkmark"></span>
+										</label>
+									</div>
+								</td>
+								<td style="min-width: 20px"></td>
+								<td>
+									<div class="checkbox" >
+										<label>
+											<input type="checkbox" id="dast"> Preload DAST
+											<span class="checkmark"></span>
+										</label>
+									</div>
+								</td>
+							</tr>
+						</table>
 	                </section>
-
 					<!-- SECTION 2 -->
 	                <h4></h4>
 	                <section>
@@ -88,11 +98,7 @@
 						<br />
 	                    <div class="form-row form-group">
 	                    	<div class="form-holder">
-	                    		<label for="grafana_login">Grafana Login</label>
-	                    		<input id="grafana_login" type="text" class="form-control">
-	                    	</div>
-	                    	<div class="form-holder">
-	                    		<label for="grafana_password">Grafana Password</label>
+	                    		<label for="grafana_password">Grafana Admin Password</label>
 	                    		<input id="grafana_password" type="password" class="form-control">
 	                    	</div>
                         </div>
@@ -136,9 +142,9 @@
 	                <section>
 	                    <div class="checkout">
 	                    	<div class="total">
-                    			<span class="heading">Public DNS:</span>
+                    			<span class="heading">Public IP:</span>
                     			<span class="total-price" id="public_dns_review">http://example.com</span>
-                                <p>This DNS/IP will be used to access your deployment</p>
+                                <p>This IP will be used to access your deployment</p>
                     		</div>
                             <div class="total">
                     			<span class="total-price" id="workers_count">10</span>

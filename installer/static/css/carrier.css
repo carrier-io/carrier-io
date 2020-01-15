@@ -71,7 +71,7 @@ img {
 }
 
 body {
-    background-color: #3729A6;
+    background-color: #1976D2;
 }
 
 .wrapper {
@@ -89,7 +89,8 @@ body {
   display: none; }
 
 #wizard {
-  min-height: 834px;
+  min-height: 700px;
+  max-height: 700px;
   background: #fff;
   margin-right: 60px;
   padding: 107px 75px 65px; }

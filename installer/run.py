@@ -33,7 +33,6 @@ def hello():
 def install():
     data = dict(dns=request.form['dns'],
                 workers=int(request.form['workers']),
-                inteceptor=str2bool(request.form['interceptor']),
                 perfmeter=str2bool(request.form['perfmeter']),
                 perfgun=str2bool(request.form['perfgun']),
                 sast=str2bool(request.form['sast']),
@@ -43,7 +42,7 @@ def install():
                 influx_dbs=not str2bool(request.form['influx_dbs']),
                 install_grafana=True if not request.form['grafana_url'] else False,
                 grafana_url=request.form['grafana_url'],
-                grafana_user='admin' if not request.form['grafana_user'] else request.form['grafana_user'],
+                grafana_user='admin',
                 grafana_password=request.form['grafana_password'],
                 install_influx=True if not request.form['influx_url'] else False,
                 influx_url=request.form['influx_url'],
@@ -71,7 +70,7 @@ def stream_uninstall():
 def main():
     host = "0.0.0.0"
     port = 9999
-    app.run(host=host, port=port, debug=True)
+    app.run(host=host, port=port)
 
 
 if __name__ == "__main__":
