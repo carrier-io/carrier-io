@@ -4,7 +4,7 @@
 
 ## Standalone Deployment on server with Docker Installed
 
-### Installing Carrier instance (web UI based, seems less reliable for now - see CLI method in the bottom of the page).
+### Installing Carrier instance
 
 1. Run the docker command
    
