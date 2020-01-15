@@ -50,11 +50,12 @@ $(function(){
                     // influx_user: $("#influx_login")[0].value,
                     // influx_password: $("#influx_password")[0].value
                   },
-                  success: function(result){ console.log(result) },
+                  success: function(result){
+                    $('.steps ul').addClass('step-4');
+                    $('#install_status').html('<iframe src="/response" height="500px" width="100%"></iframe>')
+                  },
                   dataType: 'json'
                 });
-                $('.steps ul').addClass('step-4');
-                $('#install_status').html('<iframe src="/response" height="500px" width="100%"></iframe>')
             } else {
                 $('.steps ul').removeClass('step-4');
                 $('.actions ul').removeClass('step-last');
