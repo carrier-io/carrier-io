@@ -74,9 +74,18 @@ class ProvisionDocker(object):
                                                             volume=constants.INFLUX_VOLUME_NAME)
 
     def prepare_redis(self):
+        self.client.volumes.create(constants.MINIO_VOLUME_NAME, labels={"carrier": "minio"})
+        self.volumes_piece += f'\n  {constants.MINIO_VOLUME_NAME}:\n    external: true'
+        self.client.volumes.create(constants.GALLOPER_REPORTS_VOLUME, labels={"carrier": "report"})
+        self.volumes_piece += f'\n  {constants.GALLOPER_REPORTS_VOLUME}:\n    external: true'
+        self.client.volumes.create(constants.GALLOPER_DB_VOLUME, labels={"carrier": "galloper"})
+        self.volumes_piece += f'\n  {constants.GALLOPER_DB_VOLUME}:\n    external: true'
         self.redis_piece = constants.REDIS_COMPOSE.format(password=self.data['redis_password'],
                                                           host=self.data['dns'],
-                                                          cpu_cores=self.data['workers'])
+                                                          cpu_cores=self.data['workers'],
+                                                          minio_volume=constants.MINIO_VOLUME_NAME,
+                                                          galloper_reports=constants.GALLOPER_REPORTS_VOLUME,
+                                                          galloper_db=constants.GALLOPER_DB_VOLUME)
 
     def prepare_vault(self):
         self.client.volumes.create(constants.VAULT_VOLUME_NAME, labels={"carrier": "jenkins"})
@@ -189,6 +198,10 @@ class ProvisionDocker(object):
             self.seed_grafana_dashboards()
         for line in self.seed_docker_images():
             yield line
+        yield "Creating object buckets ... \n"
+        for bucket in constants.BUCKETS:
+            yield post(f"http://{self.data['dns']}/artifacts/bucket", data={"bucket": bucket}).content
+
         yield "Installation complete ... \n"
 
     def uninstall(self):

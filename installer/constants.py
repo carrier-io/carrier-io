@@ -13,6 +13,15 @@ INFLUX_VOLUME_NAME = "carrier_influx_volume"
 GRAFANA_VOLUME_NAME = "carrier_grafana_volume"
 JENKINS_VOLUME_NAME = "carrier_jenkins_volume"
 VAULT_VOLUME_NAME = "carrier_vault_volume"
+MINIO_VOLUME_NAME = "carrier_minio_volume"
+GALLOPER_REPORTS_VOLUME = "carrier_reports_volume"
+GALLOPER_DB_VOLUME = "carrier_galloperdb_volume"
+
+# S3 buckets to create
+BUCKETS = [
+    'reports',
+    'tests'
+]
 
 # Dockerfiles
 JENKINSFILE = f"""FROM jenkins/jenkins:lts
@@ -242,18 +251,25 @@ REDIS_COMPOSE = """  redis:
     restart: unless-stopped
     volumes:
       - //var/run/docker.sock://var/run/docker.sock
+      - {galloper_reports}:/tmp/reports
+      - {galloper_db}:/tmp/db
     networks:
       - carrier
     links:
       - "redis:redis"
     container_name: carrier-galloper
     environment:
-      - REDIS_PASSWORD={password}
-      - REDIS_HOST=redis
+      - REDIS_DB=2
+      - REDIS_HOST=carrier-redis
+      - CPU_CORES=1
       - APP_HOST={host}
-      - CPU_CORES={cpu_cores}
+      - MINIO_HOST=http://carrier-minio:9000
+      - MINIO_ACCESS_KEY=admin
+      - MINIO_SECRET_KEY=password
+      - MINIO_REGION=us-east-1
     depends_on:
       - redis
+      - minio
     expose:
       - "5000"
     labels:
@@ -262,11 +278,27 @@ REDIS_COMPOSE = """  redis:
       - 'traefik.frontend.rule=PathPrefix: /'
       - 'traefik.frontend.passHostHeader=true'
       - 'carrier=galloper' 
-      
+  minio:
+    image: minio/minio:RELEASE.2019-10-12T01-39-57Z
+    networks:
+      - carrier
+    environment:
+      - MINIO_ACCESS_KEY=admin
+      - MINIO_SECRET_KEY=password
+    volumes:
+      - {minio_volume}:/data
+    labels:
+      - 'traefik.enable=false'
+      - 'carrier=minio'
+    container_name: carrier-minio
+    command: server /data
+  
   interceptor:
     image: getcarrier/interceptor:latest
     restart: unless-stopped
     container_name: interceptor
+    networks:
+      - carrier
     labels:
       - 'traefik.enable=false'
       - 'carrier=interceptor'
@@ -278,6 +310,19 @@ REDIS_COMPOSE = """  redis:
       - CPU_CORES={cpu_cores}
       - REDIS_PASSWORD={password}
       - REDIS_HOST={host}
+  
+  observer_chrome:
+    image: getcarrier/observer-chrome:latest
+    restart: unless-stopped
+    networks:
+      - carrier
+    ports:
+      - 4444:4444
+    container_name: observer-chrome
+    labels:
+      - 'traefik.enable=false'
+      - 'carrier=chrome'
+
 """
 
 NETWORK_PIECE = """\nnetworks:
