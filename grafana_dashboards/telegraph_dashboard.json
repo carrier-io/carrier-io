@@ -2482,7 +2482,7 @@
       }
     ],
     "refresh": false,
-    "schemaVersion": 16,
+    "schemaVersion": 20,
     "style": "dark",
     "tags": [
       "influxdb",
@@ -2625,7 +2625,6 @@
     },
     "timezone": "browser",
     "title": "Telegraf metrics",
-    "uid": "vlVLcIjmk",
     "version": 1
   }
 }

@@ -125,19 +125,17 @@ class ProvisionDocker(object):
         for db in constants.INFLUX_DATABASES:
             influx_container.exec_run(constants.INFLUX_CREATEDB_COMMAND.format(db=db))
 
-    def seed_influx_dbs(self):
-        for db in constants.DATASOURCES:
+    def _seed_data_to_influx(self, url, data):
+        for db in data:
             db_data = get(db).content
-            post(constants.DATASOURCES_HOST.format(host=self.data['dns']),
-                 headers=constants.GRAFANA_HEADERS, data=db_data,
+            post(url, headers=constants.GRAFANA_HEADERS, data=db_data,
                  auth=(self.data['grafana_user'], self.data['grafana_password']))
 
+    def seed_influx_dbs(self):
+        self._seed_data_to_influx(constants.DATASOURCES_HOST.format(host=self.data['dns']), constants.DATASOURCES)
+
     def seed_grafana_dashboards(self):
-        for dashboard in constants.GRAFANA_DASHBOARDS:
-            db_data = get(dashboard).content
-            post(constants.GRAFANA_URL.format(host=self.data['dns']),
-                 headers=constants.GRAFANA_HEADERS, data=db_data,
-                 auth=(self.data['grafana_user'], self.data['grafana_password']))
+        self._seed_data_to_influx(constants.GRAFANA_URL.format(host=self.data['dns']), constants.GRAFANA_DASHBOARDS)
 
     def seed_docker_images(self):
         if self.data['perfmeter']:

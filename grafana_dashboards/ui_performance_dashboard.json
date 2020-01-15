@@ -1881,7 +1881,7 @@
       }
     ],
     "refresh": false,
-    "schemaVersion": 16,
+    "schemaVersion": 20,
     "style": "dark",
     "tags": [
       "ui"
@@ -2076,7 +2076,6 @@
     },
     "timezone": "browser",
     "title": "UI Performance",
-    "uid": "BSrQYBYmk",
-    "version": 8
+    "version": 1
   }
 }

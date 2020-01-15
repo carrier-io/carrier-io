@@ -16,7 +16,7 @@
     "editable": true,
     "gnetId": null,
     "graphTooltip": 1,
-    "id": 7,
+    "id": null,
     "iteration": 1578295113562,
     "links": [],
     "panels": [
@@ -123,7 +123,6 @@
     },
     "timezone": "browser",
     "title": "Thresholds",
-    "uid": "0HlylVaZz",
-    "version": 12
+    "version": 1
   }
 }

@@ -16,7 +16,7 @@
     "editable": true,
     "gnetId": null,
     "graphTooltip": 0,
-    "id": 1,
+    "id": null,
     "iteration": 1573034645100,
     "links": [],
     "panels": [
@@ -1955,9 +1955,8 @@
         "30d"
       ]
     },
-    "timezone": "",
+    "timezone": "browser",
     "title": "Gatling Performance",
-    "uid": "q68rYQlik",
-    "version": 50
+    "version": 1
   }
 }

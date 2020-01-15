@@ -28,7 +28,7 @@
     "editable": true,
     "gnetId": null,
     "graphTooltip": 1,
-    "id": 3,
+    "id": null,
     "iteration": 1573230276487,
     "links": [],
     "panels": [
@@ -924,7 +924,7 @@
       }
     ],
     "refresh": false,
-    "schemaVersion": 18,
+    "schemaVersion": 20,
     "style": "dark",
     "tags": [
       "benchmark"
@@ -1298,7 +1298,6 @@
     },
     "timezone": "browser",
     "title": "Performance Comparison Dashboard",
-    "uid": "b_qfjP_ik",
-    "version": 3
+    "version": 1
   }
 }

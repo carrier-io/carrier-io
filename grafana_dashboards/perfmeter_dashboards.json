@@ -16,7 +16,7 @@
     "editable": true,
     "gnetId": null,
     "graphTooltip": 0,
-    "id": 2,
+    "id": null,
     "iteration": 1574763490188,
     "links": [],
     "panels": [
@@ -1939,9 +1939,8 @@
         "30d"
       ]
     },
-    "timezone": "",
+    "timezone": "browser",
     "title": "Jmeter Performance",
-    "uid": "q69rYQlik",
-    "version": 14
+    "version": 1
   }
 }
