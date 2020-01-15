@@ -1,4 +1,4 @@
-WORKDIR = "/tmp/carrier"
+WORKDIR = "/opt/carrier"
 
 
 USERNAME = "carrier"
@@ -173,11 +173,13 @@ INFLUX_COMPOSE = '''  influx:
 '''
 
 GRAFANA_COMPOSE = '''  grafana:
-    image: grafana/grafana:5.4.0
+    image: grafana/grafana:6.4.4
     restart: unless-stopped
     volumes:
       - {volume}:/var/lib/grafana
     environment:
+      - GF_PANELS_DISABLE_SANITIZE_HTML=true
+      - GF_INSTALL_PLUGINS=natel-influx-admin-panel
       - GF_SECURITY_ADMIN_PASSWORD={password}
       - GF_SERVER_ROOT_URL=http://{host}/grafana
     networks:
@@ -190,6 +192,18 @@ GRAFANA_COMPOSE = '''  grafana:
       - 'traefik.frontend.passHostHeader=true'
       - 'carrier=grafana'
     user: root
+  loki:
+    image: grafana/loki:latest
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    container_name: carrier-loki
+    networks:
+      - carrier
+    labels:
+      - 'traefik.enable=false'
+      - 'carrier=loki'
 '''
 
 TRAEFIC_COMPOSE = """  traefik:
@@ -306,7 +320,9 @@ DATASOURCES = [
     'https://raw.githubusercontent.com/carrier-io/carrier-io/master/influx_datasources/datasource_gatling',
     'https://raw.githubusercontent.com/carrier-io/carrier-io/master/influx_datasources/datasource_perfui',
     'https://raw.githubusercontent.com/carrier-io/carrier-io/master/influx_datasources/datasource_prodsec',
-    'https://raw.githubusercontent.com/carrier-io/carrier-io/master/influx_datasources/datasource_telegraf'
+    'https://raw.githubusercontent.com/carrier-io/carrier-io/master/influx_datasources/datasource_telegraf',
+    'https://raw.githubusercontent.com/carrier-io/carrier-io/master/influx_datasources/loki',
+    'https://raw.githubusercontent.com/carrier-io/carrier-io/master/influx_datasources/datasource_thresholds'
 ]
 
 # Seed data GRAFANA

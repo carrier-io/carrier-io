@@ -4,12 +4,19 @@ $(function(){
         bodyTag: "section",
         transitionEffect: "fade",
         enableAllSteps: true,
-        transitionEffectSpeed: 500,
+        transitionEffectSpeed: 400,
         onStepChanging: function (event, currentIndex, newIndex) {
-            if ( newIndex === 1 && $("#interceptor")[0].checked ) {
-                console.log("We need to block second step here")
-            } else if ( newIndex === 1 ) {
-                $('.steps ul').addClass('step-2');
+            if ( newIndex === 1 ) {
+                if ($("#dns")[0].value == ''){
+                    alert("Please fill IP value");
+                    return false;
+                }
+                else if ($("#workers")[0].value == '') {
+                    alert("Please specify amount of workers");
+                    return false;
+                } else if ($("#dns")[0].value != '' && $("#workers")[0].value != ''){
+                    $('.steps ul').addClass('step-2');
+                }
             } else {
                 $('.steps ul').removeClass('step-2');
             }
@@ -31,7 +38,6 @@ $(function(){
                   data: {
                     dns: $("#dns")[0].value,
                     workers: $("#workers")[0].value,
-                    interceptor: $("#interceptor")[0].checked,
                     perfmeter: $("#perfmeter")[0].checked,
                     perfgun: $("#perfgun")[0].checked,
                     dast: $("#dast")[0].checked,
@@ -40,7 +46,6 @@ $(function(){
                     install_jenkins: $("#jenkins")[0].checked,
                     influx_dbs: $("#influx")[0].checked,
                     grafana_url: $("#grafana_url")[0].value,
-                    grafana_user: $("#grafana_login")[0].value,
                     grafana_password: $("#grafana_password")[0].value,
                     influx_url: $("#influx_url")[0].value
                     // influx_user: $("#influx_login")[0].value,
@@ -55,7 +60,7 @@ $(function(){
                 $('.steps ul').removeClass('step-4');
                 $('.actions ul').removeClass('step-last');
             }
-            return true; 
+            return true;
         },
         labels: {
             finish: "Done",
@@ -65,9 +70,9 @@ $(function(){
     });
     // Custom Steps Jquery Steps
     $('.wizard > .steps li a').click(function(){
-    	$(this).parent().addClass('checked');
-		$(this).parent().prevAll().addClass('checked');
-		$(this).parent().nextAll().removeClass('checked');
+        $('.wizard > .steps li a').parent().addClass('checked');
+        $('.wizard > .steps li a').parent().prevAll().addClass('checked');
+        $('.wizard > .steps li a').parent().nextAll().removeClass('checked');
     });
     // Custom Button Jquery Steps
     $('.forward').click(function(){
