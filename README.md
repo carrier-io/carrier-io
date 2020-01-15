@@ -18,9 +18,7 @@
 
 4. Fill Grafana Admin password on second screen
 
-
 5. Review comfiguration and proceed with installation
-
 
 6. Once installation is done you will see `Installation complete ...` message in log trace area
 
