@@ -8,27 +8,21 @@
 
 1. Run the docker command
    
-   `docker run -it --rm -p 9999:9999 -v //var/run/docker.sock://var/run/docker.sock getcarrier/carrier-io:latest`
+   `docker run -it --rm -p 9999:9999 -v <local folder for docker-compose>://opt/carrier -v //var/run/docker.sock://var/run/docker.sock getcarrier/carrier-io:latest`
 
 2. Open `http://localhost:9999` in your browser
 
-3. Fill DNS and amount of worker slots you want be available on this server 
+3. Fill IP and amount of worker slots you want be available on this server 
 
-   Mark all images you want to be seeded (Perfmeter, Perfgun, SAST and DAST) 
+   Mark all images you want to be pre-fetched on particular server (jMeter, Gatling, SAST and DAST) 
 
-   ![alt text](https://raw.githubusercontent.com/carrier-io/carrier-io/master/images/installation_step_1.png)
+4. Fill Grafana Admin password on second screen
 
-4. Fill Grafana and Influx data in second screen
-
-   _Note: Leave Grafana and Influx URLs blank in case you need it filled_ 
-
-   ![alt text](https://raw.githubusercontent.com/carrier-io/carrier-io/master/images/installation_step_2.png)
 
 5. Review comfiguration and proceed with installation
 
-   ![alt text](https://raw.githubusercontent.com/carrier-io/carrier-io/master/images/installation_progress.png)
 
-6. Once installation is done you will see `Installation complete ...` message
+6. Once installation is done you will see `Installation complete ...` message in log trace area
 
 Jenkins will is available at `<public_dns>/jenkins` (only in case you choose an option to install it)
 
@@ -64,10 +58,3 @@ interceptor | 1 | 3Gb | 20Gb
    `docker run -it --rm -p 9999:9999 -v //var/run/docker.sock://var/run/docker.sock getcarrier/carrier-io:latest`
 
 2. Open `http://localhost:9999/uninstall` in your browser
-
-### Installing Carrier instance from CLI.
-If you are using AWS Amazon Linux 2 to try carrier.io out, just run following under root:
-https://github.com/dzavalei/carrier-io/blob/master/amazon2/install.sh
-
-For Ubuntu and Centos there are corresponding subfolders in https://github.com/dzavalei/carrier-io/ folder.
-

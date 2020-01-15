@@ -25,7 +25,6 @@ $(function(){
                 $('#workers_count').text($("#workers")[0].value);
                 $('#jenkins_review').html("http://"+$("#dns")[0].value+"/jenkins");
                 $('#grafana_review').html("http://"+$("#dns")[0].value+"/grafana");
-                $('#grafana_login_review').html($("#grafana_login")[0].value);
                 $('#influx_review').html("http://"+$("#dns")[0].value+"/jenkins");
                 $('.steps ul').addClass('step-3');
             } else {
@@ -70,9 +69,9 @@ $(function(){
     });
     // Custom Steps Jquery Steps
     $('.wizard > .steps li a').click(function(){
-        $('.wizard > .steps li a').parent().addClass('checked');
-        $('.wizard > .steps li a').parent().prevAll().addClass('checked');
-        $('.wizard > .steps li a').parent().nextAll().removeClass('checked');
+        $(this).parent().addClass('checked');
+        $(this).parent().prevAll().addClass('checked');
+        $(this).parent().nextAll().removeClass('checked');
     });
     // Custom Button Jquery Steps
     $('.forward').click(function(){
