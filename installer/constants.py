@@ -280,6 +280,7 @@ REDIS_COMPOSE = """  redis:
       - 'carrier=galloper' 
   minio:
     image: minio/minio:RELEASE.2019-10-12T01-39-57Z
+    restart: unless-stopped
     networks:
       - carrier
     environment:
@@ -353,7 +354,8 @@ INFLUX_DATABASES = [
     'prodsec',
     'perfui',
     'telegraf',
-    'thresholds'
+    'thresholds',
+    'profiling'
 ]
 INFLUX_CREATEDB_COMMAND = 'bash -c "influx -execute \'create database {db}\'"'
 
@@ -368,6 +370,7 @@ DATASOURCES = [
     'https://raw.githubusercontent.com/carrier-io/carrier-io/master/influx_datasources/datasource_telegraf',
     'https://raw.githubusercontent.com/carrier-io/carrier-io/master/influx_datasources/loki',
     'https://raw.githubusercontent.com/carrier-io/carrier-io/master/influx_datasources/datasource_thresholds'
+    'https://raw.githubusercontent.com/carrier-io/carrier-io/master/influx_datasources/datasource_profiling'
 ]
 
 # Seed data GRAFANA
