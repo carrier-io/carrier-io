@@ -18,7 +18,7 @@ from installer.libs.docker_part import ProvisionDocker
 
 from installer.libs.utlis import str2bool
 from flask import Flask, render_template, request, Response
-from werkzeug.contrib.cache import SimpleCache
+from cachelib import SimpleCache
 
 app = Flask(__name__)
 cache = SimpleCache()
