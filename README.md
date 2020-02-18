@@ -4,6 +4,28 @@
 
 ## Standalone Deployment on server with Docker Installed
 
+### Prerequisites
+
+Ports required for minimal installation to work:
+
+80 - basic port where Galloper will be serving
+
+8080 - Traefik stats port
+
+2003 - Grafite protocol (Usage is minimal, will be removed in next release)
+
+8086 - InfluxDB port
+
+6379 - Redis port for tasks management (Will be replaced in next release)
+
+3100 - Loki port for logs aggregartion
+
+4444 - WebDriver port for UI performance
+
+9999 - UI performance control API port
+
+Note: In order to use different port for Traefik statistic interface (:8080) you may want to specify ` -e TRAEFIK_STATS_PORT=<your_port> ` while starting installation container
+
 ### Installing Carrier instance
 
 1. Run the docker command
@@ -18,14 +40,14 @@
 
 4. Fill Grafana Admin password on second screen
 
-5. Review comfiguration and proceed with installation
+5. Review configuration and proceed with installation
 
 6. Once installation is done you will see `Installation complete ...` message in log trace area
 
 Jenkins will is available at `<public_dns>/jenkins` (only in case you choose an option to install it)
 
 Grafana will is available at `<public_dns>/grafana` (only in case you choose an option to install it)  
- 
+
 
 ## Configuration of interceptor (scale unit)
 

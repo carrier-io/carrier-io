@@ -15,7 +15,7 @@
 import docker
 from requests import get, post
 from time import sleep
-from os import mkdir, path
+from os import mkdir, path, makedirs
 from installer import constants
 from subprocess import Popen, PIPE, CalledProcessError
 from traceback import format_exc
@@ -52,12 +52,14 @@ class ProvisionDocker(object):
             f.write(constants.TRAEFICFILE)
         with open(path.join(constants.WORKDIR, 'traefik', "traefik.toml"), "w") as f:
             f.write(constants.TRAEFIC_CONFIG)
-        self.traefik_piece = constants.TRAEFIC_COMPOSE.format(path=path.join(constants.WORKDIR, 'traefik'))
+        self.traefik_piece = constants.TRAEFIC_COMPOSE.format(path=path.join(constants.WORKDIR, 'traefik'),
+                                                              TRAEFIK_STATS_PORT=constants.TRAEFIK_STATS_PORT,
+                                                              TRAEFIK_PUBLIC_PORT=constants.TRAEFIK_PUBLIC_PORT)
 
     def prepare_grafana(self):
         self.client.volumes.create(constants.GRAFANA_VOLUME_NAME, labels={"carrier": "grafana"})
         self.volumes_piece += f'\n  {constants.GRAFANA_VOLUME_NAME}:\n    external: true'
-        mkdir(path.join(constants.WORKDIR, 'grafana'))
+        makedirs(path.join(constants.WORKDIR, 'grafana'), exist_ok=True)
         self.grafana_piece = constants.GRAFANA_COMPOSE.format(volume=constants.GRAFANA_VOLUME_NAME,
                                                               password=self.data['grafana_password'],
                                                               host=self.data['dns'])

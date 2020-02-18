@@ -1,3 +1,8 @@
+from os import environ
+
+TRAEFIK_STATS_PORT = environ.get("TRAEFIK_STATS_PORT", "8080")
+TRAEFIK_PUBLIC_PORT = environ.get("TRAEFIK_PUBLIC_PORT", "80")
+
 WORKDIR = "/opt/carrier"
 
 
@@ -226,8 +231,8 @@ TRAEFIC_COMPOSE = """  traefik:
     labels:
         - 'carrier=traefik'
     ports:
-      - 8080:8080
-      - 80:80
+      - {TRAEFIK_STATS_PORT}:8080
+      - {TRAEFIK_PUBLIC_PORT}:80
 """
 
 REDIS_COMPOSE = """  redis:
