@@ -5,7 +5,7 @@ TRAEFIK_PUBLIC_PORT = environ.get("TRAEFIK_PUBLIC_PORT", "80")
 
 WORKDIR = "/opt/carrier"
 ENTRY_POINTS_DIR = path.join(path.dirname(__file__), "entry_points")
-
+ENV_FILES_DIR = path.join(path.dirname(__file__), "env_files")
 
 USERNAME = "carrier"
 REDIS_PASSWORD = "password"
@@ -259,13 +259,12 @@ REDIS_COMPOSE = """
     container_name: carrier-postgres
     volumes:
       - {carrier_pg_db_volume}:/var/lib/postgresql/data
-      - ./postgres-entrypoint.sh:/docker-entrypoint-initdb.d/postgres-entrypoint.sh
+      - ./entry_points/postgres-entrypoint.sh:/docker-entrypoint-initdb.d/postgres-entrypoint.sh
     networks:
       - carrier
+    env_file:
+     - ./env_files/postgres.env
     environment:
-      - POSTGRES_USER=carrier_pg_user
-      - POSTGRES_PASSWORD=carrier_pg_password
-      - POSTGRES_DB=carrier_pg_db
       - POSTGRES_SCHEMAS=carrier,keycloack
       - POSTGRES_INITDB_ARGS=--data-checksums
     labels:
@@ -283,6 +282,8 @@ REDIS_COMPOSE = """
     links:
       - "redis:redis"
     container_name: carrier-galloper
+    env_file:
+     - ./env_files/postgres.env
     environment:
       - REDIS_DB=2
       - REDIS_HOST=carrier-redis
@@ -292,6 +293,7 @@ REDIS_COMPOSE = """
       - MINIO_ACCESS_KEY=admin
       - MINIO_SECRET_KEY=password
       - MINIO_REGION=us-east-1
+      - POSTGRES_SCHEMA=carrier
     depends_on:
       - redis
       - minio
