@@ -267,6 +267,8 @@ REDIS_COMPOSE = """
       - POSTGRES_DB=carrier_pg_db
       - POSTGRES_SCHEMAS=carrier,keycloack
       - POSTGRES_INITDB_ARGS=--data-checksums
+    labels:
+      - 'carrier=postgres' 
   galloper:
     image: getcarrier/galloper:latest
     restart: unless-stopped
