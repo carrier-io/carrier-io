@@ -1,9 +1,10 @@
-from os import environ
+from os import environ, path
 
 TRAEFIK_STATS_PORT = environ.get("TRAEFIK_STATS_PORT", "8080")
 TRAEFIK_PUBLIC_PORT = environ.get("TRAEFIK_PUBLIC_PORT", "80")
 
 WORKDIR = "/opt/carrier"
+ENTRY_POINTS_DIR = path.join(path.dirname(__file__), "entry_points")
 
 
 USERNAME = "carrier"
@@ -254,17 +255,18 @@ REDIS_COMPOSE = """
       - {password}
   postgres:
     image: postgres:12.2
+    container_name: carrier-postgres
     volumes:
       - {carrier_pg_db_volume}:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+      - ./postgres-entrypoint.sh:/docker-entrypoint-initdb.d/postgres-entrypoint.sh
     networks:
       - carrier
     environment:
-      POSTGRES_USER=carrier_pg_user
-      POSTGRES_PASSWORD=carrier_pg_password
-      POSTGRES_DB=carrier_pg_db
-      POSTGRES_INITDB_ARGS=--data-checksums
+      - POSTGRES_USER=carrier_pg_user
+      - POSTGRES_PASSWORD=carrier_pg_password
+      - POSTGRES_DB=carrier_pg_db
+      - POSTGRES_SCHEMAS=carrier,keycloack
+      - POSTGRES_INITDB_ARGS=--data-checksums
   galloper:
     image: getcarrier/galloper:latest
     restart: unless-stopped

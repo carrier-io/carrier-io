@@ -15,7 +15,8 @@
 import docker
 from requests import get, post
 from time import sleep
-from os import mkdir, path, makedirs
+from os import mkdir, path, makedirs, listdir
+from shutil import copyfile
 from installer import constants
 from subprocess import Popen, PIPE, CalledProcessError
 from traceback import format_exc
@@ -91,12 +92,20 @@ class ProvisionDocker(object):
                                                           cpu_cores=self.data['workers'],
                                                           minio_volume=constants.MINIO_VOLUME_NAME,
                                                           galloper_reports=constants.GALLOPER_REPORTS_VOLUME,
-                                                          galloper_db=constants.GALLOPER_DB_VOLUME)
+                                                          galloper_db=constants.GALLOPER_DB_VOLUME,
+                                                          carrier_pg_db_volume=constants.CARRIER_PG_DB_VOLUME)
 
     def prepare_vault(self):
         self.client.volumes.create(constants.VAULT_VOLUME_NAME, labels={"carrier": "jenkins"})
         self.volumes_piece += f'\n  {constants.VAULT_VOLUME_NAME}:\n    external: true'
         self.vault_piece = constants.VAULT_COMPOSE % constants.VAULT_VOLUME_NAME
+
+    @staticmethod
+    def prepare_entry_points():
+        for file_name in listdir(constants.ENTRY_POINTS_DIR):
+            file_path = path.join(constants.ENTRY_POINTS_DIR, file_name)
+            if path.isfile(file_path):
+                copyfile(file_path, path.join(constants.WORKDIR, file_name))
 
     def _popen_yield(self, cmd):
         popen = Popen(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True, cwd=constants.WORKDIR)
@@ -109,6 +118,7 @@ class ProvisionDocker(object):
             raise CalledProcessError(return_code, cmd, popen.stderr.read())
 
     def compose_build(self):
+        self.prepare_entry_points()
         self.create_network()
         self.prepare_redis()
         self.prepare_vault()
