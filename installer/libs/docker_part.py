@@ -80,6 +80,10 @@ class ProvisionDocker(object):
         self.volumes_piece += f'\n  {constants.MINIO_VOLUME_NAME}:\n    external: true'
         self.client.volumes.create(constants.GALLOPER_REPORTS_VOLUME, labels={"carrier": "report"})
         self.volumes_piece += f'\n  {constants.GALLOPER_REPORTS_VOLUME}:\n    external: true'
+        self.client.volumes.create(constants.CARRIER_PG_DB_VOLUME, labels={"carrier": "postgres"})
+        self.volumes_piece += f'\n  {constants.CARRIER_PG_DB_VOLUME}:\n    external: true'
+
+        # GALLOPER_DB_VOLUME will be deprecated soon
         self.client.volumes.create(constants.GALLOPER_DB_VOLUME, labels={"carrier": "galloper"})
         self.volumes_piece += f'\n  {constants.GALLOPER_DB_VOLUME}:\n    external: true'
         self.redis_piece = constants.REDIS_COMPOSE.format(password=self.data['redis_password'],

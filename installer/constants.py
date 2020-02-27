@@ -21,6 +21,7 @@ VAULT_VOLUME_NAME = "carrier_vault_volume"
 MINIO_VOLUME_NAME = "carrier_minio_volume"
 GALLOPER_REPORTS_VOLUME = "carrier_reports_volume"
 GALLOPER_DB_VOLUME = "carrier_galloperdb_volume"
+CARRIER_PG_DB_VOLUME = "carrier_pg_db_volume"
 
 # S3 buckets to create
 BUCKETS = [
@@ -235,7 +236,8 @@ TRAEFIC_COMPOSE = """  traefik:
       - {TRAEFIK_PUBLIC_PORT}:80
 """
 
-REDIS_COMPOSE = """  redis:
+REDIS_COMPOSE = """  
+  redis:
     image: redis:5.0.3
     restart: unless-stopped
     ports:
@@ -250,7 +252,19 @@ REDIS_COMPOSE = """  redis:
       - redis-server
       - --requirepass
       - {password}
-  
+  postgres:
+    image: postgres:12.2
+    volumes:
+      - {carrier_pg_db_volume}:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - carrier
+    environment:
+      POSTGRES_USER=carrier_pg_user
+      POSTGRES_PASSWORD=carrier_pg_password
+      POSTGRES_DB=carrier_pg_db
+      POSTGRES_INITDB_ARGS=--data-checksums
   galloper:
     image: getcarrier/galloper:latest
     restart: unless-stopped
@@ -275,6 +289,7 @@ REDIS_COMPOSE = """  redis:
     depends_on:
       - redis
       - minio
+      - postgres
     expose:
       - "5000"
     labels:
