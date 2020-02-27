@@ -255,6 +255,7 @@ REDIS_COMPOSE = """
       - {password}
   postgres:
     image: postgres:12.2
+    restart: unless-stopped
     container_name: carrier-postgres
     volumes:
       - {carrier_pg_db_volume}:/var/lib/postgresql/data
