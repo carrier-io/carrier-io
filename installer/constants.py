@@ -269,6 +269,7 @@ REDIS_COMPOSE = """
       - POSTGRES_SCHEMAS=carrier,keycloack
       - POSTGRES_INITDB_ARGS=--data-checksums
     labels:
+      - 'traefik.enable=false'
       - 'carrier=postgres' 
   galloper:
     image: getcarrier/galloper:latest
