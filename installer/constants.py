@@ -294,6 +294,7 @@ REDIS_COMPOSE = """
       - MINIO_SECRET_KEY=password
       - MINIO_REGION=us-east-1
       - POSTGRES_SCHEMA=carrier
+      - POSTGRES_HOST=postgres
     depends_on:
       - redis
       - minio
