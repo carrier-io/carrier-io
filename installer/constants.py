@@ -252,7 +252,7 @@ REDIS_COMPOSE = """  redis:
       - {password}
   
   galloper:
-    image: getcarrier/galloper:latest
+    image: getcarrier/galloper:sqlite
     restart: unless-stopped
     volumes:
       - //var/run/docker.sock://var/run/docker.sock
