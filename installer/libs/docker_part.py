@@ -16,6 +16,7 @@ import docker
 from requests import get, post
 from time import sleep
 from os import mkdir, path, makedirs
+from shutil import copytree
 from installer import constants
 from subprocess import Popen, PIPE, CalledProcessError
 from traceback import format_exc
@@ -80,6 +81,10 @@ class ProvisionDocker(object):
         self.volumes_piece += f'\n  {constants.MINIO_VOLUME_NAME}:\n    external: true'
         self.client.volumes.create(constants.GALLOPER_REPORTS_VOLUME, labels={"carrier": "report"})
         self.volumes_piece += f'\n  {constants.GALLOPER_REPORTS_VOLUME}:\n    external: true'
+        self.client.volumes.create(constants.CARRIER_PG_DB_VOLUME, labels={"carrier": "postgres"})
+        self.volumes_piece += f'\n  {constants.CARRIER_PG_DB_VOLUME}:\n    external: true'
+
+        # GALLOPER_DB_VOLUME will be deprecated soon
         self.client.volumes.create(constants.GALLOPER_DB_VOLUME, labels={"carrier": "galloper"})
         self.volumes_piece += f'\n  {constants.GALLOPER_DB_VOLUME}:\n    external: true'
         self.redis_piece = constants.REDIS_COMPOSE.format(password=self.data['redis_password'],
@@ -87,12 +92,24 @@ class ProvisionDocker(object):
                                                           cpu_cores=self.data['workers'],
                                                           minio_volume=constants.MINIO_VOLUME_NAME,
                                                           galloper_reports=constants.GALLOPER_REPORTS_VOLUME,
-                                                          galloper_db=constants.GALLOPER_DB_VOLUME)
+                                                          galloper_db=constants.GALLOPER_DB_VOLUME,
+                                                          carrier_pg_db_volume=constants.CARRIER_PG_DB_VOLUME)
 
     def prepare_vault(self):
         self.client.volumes.create(constants.VAULT_VOLUME_NAME, labels={"carrier": "jenkins"})
         self.volumes_piece += f'\n  {constants.VAULT_VOLUME_NAME}:\n    external: true'
         self.vault_piece = constants.VAULT_COMPOSE % constants.VAULT_VOLUME_NAME
+
+    @staticmethod
+    def prepare_entry_points_and_env_files():
+        copytree(
+            constants.ENTRY_POINTS_DIR,
+            path.join(constants.WORKDIR, path.basename(constants.ENTRY_POINTS_DIR))
+        )
+        copytree(
+            constants.ENV_FILES_DIR,
+            path.join(constants.WORKDIR, path.basename(constants.ENV_FILES_DIR))
+        )
 
     def _popen_yield(self, cmd):
         popen = Popen(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True, cwd=constants.WORKDIR)
@@ -105,6 +122,7 @@ class ProvisionDocker(object):
             raise CalledProcessError(return_code, cmd, popen.stderr.read())
 
     def compose_build(self):
+        self.prepare_entry_points_and_env_files()
         self.create_network()
         self.prepare_redis()
         self.prepare_vault()
@@ -216,4 +234,3 @@ class ProvisionDocker(object):
         yield "Remove network ... \n"
         self.client.networks.prune(filters={"label": "carrier"})
         yield "You are all clean ... \n"
-

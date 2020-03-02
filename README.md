@@ -16,6 +16,8 @@ Ports required for minimal installation to work:
 
 8086 - InfluxDB port
 
+5432 - PostgreSQL port
+
 6379 - Redis port for tasks management (Will be replaced in next release)
 
 3100 - Loki port for logs aggregartion

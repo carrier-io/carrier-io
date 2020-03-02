@@ -1,10 +1,11 @@
-from os import environ
+from os import environ, path
 
 TRAEFIK_STATS_PORT = environ.get("TRAEFIK_STATS_PORT", "8080")
 TRAEFIK_PUBLIC_PORT = environ.get("TRAEFIK_PUBLIC_PORT", "80")
 
 WORKDIR = "/opt/carrier"
-
+ENTRY_POINTS_DIR = path.join(path.dirname(__file__), "entry_points")
+ENV_FILES_DIR = path.join(path.dirname(__file__), "env_files")
 
 USERNAME = "carrier"
 REDIS_PASSWORD = "password"
@@ -21,6 +22,7 @@ VAULT_VOLUME_NAME = "carrier_vault_volume"
 MINIO_VOLUME_NAME = "carrier_minio_volume"
 GALLOPER_REPORTS_VOLUME = "carrier_reports_volume"
 GALLOPER_DB_VOLUME = "carrier_galloperdb_volume"
+CARRIER_PG_DB_VOLUME = "carrier_pg_db_volume"
 
 # S3 buckets to create
 BUCKETS = [
@@ -235,7 +237,8 @@ TRAEFIC_COMPOSE = """  traefik:
       - {TRAEFIK_PUBLIC_PORT}:80
 """
 
-REDIS_COMPOSE = """  redis:
+REDIS_COMPOSE = """  
+  redis:
     image: redis:5.0.3
     restart: unless-stopped
     ports:
@@ -250,7 +253,23 @@ REDIS_COMPOSE = """  redis:
       - redis-server
       - --requirepass
       - {password}
-  
+  postgres:
+    image: postgres:12.2
+    restart: unless-stopped
+    container_name: carrier-postgres
+    volumes:
+      - {carrier_pg_db_volume}:/var/lib/postgresql/data
+      - ./entry_points/postgres-entrypoint.sh:/docker-entrypoint-initdb.d/postgres-entrypoint.sh
+    networks:
+      - carrier
+    env_file:
+     - ./env_files/postgres.env
+    environment:
+      - POSTGRES_SCHEMAS=carrier,keycloack
+      - POSTGRES_INITDB_ARGS=--data-checksums
+    labels:
+      - 'traefik.enable=false'
+      - 'carrier=postgres' 
   galloper:
     image: getcarrier/galloper:latest
     restart: unless-stopped
@@ -263,6 +282,8 @@ REDIS_COMPOSE = """  redis:
     links:
       - "redis:redis"
     container_name: carrier-galloper
+    env_file:
+     - ./env_files/postgres.env
     environment:
       - REDIS_DB=2
       - REDIS_HOST=carrier-redis
@@ -272,9 +293,12 @@ REDIS_COMPOSE = """  redis:
       - MINIO_ACCESS_KEY=admin
       - MINIO_SECRET_KEY=password
       - MINIO_REGION=us-east-1
+      - POSTGRES_SCHEMA=carrier
+      - POSTGRES_HOST=postgres
     depends_on:
       - redis
       - minio
+      - postgres
     expose:
       - "5000"
     labels:
