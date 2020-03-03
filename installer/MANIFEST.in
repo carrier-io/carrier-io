@@ -1,3 +1,5 @@
 graft installer/static
 graft installer/templates
+graft installer/entry_points
+graft installer/env_files
 global-exclude *.pyc

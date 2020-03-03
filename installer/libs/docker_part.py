@@ -12,14 +12,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from os import path, makedirs
+from shutil import copytree, ignore_patterns
+from subprocess import Popen, PIPE, CalledProcessError
+from time import sleep
+from traceback import format_exc
+
 import docker
 from requests import get, post
-from time import sleep
-from os import mkdir, path, makedirs
-from shutil import copytree
+
 from installer import constants
-from subprocess import Popen, PIPE, CalledProcessError
-from traceback import format_exc
 
 
 class ProvisionDocker(object):
@@ -41,14 +43,14 @@ class ProvisionDocker(object):
     def prepare_jenkins(self):
         self.client.volumes.create(constants.JENKINS_VOLUME_NAME, labels={"carrier": "jenkins"})
         self.volumes_piece += f'\n  {constants.JENKINS_VOLUME_NAME}:\n    external: true'
-        mkdir(path.join(constants.WORKDIR, 'jenkins'))
+        makedirs(path.join(constants.WORKDIR, 'jenkins'), exist_ok=True)
         with open(path.join(constants.WORKDIR, 'jenkins', "Dockerfile"), "w") as f:
             f.write(constants.JENKINSFILE)
         self.jenkins_piece = constants.JENKINS_COMPOSE.format(path=path.join(constants.WORKDIR, 'jenkins'),
                                                               volume=constants.JENKINS_VOLUME_NAME)
 
     def prepare_traefik(self):
-        mkdir(path.join(constants.WORKDIR, 'traefik'))
+        makedirs(path.join(constants.WORKDIR, 'traefik'), exist_ok=True)
         with open(path.join(constants.WORKDIR, 'traefik', "Dockerfile"), "w") as f:
             f.write(constants.TRAEFICFILE)
         with open(path.join(constants.WORKDIR, 'traefik', "traefik.toml"), "w") as f:
@@ -68,7 +70,7 @@ class ProvisionDocker(object):
     def prepare_influx(self):
         self.client.volumes.create(constants.INFLUX_VOLUME_NAME, labels={"carrier": "influx"})
         self.volumes_piece += f'\n  {constants.INFLUX_VOLUME_NAME}:\n    external: true'
-        mkdir(path.join(constants.WORKDIR, 'influx'))
+        makedirs(path.join(constants.WORKDIR, 'influx'), exist_ok=True)
         with open(path.join(constants.WORKDIR, 'influx', "Dockerfile"), "w") as f:
             f.write(constants.INFLUXFILE)
         with open(path.join(constants.WORKDIR, 'influx', "influxdb.conf"), "w") as f:
@@ -104,11 +106,13 @@ class ProvisionDocker(object):
     def prepare_entry_points_and_env_files():
         copytree(
             constants.ENTRY_POINTS_DIR,
-            path.join(constants.WORKDIR, path.basename(constants.ENTRY_POINTS_DIR))
+            path.join(constants.WORKDIR, path.basename(constants.ENTRY_POINTS_DIR)),
+            ignore=ignore_patterns('*.pyc', '*.py')
         )
         copytree(
             constants.ENV_FILES_DIR,
-            path.join(constants.WORKDIR, path.basename(constants.ENV_FILES_DIR))
+            path.join(constants.WORKDIR, path.basename(constants.ENV_FILES_DIR)),
+            ignore=ignore_patterns('*.pyc', '*.py')
         )
 
     def _popen_yield(self, cmd):
