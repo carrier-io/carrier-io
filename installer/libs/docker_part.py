@@ -32,6 +32,7 @@ class ProvisionDocker(object):
         self.jenkins_piece = ''
         self.grafana_piece = ''
         self.influx_piece = ''
+        self.postgres_piece = ''
         self.redis_piece = ''
         self.vault_piece = ''
         self.volumes_piece = 'volumes:'
@@ -83,19 +84,26 @@ class ProvisionDocker(object):
         self.volumes_piece += f'\n  {constants.MINIO_VOLUME_NAME}:\n    external: true'
         self.client.volumes.create(constants.GALLOPER_REPORTS_VOLUME, labels={"carrier": "report"})
         self.volumes_piece += f'\n  {constants.GALLOPER_REPORTS_VOLUME}:\n    external: true'
-        self.client.volumes.create(constants.CARRIER_PG_DB_VOLUME, labels={"carrier": "postgres"})
-        self.volumes_piece += f'\n  {constants.CARRIER_PG_DB_VOLUME}:\n    external: true'
 
-        # GALLOPER_DB_VOLUME will be deprecated soon
-        self.client.volumes.create(constants.GALLOPER_DB_VOLUME, labels={"carrier": "galloper"})
-        self.volumes_piece += f'\n  {constants.GALLOPER_DB_VOLUME}:\n    external: true'
         self.redis_piece = constants.REDIS_COMPOSE.format(password=self.data['redis_password'],
                                                           host=self.data['dns'],
                                                           cpu_cores=self.data['workers'],
                                                           minio_volume=constants.MINIO_VOLUME_NAME,
-                                                          galloper_reports=constants.GALLOPER_REPORTS_VOLUME,
-                                                          galloper_db=constants.GALLOPER_DB_VOLUME,
-                                                          carrier_pg_db_volume=constants.CARRIER_PG_DB_VOLUME)
+                                                          galloper_reports=constants.GALLOPER_REPORTS_VOLUME)
+
+    def prepare_postgres(self):
+        dirname = "postgres"
+        self.client.volumes.create(constants.POSTGRES_DB_VOLUME, labels={"carrier": "postgres"})
+        self.volumes_piece += f"\n  {constants.POSTGRES_DB_VOLUME}:\n    external: true"
+        makedirs(path.join(constants.WORKDIR, dirname), exist_ok=True)
+        with open(path.join(constants.WORKDIR, dirname, "Dockerfile"), "w") as f:
+            f.write(constants.POSTGRESFILE)
+        with open(path.join(constants.WORKDIR, dirname, constants.POSTGRES_ENTRYPOINT_FILENAME), "w") as f:
+            f.write(constants.POSTGRES_ENTRYPOINT)
+        self.postgres_piece = constants.POSTGRES_COMPOSE.format(
+            path=path.join(constants.WORKDIR, dirname),
+            volume=constants.POSTGRES_DB_VOLUME
+        )
 
     def prepare_vault(self):
         self.client.volumes.create(constants.VAULT_VOLUME_NAME, labels={"carrier": "jenkins"})
@@ -103,16 +111,11 @@ class ProvisionDocker(object):
         self.vault_piece = constants.VAULT_COMPOSE % constants.VAULT_VOLUME_NAME
 
     @staticmethod
-    def prepare_entry_points_and_env_files():
-        copytree(
-            constants.ENTRY_POINTS_DIR,
-            path.join(constants.WORKDIR, path.basename(constants.ENTRY_POINTS_DIR)),
-            ignore=ignore_patterns('*.pyc', '*.py')
-        )
+    def prepare_env_files():
         copytree(
             constants.ENV_FILES_DIR,
             path.join(constants.WORKDIR, path.basename(constants.ENV_FILES_DIR)),
-            ignore=ignore_patterns('*.pyc', '*.py')
+            ignore=ignore_patterns("*.pyc", "*.py")
         )
 
     def _popen_yield(self, cmd):
@@ -126,16 +129,17 @@ class ProvisionDocker(object):
             raise CalledProcessError(return_code, cmd, popen.stderr.read())
 
     def compose_build(self):
-        self.prepare_entry_points_and_env_files()
+        self.prepare_env_files()
         self.create_network()
+        self.prepare_postgres()
         self.prepare_redis()
         self.prepare_vault()
         with open(path.join(constants.WORKDIR, 'docker-compose.yaml'), 'w') as f:
             f.write(constants.DOCKER_COMPOSE)
-            for each in [self.traefik_piece, self.jenkins_piece,
-                         self.influx_piece, self.grafana_piece,
-                         self.redis_piece, self.vault_piece,
-                         self.volumes_piece, self.network_piece]:
+            for each in (
+                    self.traefik_piece, self.jenkins_piece, self.influx_piece, self.grafana_piece,
+                    self.postgres_piece, self.redis_piece, self.vault_piece, self.volumes_piece, self.network_piece
+            ):
                 if each:
                     f.write(each)
         cmd = ['docker-compose', 'build']
