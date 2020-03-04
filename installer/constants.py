@@ -13,6 +13,7 @@ GROUPNAME = "carrier"
 GROUPID = "1001"
 USERID = "1001"
 JENKINS_HOME = "/var/jenkins_home"
+POSTGRES_ENTRYPOINT_FILENAME = "postgres-entrypoint.sh"
 
 # Name of volumes
 INFLUX_VOLUME_NAME = "carrier_influx_volume"
@@ -21,8 +22,7 @@ JENKINS_VOLUME_NAME = "carrier_jenkins_volume"
 VAULT_VOLUME_NAME = "carrier_vault_volume"
 MINIO_VOLUME_NAME = "carrier_minio_volume"
 GALLOPER_REPORTS_VOLUME = "carrier_reports_volume"
-GALLOPER_DB_VOLUME = "carrier_galloperdb_volume"
-CARRIER_PG_DB_VOLUME = "carrier_pg_db_volume"
+POSTGRES_DB_VOLUME = "carrier_pg_db_volume"
 
 # S3 buckets to create
 BUCKETS = [
@@ -61,6 +61,9 @@ RUN /usr/local/bin/install-plugins.sh job-dsl durable-task git cloudbees-folder 
 EXPOSE 8080
 """
 
+POSTGRESFILE = f"""FROM postgres:12.2
+ADD {POSTGRES_ENTRYPOINT_FILENAME} /docker-entrypoint-initdb.d/postgres-entrypoint.sh
+"""
 
 INFLUXFILE = '''FROM influxdb:1.7
 ADD influxdb.conf /etc/influxdb/influxdb.conf
@@ -237,6 +240,25 @@ TRAEFIC_COMPOSE = """  traefik:
       - {TRAEFIK_PUBLIC_PORT}:80
 """
 
+POSTGRES_COMPOSE = """
+  postgres:
+    build: {path}
+    restart: unless-stopped
+    container_name: carrier-postgres
+    volumes:
+      - {volume}:/var/lib/postgresql/data
+    networks:
+      - carrier
+    env_file:
+     - ./env_files/postgres.env
+    environment:
+      - POSTGRES_SCHEMAS=carrier,keycloack
+      - POSTGRES_INITDB_ARGS=--data-checksums
+    labels:
+      - 'traefik.enable=false'
+      - 'carrier=postgres' 
+"""
+
 REDIS_COMPOSE = """  
   redis:
     image: redis:5.0.3
@@ -253,30 +275,12 @@ REDIS_COMPOSE = """
       - redis-server
       - --requirepass
       - {password}
-  postgres:
-    image: postgres:12.2
-    restart: unless-stopped
-    container_name: carrier-postgres
-    volumes:
-      - {carrier_pg_db_volume}:/var/lib/postgresql/data
-      - ./entry_points/postgres-entrypoint.sh:/docker-entrypoint-initdb.d/postgres-entrypoint.sh
-    networks:
-      - carrier
-    env_file:
-     - ./env_files/postgres.env
-    environment:
-      - POSTGRES_SCHEMAS=carrier,keycloack
-      - POSTGRES_INITDB_ARGS=--data-checksums
-    labels:
-      - 'traefik.enable=false'
-      - 'carrier=postgres' 
   galloper:
     image: getcarrier/galloper:latest
     restart: unless-stopped
     volumes:
       - //var/run/docker.sock://var/run/docker.sock
       - {galloper_reports}:/tmp/reports
-      - {galloper_db}:/tmp/db
     networks:
       - carrier
     links:
@@ -322,7 +326,6 @@ REDIS_COMPOSE = """
       - 'carrier=minio'
     container_name: carrier-minio
     command: server /data
-  
   interceptor:
     image: getcarrier/interceptor:latest
     restart: unless-stopped
@@ -340,7 +343,6 @@ REDIS_COMPOSE = """
       - CPU_CORES={cpu_cores}
       - REDIS_PASSWORD={password}
       - REDIS_HOST={host}
-  
   observer_chrome:
     image: getcarrier/observer-chrome:latest
     restart: unless-stopped
@@ -352,12 +354,38 @@ REDIS_COMPOSE = """
     labels:
       - 'traefik.enable=false'
       - 'carrier=chrome'
-
 """
 
 NETWORK_PIECE = """\nnetworks:
   carrier:
     external: true
+"""
+
+
+POSTGRES_ENTRYPOINT = """
+#!/bin/bash
+
+set -e
+set -u
+
+# create schema within database
+docker_setup_schema() {
+  local schema=$1
+  if [ "$schema" != 'public' ]; then
+    echo "Creating database schema '$schema' for user '$POSTGRES_USER'"
+		psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+		  CREATE SCHEMA IF NOT EXISTS "$schema" AUTHORIZATION "$POSTGRES_USER";
+		EOSQL
+	fi
+}
+
+if [ -n "$POSTGRES_SCHEMAS" ]; then
+	echo "Multiple schemas creation requested: '$POSTGRES_SCHEMAS'"
+	for schema in $(echo "$POSTGRES_SCHEMAS" | tr ',' ' '); do
+		docker_setup_schema "$schema"
+	done
+	echo "Multiple schemas created"
+fi
 """
 
 
