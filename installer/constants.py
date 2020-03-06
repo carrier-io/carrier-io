@@ -71,14 +71,12 @@ EXPOSE 8086
 EXPOSE 2003
 '''
 
-
 TRAEFICFILE = '''
 FROM traefik:1.7
 ADD traefik.toml /etc/traefik/traefik.toml
 EXPOSE 8080
 EXPOSE 80
 '''
-
 
 # Config files
 
@@ -117,7 +115,6 @@ enabled=true
 bind-address=":8086"
 '''
 
-
 TRAEFIC_CONFIG = '''################################################################
 # API and dashboard configuration
 ################################################################
@@ -128,7 +125,6 @@ TRAEFIC_CONFIG = '''############################################################
 [docker]
 domain = "docker.local"
 watch = true'''
-
 
 # Compose pieces
 
@@ -252,7 +248,7 @@ POSTGRES_COMPOSE = """
     env_file:
      - ./env_files/postgres.env
     environment:
-      - POSTGRES_SCHEMAS=carrier,keycloack
+      - POSTGRES_SCHEMAS=carrier,keycloak
       - POSTGRES_INITDB_ARGS=--data-checksums
     labels:
       - 'traefik.enable=false'
@@ -275,6 +271,32 @@ REDIS_COMPOSE = """
       - redis-server
       - --requirepass
       - {password}
+  keycloak:
+    image: jboss/keycloak:latest
+    restart: unless-stopped
+    container_name: carrier-keycloak
+    volumes:
+    - ./client_secrets.json:/tmp/auth
+    networks:
+      - carrier
+    depends_on:
+      - postgres
+    environment:
+      KEYCLOAK_USER: "carrier"
+      KEYCLOAK_PASSWORD: "carrier"
+      DB_VENDOR: "postgres"
+      DB_ADDR: "postgres"
+      DB_DATABASE: "carrier_pg_db"
+      DB_USER: "carrier_pg_user"
+      DB_SCHEMA: "keycloak"
+      DB_PASSWORD: "carrier_pg_password"
+      PROXY_ADDRESS_FORWARDING: "true"
+    labels:
+      - 'traefik.backend=keycloak'
+      - 'traefik.frontend.rule=PathPrefix: /auth'
+      - 'traefic.port=8099'
+      - 'traefik.frontend.passHostHeader=true'
+      - 'carrier=keycloak'
   galloper:
     image: getcarrier/galloper:latest
     restart: unless-stopped
@@ -361,7 +383,6 @@ NETWORK_PIECE = """\nnetworks:
     external: true
 """
 
-
 POSTGRES_ENTRYPOINT = """
 #!/bin/bash
 
@@ -387,7 +408,6 @@ if [ -n "$POSTGRES_SCHEMAS" ]; then
 	echo "Multiple schemas created"
 fi
 """
-
 
 # Seed data Jenkins
 JENKINS_URL = "http://{host}/jenkins/createItem?name={job}"
