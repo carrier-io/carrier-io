@@ -275,8 +275,6 @@ REDIS_COMPOSE = """
     image: jboss/keycloak:latest
     restart: unless-stopped
     container_name: carrier-keycloak
-    volumes:
-    - ./client_secrets.json:/tmp/auth
     networks:
       - carrier
     depends_on:
