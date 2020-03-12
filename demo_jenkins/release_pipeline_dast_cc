@@ -4,7 +4,7 @@ pipeline {
 		galloper_auth = credentials("galloper-auth")
 		redis_pwd = credentials("redis-password")
 		galloper = credentials("galloper-url")
-
+        webhook = credentials("postprocessing")
 	}
 	stages {
 		stage('Deploying Project') {
@@ -38,7 +38,7 @@ pipeline {
 								"-e galloper_url=http://$galloper_auth@$galloper",
 								"-e bucket=tests",
 								"-e artifact=Archive.zip",
-								"-e GALLOPER_WEB_HOOK=http://$galloper_auth@$galloper/task/7358d174-aa0b-40fb-a229-24c60aa17700"
+								"-e GALLOPER_WEB_HOOK=http://$galloper_auth@$galloper$webhook"
 							]
 							for (param in params) {
 								dockerParamsString += " ${param}"
