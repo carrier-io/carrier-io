@@ -3,8 +3,8 @@ from os import environ, path
 TRAEFIK_STATS_PORT = environ.get("TRAEFIK_STATS_PORT", "8080")
 TRAEFIK_PUBLIC_PORT = environ.get("TRAEFIK_PUBLIC_PORT", "80")
 
-WORKDIR = "/opt/carrier"
-ENTRY_POINTS_DIR = path.join(path.dirname(__file__), "entry_points")
+WORKDIR = "/tmp/carrier"
+DATA_FILES_DIR = path.join(path.dirname(__file__), "data")
 ENV_FILES_DIR = path.join(path.dirname(__file__), "env_files")
 
 USERNAME = "carrier"
@@ -72,7 +72,7 @@ EXPOSE 2003
 '''
 
 TRAEFICFILE = '''
-FROM traefik:1.7
+FROM traefik:cantal
 ADD traefik.toml /etc/traefik/traefik.toml
 EXPOSE 8080
 EXPOSE 80
@@ -226,6 +226,8 @@ TRAEFIC_COMPOSE = """  traefik:
     restart: unless-stopped
     volumes:
       - //var/run/docker.sock://var/run/docker.sock
+      - ./data/traefik/config/static:/etc/traefik
+      - ./data/traefik/config:/config
     networks:
       - carrier
     container_name: carrier-traefik
@@ -273,6 +275,8 @@ REDIS_COMPOSE = """
       - {password}
   keycloak:
     image: jboss/keycloak:latest
+    volumes:
+     - ./data/keycloak:/data
     restart: unless-stopped
     container_name: carrier-keycloak
     networks:
@@ -374,6 +378,12 @@ REDIS_COMPOSE = """
     labels:
       - 'traefik.enable=false'
       - 'carrier=chrome'
+  carrier-auth:
+    image: lifedjik/traefik-forward-auth-saml:0.1
+    volumes:
+    - ./data/auth:/config
+    environment:
+      CONFIG_FILENAME: "/config/settings.yaml"
 """
 
 NETWORK_PIECE = """\nnetworks:

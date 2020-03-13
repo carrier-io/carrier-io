@@ -1,0 +1,15 @@
+providers:
+  file:
+    directory: /config/dynamic
+    watch: true
+
+api:
+  dashboard: true
+ping:
+  manualRouting: true
+
+entryPoints:
+  http:
+    address: ":80"
+    forwardedHeaders:
+      insecure: true

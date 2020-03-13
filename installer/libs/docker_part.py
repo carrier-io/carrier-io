@@ -118,6 +118,14 @@ class ProvisionDocker(object):
             ignore=ignore_patterns("*.pyc", "*.py")
         )
 
+    @staticmethod
+    def prepare_data_files():
+        copytree(
+            constants.DATA_FILES_DIR,
+            path.join(constants.WORKDIR, path.basename(constants.DATA_FILES_DIR)),
+            ignore=ignore_patterns("*.pyc", "*.py")
+        )
+
     def _popen_yield(self, cmd):
         popen = Popen(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True, cwd=constants.WORKDIR)
         for stdout_line in iter(popen.stdout.readline, ""):
@@ -134,6 +142,7 @@ class ProvisionDocker(object):
         self.prepare_postgres()
         self.prepare_redis()
         self.prepare_vault()
+        self.prepare_data_files()
         with open(path.join(constants.WORKDIR, 'docker-compose.yaml'), 'w') as f:
             f.write(constants.DOCKER_COMPOSE)
             for each in (

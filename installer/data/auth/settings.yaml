@@ -1,0 +1,151 @@
+global:
+  debug: false
+  disable_auth: false
+  # forced_info:
+  #   raw:
+  #     auth: true
+  #     auth_errors: []
+  #     auth_nameid: ""
+  #     auth_sessionindex: ""
+  #     auth_attributes: {}
+
+
+# vault:
+#   url: https://vault.example.com:8200
+#   ssl_verify: true
+#   namespace: some/namespace
+#   secrets_path: secrets
+#   secrets_mount_point: kv
+#   # auth_token: t...n
+#   # auth_username: u..r
+#   # auth_password: p......d
+#   auth_role_id: r....d
+#   auth_secret_id: s......d
+
+
+server:
+  global:
+    environment: production
+    engine.signals.on: true
+    server.socket_host: 0.0.0.0
+    server.socket_port: 80
+    server.thread_pool: 8
+    server.max_request_body_size: 0
+    server.socket_timeout: 60
+
+  "/":
+    tools.sessions.on: true
+    tools.sessions.name: auth_session_id
+    tools.sessions.domain: localhost
+    tools.sessions.httponly: true
+    tools.sessions.secure: false
+    tools.proxy.on: true
+    tools.proxy.local: Host
+    tools.secureheaders.on: true
+    tools.staticdir.on: true
+    tools.staticdir.dir: static
+
+
+endpoints:
+  root: "/forward-auth/"
+  saml: "/forward-auth/saml"
+  oidc: "/forward-auth/oidc"
+  info: "/forward-auth/info"
+  access_denied: "/access_denied"
+
+
+auth:
+  auth_redirect: "http://localhost/forward-auth/login"
+  login_handler: "/forward-auth/oidc/login"
+  logout_handler: "/forward-auth/oidc/logout"
+  # login_handler: "/forward-auth/saml/login"
+  # logout_handler: "/forward-auth/saml/logout"
+  login_default_redirect_url: http://localhost/
+  logout_default_redirect_url: http://localhost/
+  logout_allowed_redirect_urls:
+  - http://localhost/
+
+
+mappers:
+  header:
+    grafana:
+      X-WEBAUTH-USER: "'auth_attributes'.'preferred_username'"
+      X-WEBAUTH-NAME: "'auth_attributes'.'name'"
+      X-WEBAUTH-EMAIL: "'auth_attributes'.'email'"
+
+
+saml:
+  strict: false
+  debug: false
+
+  sp:
+    entityId: carrier-saml
+    assertionConsumerService:
+      url: http://localhost/forward-auth/saml/acs
+      binding: urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
+    singleLogoutService:
+      url: http://localhost/forward-auth/saml/sls
+      binding: urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
+    NameIDFormat: urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+    x509cert: "MIICpzCCAY8CBgFwkhoS8zANBgkqhkiG9w0BAQsFADAXMRUwEwYDVQQDDAxjYXJyaWVyLXNhbWwwHhcNMjAwMjI5MTc1NzI3WhcNMzAwMjI4MTc1OTA3WjAXMRUwEwYDVQQDDAxjYXJyaWVyLXNhbWwwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCJtFKL4EMSif6Bhtlfrr4JQuwKpHnpf83DYLx3sXOK6DrbEv518ldGvGPiizP7mFMpqR+7w3k/WFMxP0OO2VWe8kNJy6KBvzIGXhC3Oswhypdf9nnJ/4GD19lGmLhzwNqlwixUVUbTc6HP6ECTqr4SIcI0eIgRdbwaBq0Ug1awCKvspNYMpOdJ5lnrGXwXSJO32SrANySbnPW6SMoW4+TzwZ1fsU5VXVkDYSDTsXxoL2nnsa7aboj6iuKQR3Ss1gRv5IaAFvI67UekeJZWZzeayHg3hfQosUMIHQfrYersT289zQQshVBTMtqHwKzylw6f9FexsZuCrB0zqh4rDSrnAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAEr2FTD3g0xx6SHAkU6r6IeGYV6gp0aAAQ8Nh2acc5G6fTDo1OAIodacpq1opaO0XkYfVfyZ2JlPnG5Kzln/XxIiDm3S0vYz+QLEzWUfjfPosB0MC4X8mUVBadXbuPC86n3pB+7/mjgIyRlu5eC5fTBkjW+xmalETkDqQ0xYSOXvQEkQtAyUQdVBP1n2HxEjekh1etQnY53JlfVC5XHMSE5VMp+3SdADD+YkAAYxRIbdzVxRdYvquTKh2qA5S+2XvBrvFlplt0Eb0XikRHIkNcfOnqKgyXLin1MMD2OsousIojtNr2XcNAn7N2DiospZunEr/VxpBowXfbc3HnelbGI="
+    privateKey: "MIIEogIBAAKCAQEAibRSi+BDEon+gYbZX66+CULsCqR56X/Nw2C8d7Fziug62xL+dfJXRrxj4osz+5hTKakfu8N5P1hTMT9DjtlVnvJDScuigb8yBl4QtzrMIcqXX/Z5yf+Bg9fZRpi4c8DapcIsVFVG03Ohz+hAk6q+EiHCNHiIEXW8GgatFINWsAir7KTWDKTnSeZZ6xl8F0iTt9kqwDckm5z1ukjKFuPk88GdX7FOVV1ZA2Eg07F8aC9p57Gu2m6I+orikEd0rNYEb+SGgBbyOu1HpHiWVmc3msh4N4X0KLFDCB0H62Hq7E9vPc0ELIVQUzLah8Cs8pcOn/RXsbGbgqwdM6oeKw0q5wIDAQABAoIBAFwaSePYmcP6nEmSIi4HOIAFTM9Jd2kf3EZDm4sLG1bbQRJqP9wvvQRI2R4bMSekmGsS/XCeq6gcsXgM8mjHIKdxLmRbWVQix5jOrauAHiyzzk+XEZpz1PKUGnVHjIePhC6+EtxNNVQU0TO4Cgk6eGq0ParOu2PCNY/Ky1UfC4otH7/lQmxLxHJJmwzdsB5siCuhO3nW7+zAZKAXZ/QlSQX640/6C0Ow7rv/dP8UK/FIbQzCKsG9Q4R3s+dDdeXyNJYNEV+mXODPBNv4GXPYpFzKnG2zxX20d4NcG3CIM5iEIZqRNcLdcYwxmgHFOyKjszqoeKqVE59wEKRWL14+l+ECgYEA8GveTqO34kZaImMTjMqIiGAOBBQbUWDze1nmqJWg31EtQvOwGCRJZ93aqJcqqAb/gUJ6wzk9r6lwmAN9I6SGq3ft0Ur6sb0sHllVd8I/TdzGFawWqcec9KWAQh/xFkGyjQm/XfFqO40xO8m+x651LYTrQy1q9BgVh2RMsEWyXk8CgYEAkqCTTvMCw6Ne6ZLJyVZ26N+AExD3gBbz/btWsgqL3bQ3rFHtFDz9pDy4s47m5Srn8ZXt7qfKRpO+fhcOJlISPnzRpjGkjzjgKcFEeG/FVDluRRuv12By5h1xbv5hlkbvAg1CAsNH6IG6PWO138D0yyrsL8vI+6cSQdNL4xJNG+kCgYAV9LPjmJ31YxleJJAnfmODmMoO40svXlw9+pLO+IMtgbtRbvG48q9ldeQ/GzcBC0qQImMVqweQIDgxGbh25dKKnDQytdc5Hh6GUwA0JKAlWzEXz5RuQtV5nhedck9RCgTlTmuUh7R85cMGQ8FReQQoeQgHJYGr8vscVzONsX+9jwKBgE8K0v5PUCEos6SUZcTsoINe4IrmrZVWSkdwswadWtK0MQLq0zQCwPTFawgYs+28GHcKTM5Hk2pCgQE16oHL4lvfK6E8x6oRjf3UWtXV4vlJUGFe0Ib5TlcwbhLYfMDnEjb38KrOnLgBHuWzF7s8KHpRdCs73ueSI+xqPFF3byvpAoGAS2iIDtQkMrEUZbkQ/Zlqc6qifosmv+5mG7C6SNUYa+O+zkHdqNlKNO6Hel3y+9ccHoFWnmjEzGC5zn/bWgIim/iRRdIAruyDZsjmntvWmM5ufv03rhytsWFkqH3DIspFT4GWqotNc2pXg4YAHZaq6hzvGosgoovcnL8iCKETNLU="
+
+  idp:
+    entityId: http://localhost/auth/realms/test
+    singleSignOnService:
+      url: http://localhost/auth/realms/test/protocol/saml
+      binding: urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
+    singleLogoutService:
+      url: http://localhost/auth/realms/test/protocol/saml
+      binding: urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
+    x509cert: "MIIClzCCAX8CBgFwkhgpPzANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDDAR0ZXN0MB4XDTIwMDIyOTE3NTUyMVoXDTMwMDIyODE3NTcwMVowDzENMAsGA1UEAwwEdGVzdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMI5gTphyHzNWg70Kon2L2Q4YAP1G9WC0TbfR3IzmSwYu/i/3blVrTxzrEBPy3PfeA1M0YZ+rpBicyQ3wz7WhNzfoH13b0KKNr2m/5aNCKm7QvuxocPYx+gUGTKPWxful7X+5m0QZBdAHUY3NhVPBKODpo5YgOjLMKf4+eK/JPBZf3jxCGDnZDmEDgoEHAEcoDaQo7F4KwPleKejAcEg31bgIZkkNU0IGpLUbkTq3BJQMDGQHXXnbLHCMTRicYG6faxX+loHAORHAq7arFGzM/JD7ICuWa+2tUH2LXypKtTQ6Tdwh8p0ZGBS7Q17cU8kTKveO1bB6ZsAoOe6ZpnhNj8CAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAZ/wv4dgwIG0WSNPsOn3Ggwnvseg1chpROU6JIkELOMrA3JHZjZWgPZlumnjN9sXEC4gB4G9nhgIItuZDPv7YxyfdKBBCH57CvMAfwJ96XFjgM9HJ+uJrXuhKoKet/DLVRj9REmAZLKj7joCVZPigpq5jJqnEn3qFz5NLchP0G+Y1WQGrQ24/UjkQe+AjHnBdrFCcZzI2Q+qeKi7fTTHIqHrI2j/Gg3szRpUlB8xV8QgZHS83ZdWPi6sinnyCOfrnDRAnIPulDsijPgUUlFYUnjMBFIVd7Yyvxfw2Xsc/jNhZxz145yMgSMu09MBbjsAnYdiTpmP/91iMLwCeDSzcPA=="
+
+  security:
+    authnRequestsSigned: true
+    logoutRequestSigned: true
+    signatureAlgorithm: http://www.w3.org/2001/04/xmldsig-more#rsa-sha256
+    digestAlgorithm: http://www.w3.org/2001/04/xmlenc#sha256
+
+
+oidc:
+  debug: true
+
+  provider:
+    configuration:
+      issuer: "http://localhost/auth/realms/test"
+      authorization_endpoint: "http://localhost/auth/realms/test/protocol/openid-connect/auth"
+      token_endpoint: "http://keycloak:8080/auth/realms/test/protocol/openid-connect/token"
+      token_introspection_endpoint: "http://localhost/auth/realms/test/protocol/openid-connect/token/introspect"
+      userinfo_endpoint: "http://keycloak:8080/auth/realms/test/protocol/openid-connect/userinfo"
+      end_session_endpoint: "http://localhost/auth/realms/test/protocol/openid-connect/logout"
+      jwks_uri: "http://keycloak:8080/auth/realms/test/protocol/openid-connect/certs"
+      check_session_iframe: "http://localhost/auth/realms/test/protocol/openid-connect/login-status-iframe.html"
+      grant_types_supported: ["authorization_code","implicit","refresh_token","password","client_credentials"]
+      response_types_supported: ["code","none","id_token","token","id_token token","code id_token","code token","code id_token token"]
+      subject_types_supported: ["public","pairwise"]
+      id_token_signing_alg_values_supported: ["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"]
+      id_token_encryption_alg_values_supported: ["RSA-OAEP","RSA1_5"]
+      id_token_encryption_enc_values_supported: ["A128GCM","A128CBC-HS256"]
+      userinfo_signing_alg_values_supported: ["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512","none"]
+      request_object_signing_alg_values_supported: ["PS384","ES384","RS384","ES256","RS256","ES512","PS256","PS512","RS512","none"]
+      response_modes_supported: ["query","fragment","form_post"]
+      registration_endpoint: "http://localhost/auth/realms/test/clients-registrations/openid-connect"
+      token_endpoint_auth_methods_supported: ["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"]
+      token_endpoint_auth_signing_alg_values_supported: ["PS384","ES384","RS384","ES256","RS256","ES512","PS256","PS512","RS512"]
+      claims_supported: ["aud","sub","iss","auth_time","name","given_name","family_name","preferred_username","email","acr"]
+      claim_types_supported: ["normal"]
+      claims_parameter_supported: False
+      scopes_supported: ["openid","offline_access","profile","email","address","phone","roles","web-origins","microprofile-jwt"]
+      request_parameter_supported: True
+      request_uri_parameter_supported: True
+      code_challenge_methods_supported: ["plain","S256"]
+      tls_client_certificate_bound_access_tokens: True
+      introspection_endpoint: "http://localhost/auth/realms/test/protocol/openid-connect/token/introspect"
+
+    registration:
+      client_id: carrier-oidc
+      client_secret: 565c7a98-0f30-4acf-8dcd-e8c0fe7df06e
+      redirect_uris:
+      - "http://localhost/forward-auth/oidc/callback"
+      post_logout_redirect_uris:
+      - "http://localhost"
