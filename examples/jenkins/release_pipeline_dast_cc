@@ -69,8 +69,8 @@ pipeline {
                             data.global.reporters.galloper.url = "http://$galloper"
                             data.global.reporters.galloper.login = "$galloper_usr"
                             data.global.reporters.galloper.password = "$galloper_pwd"
-                            data.global.reporters.html.file = "$WORKSPACE/reports/report.html"
-                            data.global.reporters.junit.file = "$WORKSPACE/reports/report.html"
+                            data.global.reporters.html.file = "$WORKSPACE/reports/dast_report.html"
+                            data.global.reporters.junit.file = "$WORKSPACE/reports/dast_report.xml"
                             data.suites.dast_zap.scanners.dast.zap.target = "$application_url"
                             data.suites.dast_zap.settings.build_id = "$BUILD_ID"
                             //writing changes to yaml
@@ -98,6 +98,13 @@ pipeline {
 		always {
 		    sh "docker stop dvna"
 			junit 'reports/*.xml'
+			publishHTML (target : [allowMissing: false,
+                 alwaysLinkToLastBuild: true,
+                 keepAll: false,
+                 reportDir: 'reports',
+                 reportFiles: 'dast_report.html',
+                 reportName: 'DAST Reports',
+                 reportTitles: 'DAST Report'])
 			cleanWs()
 		}
 	}
