@@ -63,16 +63,16 @@ pipeline {
                             def data = readYaml file: filename
 
                             // Change something in the file
-                            data.global.processing.false_positive.galloper = "$galloper"
+                            data.global.processing.false_positive.galloper = "http://$galloper"
                             data.global.processing.false_positive.user = "$galloper_usr"
                             data.global.processing.false_positive.password = "$galloper_pwd"
-                            data.global.reporters.galloper.url = "$galloper"
+                            data.global.reporters.galloper.url = "http://$galloper"
                             data.global.reporters.galloper.login = "$galloper_usr"
                             data.global.reporters.galloper.password = "$galloper_pwd"
                             data.global.reporters.html.file = "$WORKSPACE/reports/report.html"
                             data.global.reporters.junit.file = "$WORKSPACE/reports/report.html"
                             data.suites.dast_zap.scanners.dast.zap.target = "$application_url"
-
+                            data.suites.dast_zap.settings.build_id = "$BUILD_ID"
                             //writing changes to yaml
                             writeYaml file: "scan_config.yaml", data: data
                             def dockerParamsString = "--entrypoint=''"
@@ -81,7 +81,7 @@ pipeline {
 								dockerParamsString += " ${param}"
 							}
                             docker.image("getcarrier/dast:latest").inside(dockerParamsString){
-                                sh" dusty run -c $WORKSPACE/scan_config.yml -s dast_zap -d"
+                                sh" dusty run -c $WORKSPACE/scan_config.yaml -s dast_zap -d"
                             }
 					    }
 					}
