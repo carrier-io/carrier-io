@@ -59,7 +59,7 @@ pipeline {
 				stage('DAST') {
 					steps {
 					    script {
-                            def filename = 'zapdast.yaml'
+                            def filename = 'examples/configs/zapdast.yaml'
                             def data = readYaml file: filename
 
                             // Change something in the file
