@@ -1,0 +1,103 @@
+pipeline {
+	agent any
+	environment {
+		galloper_auth = credentials("galloper-auth")
+		redis_pwd = credentials("redis-password")
+		galloper = credentials("galloper-url")
+        webhook = credentials("postprocessing")
+        galloper_usr = credentials("galloper_login")
+        galloper_pwd = credentials("galloper_password")
+        application_url = credentials("app-url")
+	}
+	stages {
+		stage('Deploying Project') {
+			steps {
+				sh "mkdir reports || echo 'Ok'"
+				sh "git checkout -- examples/configs/zapdast.yaml"
+			    sh "docker run -d --rm --name dvna -p 9999:9090 -d appsecco/dvna:sqlite"
+			}
+		}
+		stage('Smoke tests') {
+			steps {
+				echo "Assume it is fine"
+			}
+		}
+		stage('Tests') {
+			parallel {
+				stage('Regression') {
+					steps {
+						echo "Assuming good"
+					}
+				}
+				stage('Performance') {
+					steps {
+						script {
+							def dockerParamsString = "--entrypoint=''"
+							def params = [
+								"-t",
+								"-e REDIS_HOST=$galloper",
+								"-e REDIS_PASSWORD=$redis_pwd",
+								"-e loki_host=http://$galloper",
+								"-e loki_port=3100",
+								"-e galloper_url=http://$galloper_auth@$galloper",
+								"-e bucket=tests",
+								"-e artifact=Archive.zip",
+								"-e GALLOPER_WEB_HOOK=http://$galloper_auth@$galloper$webhook"
+							]
+							for (param in params) {
+								dockerParamsString += " ${param}"
+							}
+								docker.image("getcarrier/control_tower:latest").inside(dockerParamsString){
+									echo "Starting job"
+									sh """run -c getcarrier/perfmeter:latest \\
+									   -e '{\"cmd\": \"-n -t /mnt/jmeter/FloodIO.jmx -Jtest.type=debug -Jenv.type=debug -Jinflux.host=$galloper -JVUSERS=5 -JDURATION=30 -JRAMP_UP=10 -Jtest_name=Flood\"}' \\
+									   -t perfmeter -n DemoTest -q 2 -j True -qg True -p $WORKSPACE/reports"""
+								}
+						    }
+					}
+				}
+				stage('DAST') {
+					steps {
+					    script {
+                            def filename = 'zapdast.yaml'
+                            def data = readYaml file: filename
+
+                            // Change something in the file
+                            global.processing.false_positive.galloper = "$galloper"
+                            global.processing.false_positive.user = "$galloper_usr"
+                            global.processing.false_positive.password = "$galloper_pwd"
+                            global.processing.reporters.url = "$galloper"
+                            global.processing.reporters.login = "$galloper_usr"
+                            global.processing.reporters.password = $galloper_pwd"
+                            global.processing.reporters.html.file = "$WORKSPACE/reports/report.html"
+                            global.processing.reporters.junit.file = "$WORKSPACE/reports/report.html"
+                            suites.dast_zap.scanners.dast.zap.target = "$application_url"
+
+                            //writing changes to yaml
+                            writeYaml file: "scan_config.yaml", data: data
+                            def dockerParamsString = "--entrypoint=''"
+							def params = ["-t"]
+							for (param in params) {
+								dockerParamsString += " ${param}"
+							}
+                            docker.image("getcarrier/dast:latest").inside(dockerParamsString){
+                                dusty run -c $WORKSPACE/scan_config.yml -s dast_zap -d
+                            }
+					    }
+					}
+				}
+			}
+		}
+		stage('Promote Build') {
+			steps {
+                echo "assuming good here"
+			}
+		}
+	}
+	post {
+		always {
+			junit 'reports/*.xml'
+			cleanWs()
+		}
+	}
+}

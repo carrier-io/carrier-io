@@ -1,0 +1,39 @@
+config_version: 2
+
+global:  # Common settings for all suites
+
+  settings:  # Settings
+    project_name: DemoZap  # Project name
+  processing: # Processing config
+    min_severity_filter: # Filters findings below minimal severity level
+      severity: Info # Minimal severity level to report, one of: Critical, High, Medium, Low, Info
+    false_positive:
+      galloper: galloper-url
+      user: galloper-login
+      password: galloper-password
+  #
+  reporters: # Reporters config
+    html: # HTML reporter
+      file: /tmp/reports/report.html
+    junit:
+      file: /tmp/reports/report.xml
+    galloper:
+      url: galloper-url
+      login: galloper-login
+      password: galloper-password
+
+suites: # Test suites
+  dast_zap:
+    #
+    settings: # General config
+      project_description: Zap
+      environment_name: prod # Environment under testing (branch/module for DAST)
+      testing_type: DAST # DAST or SAST
+      scan_type: full # full, incremental or other scan description (e.g.: qualys, authorized, etc)
+      build_id: '1' # Build number (or some other identifier)
+    #
+    scanners:
+      dast: # Settings common to all DAST scanners
+        zap:
+          target: https://example.com # Scan target
+          scan_types: all   # generic scanner configuration (zap or qualys)
