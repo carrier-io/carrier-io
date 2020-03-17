@@ -22,7 +22,7 @@ pipeline {
                         dockerParamsString += " ${param}"
                     }
                     docker.image("node:carbon").inside(dockerParamsString){
-                        sh" npm install $WORKSPACE/code/dvna"
+                        sh "cd code/dvna &&  npm install $WORKSPACE/code/dvna"
                     }
                 }
 			}
@@ -58,7 +58,7 @@ pipeline {
                         dockerParamsString += " ${param}"
                     }
                     docker.image("getcarrier/sast:latest").inside(dockerParamsString){
-                        sh" dusty run -c $WORKSPACE/scan_config.yaml -s sca -d"
+                        sh "dusty run -c $WORKSPACE/scan_config.yaml -s sca -d"
                     }
                 }
             }
