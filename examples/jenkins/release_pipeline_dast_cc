@@ -97,14 +97,8 @@ pipeline {
 	post {
 		always {
 		    sh "docker stop dvna"
-			junit 'reports/*.xml'
-			publishHTML (target : [allowMissing: false,
-                 alwaysLinkToLastBuild: true,
-                 keepAll: false,
-                 reportDir: 'reports',
-                 reportFiles: 'dast_report.html',
-                 reportName: 'DAST Reports',
-                 reportTitles: 'DAST Report'])
+			junit allowEmptyResults: true, healthScaleFactor: 5.0, testResults: 'reports/*.xml'
+			archiveArtifacts artifacts: 'reports/*.html', fingerprint: true
 			cleanWs()
 		}
 	}
