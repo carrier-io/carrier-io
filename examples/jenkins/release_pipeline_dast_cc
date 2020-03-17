@@ -96,6 +96,7 @@ pipeline {
 	}
 	post {
 		always {
+		    sh "docker stop dvna"
 			junit 'reports/*.xml'
 			cleanWs()
 		}
