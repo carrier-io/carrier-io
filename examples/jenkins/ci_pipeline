@@ -8,7 +8,7 @@ pipeline {
 	stages {
 		stage('Pull Code') {
 			steps {
-				sh "mkdir configs || echo 'Ok'"
+				sh "mkdir reports || echo 'Ok'"
 				sh "git checkout -- examples/configs/nodescan.yaml"
                 sh "mkdir code && cd code && git clone https://github.com/appsecco/dvna.git"
 			}
