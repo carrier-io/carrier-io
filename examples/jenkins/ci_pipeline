@@ -1,0 +1,79 @@
+pipeline {
+	agent any
+	environment {
+		galloper = credentials("galloper-url")
+        galloper_usr = credentials("galloper_login")
+        galloper_pwd = credentials("galloper_password")
+	}
+	stages {
+		stage('Pull Code') {
+			steps {
+				sh "mkdir reports || echo 'Ok'"
+				sh "git checkout -- examples/configs/nodescan.yaml"
+                sh "mkdir code && cd code && git clone https://github.com/appsecco/dvna.git"
+			}
+		}
+		stage('Build Code') {
+			steps {
+			    script{
+                    def dockerParamsString = "--entrypoint=''"
+                    def params = ["-t"]
+                    for (param in params) {
+                        dockerParamsString += " ${param}"
+                    }
+                    docker.image("node:carbon").inside(dockerParamsString){
+                        sh "cd code/dvna &&  npm install $WORKSPACE/code/dvna"
+                    }
+                }
+			}
+		}
+		stage('Code style check') {
+		    steps {
+				echo "Assume it is fine"
+			}
+		}
+		stage('SAST') {
+            steps {
+                script {
+                    def filename = 'examples/configs/nodescan.yaml'
+                    def data = readYaml file: filename
+
+                    // Change something in the file
+                    data.global.processing.false_positive.galloper = "http://$galloper"
+                    data.global.processing.false_positive.user = "$galloper_usr"
+                    data.global.processing.false_positive.password = "$galloper_pwd"
+                    data.global.reporters.galloper.url = "http://$galloper"
+                    data.global.reporters.galloper.login = "$galloper_usr"
+                    data.global.reporters.galloper.password = "$galloper_pwd"
+                    data.global.reporters.html.file = "$WORKSPACE/reports/dast_report.html"
+                    data.global.reporters.junit.file = "$WORKSPACE/reports/dast_report.xml"
+                    data.suites.sca.build_id = "$BUILD_ID"
+                    data.suites.sca.scanners.sast.nodejs.code="$WORKSPACE/code/dvna"
+                    data.suites.sca.scanners.sast.gitleaks.code="$WORKSPACE/code/dvna"
+                    //writing changes to yaml
+                    writeYaml file: "scan_config.yaml", data: data
+                    def dockerParamsString = "--entrypoint=''"
+                    def params = ["-t"]
+                    for (param in params) {
+                        dockerParamsString += " ${param}"
+                    }
+                    docker.image("getcarrier/sast:latest").inside(dockerParamsString){
+                        sh "dusty run -c $WORKSPACE/scan_config.yaml -s sca -d"
+                    }
+                }
+            }
+        }
+		stage('Promote Build') {
+			steps {
+                echo "assuming good here"
+			}
+		}
+	}
+	post {
+		always {
+			junit allowEmptyResults: true, healthScaleFactor: 5.0, testResults: 'reports/*.xml'
+			archiveArtifacts artifacts: 'reports/*.html', fingerprint: true
+			cleanWs()
+		}
+	}
+}
