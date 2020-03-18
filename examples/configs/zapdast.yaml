@@ -21,7 +21,7 @@ global:  # Common settings for all suites
 suites: # Test suites
   dast_zap:
     settings: # General config
-      project_description: Zap
+      project_description: DVNA
       environment_name: prod # Environment under testing (branch/module for DAST)
       testing_type: DAST # DAST or SAST
       scan_type: full # full, incremental or other scan description (e.g.: qualys, authorized, etc)
