@@ -1,0 +1,18 @@
+http:
+  routers:
+    galloper:
+      rule: "PathPrefix(`/`)"
+      entrypoints:
+      - "http"
+      middlewares:
+      - "header-auth"
+      service: "galloper"
+  middlewares:
+    header-auth:
+      forwardAuth:
+        address: "http://carrier-auth:80/forward-auth/auth?target=header&scope=galloper"
+  services:
+    galloper:
+      loadBalancer:
+        servers:
+        - url: "http://galloper:5000/"

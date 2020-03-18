@@ -1,0 +1,12 @@
+http:
+  routers:
+    carrier-auth:
+      rule: "PathPrefix(`/forward-auth`)"
+      entryPoints:
+      - "http"
+      service: "carrier-auth"
+  services:
+    carrier-auth:
+      loadBalancer:
+        servers:
+        - url: "http://carrier-auth:80/"

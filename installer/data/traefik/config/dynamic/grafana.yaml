@@ -1,0 +1,22 @@
+http:
+  routers:
+    grafana:
+      rule: "PathPrefix(`/grafana`)"
+      entrypoints:
+      - "http"
+      middlewares:
+      - "header-auth"
+      service: "grafana"
+  middlewares:
+    header-auth:
+      forwardAuth:
+        address: "http://carrier-auth:80/forward-auth/auth?target=header&scope=grafana"
+        authResponseHeaders:
+        - "X-WEBAUTH-USER"
+        - "X-WEBAUTH-NAME"
+        - "X-WEBAUTH-EMAIL"
+  services:
+    grafana:
+      loadBalancer:
+        servers:
+        - url: "http://grafana:3100/"

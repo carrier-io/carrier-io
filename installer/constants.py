@@ -197,15 +197,19 @@ GRAFANA_COMPOSE = '''  grafana:
       - GF_INSTALL_PLUGINS=natel-influx-admin-panel
       - GF_SECURITY_ADMIN_PASSWORD={password}
       - GF_SERVER_ROOT_URL=http://{host}/grafana
+      - GF_SERVER_SERVE_FROM_SUB_PAT=true
+      - GF_SECURITY_DISABLE_GRAVATA=true
+      - GF_SECURITY_ALLOW_EMBEDDIN=true
+      - GF_AUTH_DISABLE_LOGIN_FOR=true
+      - GF_AUTH_SIGNOUT_REDIRECT_UR=http://{host}/logout
+      - GF_AUTH_PROXY_ENABLE=true
+      - GF_AUTH_PROXY_HEADER_NAM=X-WEBAUTH-USER
+      - GF_AUTH_PROXY_HEADER_PROPERT=username
+      - GF_AUTH_PROXY_HEADERS=Name:X-WEBAUTH-NAME Email:X-WEBAUTH-EMAIL
+      - GF_AUTH_PROXY_AUTO_SIGN_UP=true
     networks:
       - carrier
     container_name: carrier-grafana
-    labels:
-      - 'traefik.backend=grafana'
-      - 'traefic.port=3000'
-      - 'traefik.frontend.rule=PathPrefixStrip: /grafana'
-      - 'traefik.frontend.passHostHeader=true'
-      - 'carrier=grafana'
     user: root
   loki:
     image: grafana/loki:latest
@@ -222,6 +226,7 @@ GRAFANA_COMPOSE = '''  grafana:
 '''
 
 TRAEFIC_COMPOSE = """  traefik:
+    image: traefik:cantal
     build: {path}
     restart: unless-stopped
     volumes:
@@ -286,6 +291,7 @@ REDIS_COMPOSE = """
     environment:
       KEYCLOAK_USER: "carrier"
       KEYCLOAK_PASSWORD: "carrier"
+      KEYCLOAK_IMPORT: /data/test_realm.json
       DB_VENDOR: "postgres"
       DB_ADDR: "postgres"
       DB_DATABASE: "carrier_pg_db"
@@ -293,12 +299,6 @@ REDIS_COMPOSE = """
       DB_SCHEMA: "keycloak"
       DB_PASSWORD: "carrier_pg_password"
       PROXY_ADDRESS_FORWARDING: "true"
-    labels:
-      - 'traefik.backend=keycloak'
-      - 'traefik.frontend.rule=PathPrefix: /auth'
-      - 'traefic.port=8099'
-      - 'traefik.frontend.passHostHeader=true'
-      - 'carrier=keycloak'
   galloper:
     image: getcarrier/galloper:latest
     restart: unless-stopped
@@ -329,12 +329,6 @@ REDIS_COMPOSE = """
       - postgres
     expose:
       - "5000"
-    labels:
-      - 'traefik.backend=galloper'
-      - 'traefic.port=5000'
-      - 'traefik.frontend.rule=PathPrefix: /'
-      - 'traefik.frontend.passHostHeader=true'
-      - 'carrier=galloper' 
   minio:
     image: minio/minio:RELEASE.2019-10-12T01-39-57Z
     restart: unless-stopped
@@ -379,9 +373,12 @@ REDIS_COMPOSE = """
       - 'traefik.enable=false'
       - 'carrier=chrome'
   carrier-auth:
+    container_name: carrier-auth
     image: lifedjik/traefik-forward-auth-saml:0.1
     volumes:
-    - ./data/auth:/config
+      - ./data/auth:/config
+    networks:
+      - carrier
     environment:
       CONFIG_FILENAME: "/config/settings.yaml"
 """
