@@ -7,7 +7,6 @@ services:
       - /opt/carrier_traefik/traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
-      - 8080:8080
       - 80:80
     container_name: carrier-traefic
   galloper:
