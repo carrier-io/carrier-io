@@ -72,6 +72,11 @@ mappers:
       X-WEBAUTH-USER: "'auth_attributes'.'preferred_username'"
       X-WEBAUTH-NAME: "'auth_attributes'.'name'"
       X-WEBAUTH-EMAIL: "'auth_attributes'.'email'"
+  json:
+    galloper:
+      login: "'auth_attributes'.'preferred_username'"
+      name: "'auth_attributes'.'name'"
+      email: "'auth_attributes'.'email'"
 
 
 saml:

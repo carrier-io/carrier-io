@@ -5,12 +5,12 @@ http:
       entrypoints:
       - "http"
       middlewares:
-      - "header-auth"
+      - "galloper-auth"
       service: "galloper"
   middlewares:
-    header-auth:
+    galloper-auth:
       forwardAuth:
-        address: "http://carrier-auth:80/forward-auth/auth?target=header&scope=galloper"
+        address: "http://carrier-auth:80/forward-auth/auth?target=json&scope=galloper"
   services:
     galloper:
       loadBalancer:
