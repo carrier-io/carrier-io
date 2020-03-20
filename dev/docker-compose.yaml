@@ -1,0 +1,136 @@
+version: '3'
+services:
+  traefik:
+    image: traefik:1.7
+    restart: unless-stopped
+    volumes:
+      - /opt/carrier/traefik/traefik.toml:/etc/traefik/traefik.toml
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/carrier/traefik/userfile:/etc/traefik/userfile
+    ports:
+      - 80:80
+    container_name: carrier-traefic
+  postgres:
+    image: postgres:12.2
+    restart: unless-stopped
+    container_name: carrier-postgres
+    volumes:
+      - /opt/carrier/postgre:/var/lib/postgresql/data
+      - ./ext/postgre_schemas.sh:/docker-entrypoint-initdb.d/postgre_schemas.sh
+    environment:
+      - POSTGRES_DB=$POSTGRES_DB
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_SCHEMAS=$DB_POSTGRES_SCHEMAS
+      - POSTGRES_INITDB_ARGS=$POSTGRES_INITDB_ARGS
+    labels:
+      - 'traefik.enable=false'
+      - 'carrier=postgres'
+  galloper:
+    image: getcarrier/galloper:latest
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - REDIS_HOST=carrier-redis
+      - POSTGRES_HOST=carrier-postgres
+      - REDIS_DB=$FAAS_REDIS_DB
+      - REDIS_PASSWORD=$REDIS_PASSWORD
+      - CPU_CORES=$FAAS_PARALLEL_TASKS
+      - APP_HOST=$APP_HOST
+      - MINIO_HOST=$MINIO_HOST
+      - MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY
+      - MINIO_SECRET_KEY=$MINIO_SECRET_KEY
+      - MINIO_REGION=$MINIO_REGION
+      - DATABASE_SCHEMA=$GL_POSTGRES_SCHEMA
+      - DATABASE_VENDOR=$DATABASE_VENDOR
+      - POSTGRES_DB=$POSTGRES_DB
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    labels:
+      - 'traefik.backend=galoper'
+      - 'traefic.port=5000'
+      - 'traefik.frontend.rule=PathPrefixStrip: /'
+      - 'traefik.frontend.passHostHeader=true'
+      - 'traefik.frontend.auth.basic.usersFile=/etc/traefik/userfile'
+    container_name: carrier-galloper
+  influx:
+    image: influxdb:1.7
+    restart: unless-stopped
+    environment:
+      - INFLUXDB_META_DIR=$INFLUXDB_META_DIR
+      - INFLUXDB_DATA_DIR=$INFLUXDB_DATA_DIR
+      - INFLUXDB_DATA_WAL_DIR=$INFLUXDB_DATA_WAL_DIR
+      - INFLUXDB_HTTP_ENABLED=$INFLUXDB_HTTP_ENABLED
+    volumes:
+      - /opt/carrier/influx:/var/lib/influxdb/data
+    ports:
+      - 2003:2003
+      - 8086:8086
+    labels:
+      - 'traefik.enable=false'
+    container_name: carrier-influx
+  grafana:
+    image: grafana/grafana:6.4.4
+    restart: unless-stopped
+    depends_on:
+      - influx
+    volumes:
+      - /opt/carrier/grafana:/var/lib/grafana
+    environment:
+      - GF_PANELS_DISABLE_SANITIZE_HTML=$GF_PANELS_DISABLE_SANITIZE_HTML
+      - GF_AUTH_ANONYMOUS_ENABLED=$GF_AUTH_ANONYMOUS_ENABLED
+      - GF_AUTH_BASIC_ENABLED=GF_AUTH_BASIC_ENABLED
+      - GF_AUTH_PROXY_ENABLED=$GF_AUTH_PROXY_ENABLED
+      - GF_SECURITY_ADMIN_PASSWORD=$GF_SECURITY_ADMIN_PASSWORD
+      - GF_INSTALL_PLUGINS=$GF_INSTALL_PLUGINS
+      - GF_SERVER_ROOT_URL=$GF_SERVER_ROOT_URL
+    labels:
+      - 'traefik.backend=grafana'
+      - 'traefic.port=3000'
+      - 'traefik.frontend.rule=PathPrefixStrip: /grafana'
+      - 'traefik.frontend.passHostHeader=true'
+      - 'traefik.frontend.auth.basic.usersFile=/etc/traefik/userfile'
+    user: root
+    container_name: carrier-grafana
+  loki:
+    image: grafana/loki:latest
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    labels:
+      - 'traefik.enable=false'
+    container_name: carrier-loki
+  minio:
+    image: minio/minio:RELEASE.2019-10-12T01-39-57Z
+    environment:
+      - MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY
+      - MINIO_SECRET_KEY=$MINIO_SECRET_KEY
+    volumes:
+      - /opt/carrier/minio:/data
+    labels:
+      - 'traefik.enable=false'
+    container_name: carrier-minio
+    command: server /data
+  redis:
+    image: redis:5.0.7
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    container_name: carrier-redis
+    entrypoint:
+      - redis-server
+      - --requirepass
+      - $REDIS_PASSWORD
+    labels:
+      - 'traefik.enable=false'
+  observer_chrome:
+    image: getcarrier/observer-chrome:latest
+    restart: unless-stopped
+    ports:
+      - 4444:4444
+      - 9999:9999
+    container_name: observer-chrome
+    labels:
+      - 'traefik.enable=false'
