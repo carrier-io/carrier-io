@@ -5,10 +5,10 @@ http:
       entryPoints:
       - "http"
       middlewares:
-      - "header-auth"
+      - "grafana-auth"
       service: "grafana"
   middlewares:
-    header-auth:
+    grafana-auth:
       forwardAuth:
         address: "http://carrier-auth:80/forward-auth/auth?target=header&scope=grafana"
         authResponseHeaders:
@@ -19,4 +19,4 @@ http:
     grafana:
       loadBalancer:
         servers:
-        - url: "http://grafana:3100/"
+        - url: "http://carrier-grafana:3000/"
