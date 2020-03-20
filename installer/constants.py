@@ -193,20 +193,22 @@ GRAFANA_COMPOSE = '''  grafana:
     volumes:
       - {volume}:/var/lib/grafana
     environment:
-      - GF_PANELS_DISABLE_SANITIZE_HTML=true
-      - GF_INSTALL_PLUGINS=natel-influx-admin-panel
-      - GF_SECURITY_ADMIN_PASSWORD={password}
-      - GF_SERVER_ROOT_URL=http://{host}/grafana
-      - GF_SERVER_SERVE_FROM_SUB_PAT=true
-      - GF_SECURITY_DISABLE_GRAVATA=true
-      - GF_SECURITY_ALLOW_EMBEDDIN=true
-      - GF_AUTH_DISABLE_LOGIN_FOR=true
-      - GF_AUTH_SIGNOUT_REDIRECT_UR=http://{host}/logout
-      - GF_AUTH_PROXY_ENABLE=true
-      - GF_AUTH_PROXY_HEADER_NAM=X-WEBAUTH-USER
-      - GF_AUTH_PROXY_HEADER_PROPERT=username
-      - GF_AUTH_PROXY_HEADERS=Name:X-WEBAUTH-NAME Email:X-WEBAUTH-EMAIL
-      - GF_AUTH_PROXY_AUTO_SIGN_UP=true
+      GF_PANELS_DISABLE_SANITIZE_HTML: "true"
+      GF_INSTALL_PLUGINS: "natel-influx-admin-panel"
+      GF_SECURITY_ADMIN_PASSWORD: {password}
+      GF_SERVER_ROOT_URL: http://{host}/grafana
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_SECURITY_ADMIN_USER: "root"
+      GF_SECURITY_DISABLE_GRAVATAR: "true"
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_AUTH_SIGNOUT_REDIRECT_URL: "http://localhost/logout"
+      GF_AUTH_PROXY_ENABLED: "true"
+      GF_AUTH_PROXY_HEADER_NAME: X-WEBAUTH-APP-USER
+      GF_AUTH_PROXY_HEADER_PROPERTY: username
+      GF_AUTH_PROXY_HEADERS: "Name:X-WEBAUTH-NAME Email:X-WEBAUTH-EMAIL"
+      GF_AUTH_PROXY_AUTO_SIGN_UP: "true"
+
     networks:
       - carrier
     container_name: carrier-grafana

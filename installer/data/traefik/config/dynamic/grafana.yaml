@@ -2,7 +2,7 @@ http:
   routers:
     grafana:
       rule: "PathPrefix(`/grafana`)"
-      entrypoints:
+      entryPoints:
       - "http"
       middlewares:
       - "header-auth"
