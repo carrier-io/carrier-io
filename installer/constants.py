@@ -3,7 +3,7 @@ from os import environ, path
 TRAEFIK_STATS_PORT = environ.get("TRAEFIK_STATS_PORT", "8080")
 TRAEFIK_PUBLIC_PORT = environ.get("TRAEFIK_PUBLIC_PORT", "80")
 
-WORKDIR = "/tmp/carrier"
+WORKDIR = "/opt/carrier"
 DATA_FILES_DIR = path.join(path.dirname(__file__), "data")
 ENV_FILES_DIR = path.join(path.dirname(__file__), "env_files")
 
