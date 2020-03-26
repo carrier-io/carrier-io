@@ -80,7 +80,7 @@ services:
     environment:
       - GF_PANELS_DISABLE_SANITIZE_HTML=$GF_PANELS_DISABLE_SANITIZE_HTML
       - GF_AUTH_ANONYMOUS_ENABLED=$GF_AUTH_ANONYMOUS_ENABLED
-      - GF_AUTH_BASIC_ENABLED=GF_AUTH_BASIC_ENABLED
+      - GF_AUTH_BASIC_ENABLED=$GF_AUTH_BASIC_ENABLED
       - GF_AUTH_PROXY_ENABLED=$GF_AUTH_PROXY_ENABLED
       - GF_SECURITY_ADMIN_PASSWORD=$GF_SECURITY_ADMIN_PASSWORD
       - GF_INSTALL_PLUGINS=$GF_INSTALL_PLUGINS
@@ -134,3 +134,17 @@ services:
     container_name: observer-chrome
     labels:
       - 'traefik.enable=false'
+  interceptor:
+    image: getcarrier/interceptor:latest
+    depends_on:
+      - redis
+    restart: unless-stopped
+    container_name: carrier-interceptor
+    environment:
+      - RAM_QUOTA=$RAM_QUOTA
+      - CPU_QUOTA=$CPU_QUOTA
+      - CPU_CORES=$INTERPECTOR_TASKS
+      - REDIS_HOST=carrier-redis
+      - REDIS_PASSWORD=$REDIS_PASSWORD
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
