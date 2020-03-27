@@ -120,16 +120,23 @@ enabled=true
 bind-address=":8086"
 '''
 
-TRAEFIC_CONFIG = '''################################################################
-# API and dashboard configuration
-################################################################
+TRAEFIC_CONFIG = '''
+[providers.docker]
+  endpoint = "unix:///var/run/docker.sock"
+  exposedByDefault = false
+  network = "carrier"
+
 [api]
-################################################################
-# Docker configuration backend
-################################################################
-[docker]
-domain = "docker.local"
-watch = true'''
+  dashboard = true
+[ping]
+  manualRouting = true
+
+[entryPoints]
+  [entryPoints.http]
+    address = ":80"
+    [entryPoints.http.forwardedHeaders]
+      insecure = true
+'''
 
 # Compose pieces
 
@@ -159,7 +166,7 @@ VAULT_COMPOSE = """  vault:
     image: vault:1.1.0
     restart: unless-stopped
     environment:
-      - 'VAULT_DEV_ROOT_TOKEN_ID=vault_token' 
+      - 'VAULT_DEV_ROOT_TOKEN_ID=vault_token'
       - 'VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200'
       - 'VAULT_LOCAL_CONFIG={"backend": {"file": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h"}'
     cap_add:
@@ -217,13 +224,12 @@ GRAFANA_COMPOSE = '''  grafana:
       - carrier
     container_name: carrier-grafana
     labels:
-      - 'traefik.backend=grafana'
-      - 'traefic.port=3000'
-      - 'traefik.frontend.rule=PathPrefixStrip: /grafana'
-      - 'traefik.frontend.passHostHeader=true'
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.grafana.rule=PathPrefix(`/grafana`)'
+      - 'traefik.http.services.grafana.loadbalancer.server.port=3000'
+      - 'traefik.http.middlewares.grafana-auth.forwardauth.address=http://carrier-auth:80/forward-auth/auth?target=header&scope=grafana'
+      - 'traefik.http.middlewares.grafana-auth.forwardauth.authResponseHeaders=X-WEBAUTH-USER, X-WEBAUTH-NAME, X-WEBAUTH-EMAIL'
       - 'carrier=grafana'
-      - 'traefik.http.routers.grafana.middlewares=grafana-auth.forwardauth.address=http://carrier-auth:80/forward-auth/auth?target=header&scope=grafana'
-      - 'traefik.http.routers.grafana.middlewares=grafana-auth.forwardauth.authResponseHeaders=X-WEBAUTH-USER, X-WEBAUTH-NAME, X-WEBAUTH-EMAIL'
     user: root
   loki:
     image: grafana/loki:latest
@@ -240,7 +246,6 @@ GRAFANA_COMPOSE = '''  grafana:
 '''
 
 TRAEFIC_COMPOSE = """  traefik:
-    image: traefik:cantal
     build: {path}
     restart: unless-stopped
     volumes:
@@ -271,7 +276,7 @@ POSTGRES_COMPOSE = """
       - POSTGRES_INITDB_ARGS=--data-checksums
     labels:
       - 'traefik.enable=false'
-      - 'carrier=postgres' 
+      - 'carrier=postgres'
 """
 
 CARRIER_AUTH_COMPOSE = """
@@ -284,11 +289,12 @@ CARRIER_AUTH_COMPOSE = """
     environment:
       CONFIG_FILENAME: "/config/settings.yaml"
     labels:
-      - 'traefik.backend=carrier-auth'
-      - 'traefik.frontend.rule=PathPrefix: /forward-auth'
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.carrier-auth.rule=PathPrefix(`/forward-auth`)'
+      - 'traefik.http.services.carrier-auth.loadbalancer.server.port=80'
 """
 
-REDIS_COMPOSE = """  
+REDIS_COMPOSE = """
   redis:
     image: redis:5.0.3
     restart: unless-stopped
@@ -326,10 +332,9 @@ REDIS_COMPOSE = """
       DB_PASSWORD: "carrier_pg_password"
       PROXY_ADDRESS_FORWARDING: "true"
     labels:
-      - 'traefik.backend=keycloak'
-      - 'traefik.frontend.rule=PathPrefix: /auth'
-      - 'traefic.port=8099'
-      - 'traefik.frontend.passHostHeader=true'
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.keycloak.rule=PathPrefix(`/auth`)'
+      - 'traefik.http.services.keycloak.loadbalancer.server.port=8080'
       - 'carrier=keycloak'
   galloper:
     image: getcarrier/galloper:latest
@@ -362,12 +367,11 @@ REDIS_COMPOSE = """
     expose:
       - "5000"
     labels:
-      - 'traefik.backend=galloper'
-      - 'traefic.port=5000'
-      - 'traefik.frontend.rule=PathPrefix: /'
-      - 'traefik.frontend.passHostHeader=true'
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.galloper.rule=PathPrefix(`/`)'
+      - 'traefik.http.services.galloper.loadbalancer.server.port=5000'
+      - 'traefik.http.middlewares.galloper-auth.forwardauth.address=http://carrier-auth:80/forward-auth/auth?target=json&scope=galloper'
       - 'carrier=galloper'
-      - 'traefik.http.routers.galloper.middlewares=galloper-auth.forwardauth.address=http://carrier-auth:80/forward-auth/auth?target=json&scope=galloper'
   minio:
     image: minio/minio:RELEASE.2019-10-12T01-39-57Z
     restart: unless-stopped
@@ -505,7 +509,7 @@ CARRIER_AUTH_SETTINGS = """
 global:
   debug: false
   disable_auth: false
-  
+
 server:
   global:
     environment: production
