@@ -1,4 +1,10 @@
-from os import environ, path
+from os import environ, path, getcwd
+import json
+
+
+def realm_load():
+    with open(f'{WORKDIR}/data/keycloak_realm.json') as f:
+        return json.load(f)
 
 TRAEFIK_STATS_PORT = environ.get("TRAEFIK_STATS_PORT", "8080")
 TRAEFIK_PUBLIC_PORT = environ.get("TRAEFIK_PUBLIC_PORT", "80")
@@ -15,6 +21,7 @@ USERID = "1001"
 JENKINS_HOME = "/var/jenkins_home"
 POSTGRES_ENTRYPOINT_FILENAME = "postgres-entrypoint.sh"
 CARRIER_AUTH_FILENAME = "settings.yaml"
+KEYCLOAK_REALM_FILENAME = "keycloak_realm_data.json"
 
 # Name of volumes
 INFLUX_VOLUME_NAME = "carrier_influx_volume"
@@ -68,6 +75,10 @@ ADD {POSTGRES_ENTRYPOINT_FILENAME} /docker-entrypoint-initdb.d/postgres-entrypoi
 
 CARRIERAUTHFILE = f"""FROM lifedjik/traefik-forward-auth-saml:0.1
 ADD {CARRIER_AUTH_FILENAME} /config/{CARRIER_AUTH_FILENAME}
+"""
+
+KEYCLOAKREALMFILE = f"""FROM jboss/keycloak:latest
+ADD {KEYCLOAK_REALM_FILENAME} /realm/data/{KEYCLOAK_REALM_FILENAME}
 """
 
 INFLUXFILE = '''FROM influxdb:1.7
@@ -294,6 +305,33 @@ CARRIER_AUTH_COMPOSE = """
       - 'traefik.http.services.carrier-auth.loadbalancer.server.port=80'
 """
 
+KEYCLOAK_COMPOSE = """
+  keycloak:
+    build: {path}
+    restart: unless-stopped
+    container_name: carrier-keycloak
+    networks:
+      - carrier
+    depends_on:
+      - postgres
+    environment:
+      KEYCLOAK_USER: "carrier"
+      KEYCLOAK_PASSWORD: "carrier"
+      KEYCLOAK_IMPORT: realm/data/keycloak_realm_data.json
+      DB_VENDOR: "postgres"
+      DB_ADDR: "postgres"
+      DB_DATABASE: "carrier_pg_db"
+      DB_USER: "carrier_pg_user"
+      DB_SCHEMA: "keycloak"
+      DB_PASSWORD: "carrier_pg_password"
+      PROXY_ADDRESS_FORWARDING: "true"
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.keycloak.rule=PathPrefix(`/auth`)'
+      - 'traefik.http.services.keycloak.loadbalancer.server.port=8080'
+      - 'carrier=keycloak'
+"""
+
 REDIS_COMPOSE = """
   redis:
     image: redis:5.0.3
@@ -310,32 +348,6 @@ REDIS_COMPOSE = """
       - redis-server
       - --requirepass
       - {password}
-  keycloak:
-    image: jboss/keycloak:latest
-    volumes:
-     - ./data/keycloak:/data
-    restart: unless-stopped
-    container_name: carrier-keycloak
-    networks:
-      - carrier
-    depends_on:
-      - postgres
-    environment:
-      KEYCLOAK_USER: "carrier"
-      KEYCLOAK_PASSWORD: "carrier"
-      KEYCLOAK_IMPORT: /data/test_realm.json
-      DB_VENDOR: "postgres"
-      DB_ADDR: "postgres"
-      DB_DATABASE: "carrier_pg_db"
-      DB_USER: "carrier_pg_user"
-      DB_SCHEMA: "keycloak"
-      DB_PASSWORD: "carrier_pg_password"
-      PROXY_ADDRESS_FORWARDING: "true"
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.keycloak.rule=PathPrefix(`/auth`)'
-      - 'traefik.http.services.keycloak.loadbalancer.server.port=8080'
-      - 'carrier=keycloak'
   galloper:
     image: getcarrier/galloper:latest
     restart: unless-stopped
