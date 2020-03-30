@@ -240,6 +240,7 @@ GRAFANA_COMPOSE = '''  grafana:
       - 'traefik.http.services.grafana.loadbalancer.server.port=3000'
       - 'traefik.http.middlewares.grafana-auth.forwardauth.address=http://carrier-auth:80/forward-auth/auth?target=header&scope=grafana'
       - 'traefik.http.middlewares.grafana-auth.forwardauth.authResponseHeaders=X-WEBAUTH-USER, X-WEBAUTH-NAME, X-WEBAUTH-EMAIL'
+      - 'traefik.http.routers.grafana.middlewares=grafana-auth@docker'
       - 'carrier=grafana'
     user: root
   loki:
@@ -317,7 +318,7 @@ KEYCLOAK_COMPOSE = """
     environment:
       KEYCLOAK_USER: "carrier"
       KEYCLOAK_PASSWORD: "carrier"
-      KEYCLOAK_IMPORT: realm/data/keycloak_realm_data.json
+      KEYCLOAK_IMPORT: /realm/data/keycloak_realm_data.json
       DB_VENDOR: "postgres"
       DB_ADDR: "postgres"
       DB_DATABASE: "carrier_pg_db"
@@ -383,6 +384,7 @@ REDIS_COMPOSE = """
       - 'traefik.http.routers.galloper.rule=PathPrefix(`/`)'
       - 'traefik.http.services.galloper.loadbalancer.server.port=5000'
       - 'traefik.http.middlewares.galloper-auth.forwardauth.address=http://carrier-auth:80/forward-auth/auth?target=json&scope=galloper'
+      - 'traefik.http.routers.galloper.middlewares=galloper-auth@docker'
       - 'carrier=galloper'
   minio:
     image: minio/minio:RELEASE.2019-10-12T01-39-57Z
