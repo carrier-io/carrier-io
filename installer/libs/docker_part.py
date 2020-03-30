@@ -17,6 +17,7 @@ from shutil import copytree, ignore_patterns
 from subprocess import Popen, PIPE, CalledProcessError
 from time import sleep
 from traceback import format_exc
+import json
 
 import docker
 from requests import get, post
@@ -37,6 +38,8 @@ class ProvisionDocker(object):
         self.vault_piece = ''
         self.volumes_piece = 'volumes:'
         self.network_piece = constants.NETWORK_PIECE
+        self.carrier_auth_piece = ''
+        self.keycloak_realm_piece = ''
 
     def create_network(self):
         self.client.networks.create('carrier', attachable=True, labels={"carrier": "base"})
@@ -118,6 +121,36 @@ class ProvisionDocker(object):
             ignore=ignore_patterns("*.pyc", "*.py")
         )
 
+    def prepare_carrier_auth(self):
+        dirname = "carrier_auth"
+        makedirs(path.join(constants.WORKDIR, dirname), exist_ok=True)
+        with open(path.join(constants.WORKDIR, dirname, "Dockerfile"), "w") as f:
+            f.write(constants.CARRIERAUTHFILE)
+        with open(path.join(constants.WORKDIR, dirname, constants.CARRIER_AUTH_FILENAME), "w") as f:
+            f.write(constants.CARRIER_AUTH_SETTINGS)
+        self.carrier_auth_piece = constants.CARRIER_AUTH_COMPOSE.format(
+            path=path.join(constants.WORKDIR, dirname),
+        )
+
+    def prepare_keycloak_realm(self):
+        dirname = "keycloak_realm"
+        makedirs(path.join(constants.WORKDIR, dirname), exist_ok=True)
+        with open(path.join(constants.WORKDIR, dirname, "Dockerfile"), "w") as f:
+            f.write(constants.KEYCLOAKREALMFILE)
+        with open(path.join(constants.WORKDIR, dirname, constants.KEYCLOAK_REALM_FILENAME), "w") as f:
+            json.dump(constants.realm_load(), f)
+        self.keycloak_realm_piece = constants.KEYCLOAK_COMPOSE.format(
+            path=path.join(constants.WORKDIR, dirname),
+        )
+
+    @staticmethod
+    def prepare_data_files():
+        copytree(
+            constants.DATA_FILES_DIR,
+            path.join(constants.WORKDIR, path.basename(constants.DATA_FILES_DIR)),
+            ignore=ignore_patterns("*.pyc", "*.py")
+        )
+
     def _popen_yield(self, cmd):
         popen = Popen(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True, cwd=constants.WORKDIR)
         for stdout_line in iter(popen.stdout.readline, ""):
@@ -134,11 +167,15 @@ class ProvisionDocker(object):
         self.prepare_postgres()
         self.prepare_redis()
         self.prepare_vault()
+        self.prepare_data_files()
+        self.prepare_carrier_auth()
+        self.prepare_keycloak_realm()
         with open(path.join(constants.WORKDIR, 'docker-compose.yaml'), 'w') as f:
             f.write(constants.DOCKER_COMPOSE)
             for each in (
                     self.traefik_piece, self.jenkins_piece, self.influx_piece, self.grafana_piece,
-                    self.postgres_piece, self.redis_piece, self.vault_piece, self.volumes_piece, self.network_piece
+                    self.postgres_piece, self.redis_piece, self.carrier_auth_piece, self.keycloak_realm_piece,
+                    self.vault_piece, self.volumes_piece, self.network_piece
             ):
                 if each:
                     f.write(each)

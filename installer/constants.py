@@ -1,10 +1,16 @@
-from os import environ, path
+from os import environ, path, getcwd
+import json
+
+
+def realm_load():
+    with open(f'{WORKDIR}/data/keycloak_realm.json') as f:
+        return json.load(f)
 
 TRAEFIK_STATS_PORT = environ.get("TRAEFIK_STATS_PORT", "8080")
 TRAEFIK_PUBLIC_PORT = environ.get("TRAEFIK_PUBLIC_PORT", "80")
 
-WORKDIR = "/opt/carrier"
-ENTRY_POINTS_DIR = path.join(path.dirname(__file__), "entry_points")
+WORKDIR = "/tmp/carrier"
+DATA_FILES_DIR = path.join(path.dirname(__file__), "data")
 ENV_FILES_DIR = path.join(path.dirname(__file__), "env_files")
 
 USERNAME = "carrier"
@@ -14,6 +20,8 @@ GROUPID = "1001"
 USERID = "1001"
 JENKINS_HOME = "/var/jenkins_home"
 POSTGRES_ENTRYPOINT_FILENAME = "postgres-entrypoint.sh"
+CARRIER_AUTH_FILENAME = "settings.yaml"
+KEYCLOAK_REALM_FILENAME = "keycloak_realm_data.json"
 
 # Name of volumes
 INFLUX_VOLUME_NAME = "carrier_influx_volume"
@@ -65,6 +73,14 @@ POSTGRESFILE = f"""FROM postgres:12.2
 ADD {POSTGRES_ENTRYPOINT_FILENAME} /docker-entrypoint-initdb.d/postgres-entrypoint.sh
 """
 
+CARRIERAUTHFILE = f"""FROM lifedjik/traefik-forward-auth-saml:0.1
+ADD {CARRIER_AUTH_FILENAME} /config/{CARRIER_AUTH_FILENAME}
+"""
+
+KEYCLOAKREALMFILE = f"""FROM jboss/keycloak:latest
+ADD {KEYCLOAK_REALM_FILENAME} /realm/data/{KEYCLOAK_REALM_FILENAME}
+"""
+
 INFLUXFILE = '''FROM influxdb:1.7
 ADD influxdb.conf /etc/influxdb/influxdb.conf
 EXPOSE 8086
@@ -72,7 +88,7 @@ EXPOSE 2003
 '''
 
 TRAEFICFILE = '''
-FROM traefik:1.7
+FROM traefik:cantal
 ADD traefik.toml /etc/traefik/traefik.toml
 EXPOSE 8080
 EXPOSE 80
@@ -115,16 +131,23 @@ enabled=true
 bind-address=":8086"
 '''
 
-TRAEFIC_CONFIG = '''################################################################
-# API and dashboard configuration
-################################################################
+TRAEFIC_CONFIG = '''
+[providers.docker]
+  endpoint = "unix:///var/run/docker.sock"
+  exposedByDefault = false
+  network = "carrier"
+
 [api]
-################################################################
-# Docker configuration backend
-################################################################
-[docker]
-domain = "docker.local"
-watch = true'''
+  dashboard = true
+[ping]
+  manualRouting = true
+
+[entryPoints]
+  [entryPoints.http]
+    address = ":80"
+    [entryPoints.http.forwardedHeaders]
+      insecure = true
+'''
 
 # Compose pieces
 
@@ -154,7 +177,7 @@ VAULT_COMPOSE = """  vault:
     image: vault:1.1.0
     restart: unless-stopped
     environment:
-      - 'VAULT_DEV_ROOT_TOKEN_ID=vault_token' 
+      - 'VAULT_DEV_ROOT_TOKEN_ID=vault_token'
       - 'VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200'
       - 'VAULT_LOCAL_CONFIG={"backend": {"file": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h"}'
     cap_add:
@@ -193,18 +216,31 @@ GRAFANA_COMPOSE = '''  grafana:
     volumes:
       - {volume}:/var/lib/grafana
     environment:
-      - GF_PANELS_DISABLE_SANITIZE_HTML=true
-      - GF_INSTALL_PLUGINS=natel-influx-admin-panel
-      - GF_SECURITY_ADMIN_PASSWORD={password}
-      - GF_SERVER_ROOT_URL=http://{host}/grafana
+      GF_PANELS_DISABLE_SANITIZE_HTML: "true"
+      GF_INSTALL_PLUGINS: "natel-influx-admin-panel"
+      GF_SECURITY_ADMIN_PASSWORD: {password}
+      GF_SERVER_ROOT_URL: http://{host}/grafana
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_SECURITY_ADMIN_USER: "user"
+      GF_SECURITY_DISABLE_GRAVATAR: "true"
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_AUTH_SIGNOUT_REDIRECT_URL: "http://localhost/logout"
+      GF_AUTH_PROXY_ENABLED: "true"
+      GF_AUTH_PROXY_HEADER_NAME: X-WEBAUTH-USER
+      GF_AUTH_PROXY_HEADER_PROPERTY: username
+      GF_AUTH_PROXY_HEADERS: "Name:X-WEBAUTH-NAME Email:X-WEBAUTH-EMAIL"
+      GF_AUTH_PROXY_AUTO_SIGN_UP: "true"
     networks:
       - carrier
     container_name: carrier-grafana
     labels:
-      - 'traefik.backend=grafana'
-      - 'traefic.port=3000'
-      - 'traefik.frontend.rule=PathPrefixStrip: /grafana'
-      - 'traefik.frontend.passHostHeader=true'
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.grafana.rule=PathPrefix(`/grafana`)'
+      - 'traefik.http.services.grafana.loadbalancer.server.port=3000'
+      - 'traefik.http.middlewares.grafana-auth.forwardauth.address=http://carrier-auth:80/forward-auth/auth?target=header&scope=grafana'
+      - 'traefik.http.middlewares.grafana-auth.forwardauth.authResponseHeaders=X-WEBAUTH-USER, X-WEBAUTH-NAME, X-WEBAUTH-EMAIL'
+      - 'traefik.http.routers.grafana.middlewares=grafana-auth@docker'
       - 'carrier=grafana'
     user: root
   loki:
@@ -252,10 +288,52 @@ POSTGRES_COMPOSE = """
       - POSTGRES_INITDB_ARGS=--data-checksums
     labels:
       - 'traefik.enable=false'
-      - 'carrier=postgres' 
+      - 'carrier=postgres'
 """
 
-REDIS_COMPOSE = """  
+CARRIER_AUTH_COMPOSE = """
+  carrier-auth:
+    build: {path}
+    restart: unless-stopped
+    container_name: carrier-auth
+    networks:
+      - carrier
+    environment:
+      CONFIG_FILENAME: "/config/settings.yaml"
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.carrier-auth.rule=PathPrefix(`/forward-auth`)'
+      - 'traefik.http.services.carrier-auth.loadbalancer.server.port=80'
+"""
+
+KEYCLOAK_COMPOSE = """
+  keycloak:
+    build: {path}
+    restart: unless-stopped
+    container_name: carrier-keycloak
+    networks:
+      - carrier
+    depends_on:
+      - postgres
+    environment:
+      KEYCLOAK_USER: "carrier"
+      KEYCLOAK_PASSWORD: "carrier"
+      KEYCLOAK_IMPORT: /realm/data/keycloak_realm_data.json
+      DB_VENDOR: "postgres"
+      DB_ADDR: "postgres"
+      DB_DATABASE: "carrier_pg_db"
+      DB_USER: "carrier_pg_user"
+      DB_SCHEMA: "keycloak"
+      DB_PASSWORD: "carrier_pg_password"
+      PROXY_ADDRESS_FORWARDING: "true"
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.keycloak.rule=PathPrefix(`/auth`)'
+      - 'traefik.http.services.keycloak.loadbalancer.server.port=8080'
+      - 'carrier=keycloak'
+"""
+
+REDIS_COMPOSE = """
   redis:
     image: redis:5.0.3
     restart: unless-stopped
@@ -271,30 +349,6 @@ REDIS_COMPOSE = """
       - redis-server
       - --requirepass
       - {password}
-  keycloak:
-    image: jboss/keycloak:latest
-    restart: unless-stopped
-    container_name: carrier-keycloak
-    networks:
-      - carrier
-    depends_on:
-      - postgres
-    environment:
-      KEYCLOAK_USER: "carrier"
-      KEYCLOAK_PASSWORD: "carrier"
-      DB_VENDOR: "postgres"
-      DB_ADDR: "postgres"
-      DB_DATABASE: "carrier_pg_db"
-      DB_USER: "carrier_pg_user"
-      DB_SCHEMA: "keycloak"
-      DB_PASSWORD: "carrier_pg_password"
-      PROXY_ADDRESS_FORWARDING: "true"
-    labels:
-      - 'traefik.backend=keycloak'
-      - 'traefik.frontend.rule=PathPrefix: /auth'
-      - 'traefic.port=8099'
-      - 'traefik.frontend.passHostHeader=true'
-      - 'carrier=keycloak'
   galloper:
     image: getcarrier/galloper:latest
     restart: unless-stopped
@@ -326,11 +380,12 @@ REDIS_COMPOSE = """
     expose:
       - "5000"
     labels:
-      - 'traefik.backend=galloper'
-      - 'traefic.port=5000'
-      - 'traefik.frontend.rule=PathPrefix: /'
-      - 'traefik.frontend.passHostHeader=true'
-      - 'carrier=galloper' 
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.galloper.rule=PathPrefix(`/`)'
+      - 'traefik.http.services.galloper.loadbalancer.server.port=5000'
+      - 'traefik.http.middlewares.galloper-auth.forwardauth.address=http://carrier-auth:80/forward-auth/auth?target=json&scope=galloper'
+      - 'traefik.http.routers.galloper.middlewares=galloper-auth@docker'
+      - 'carrier=galloper'
   minio:
     image: minio/minio:RELEASE.2019-10-12T01-39-57Z
     restart: unless-stopped
@@ -463,3 +518,142 @@ GRAFANA_DASHBOARDS = [
     'https://raw.githubusercontent.com/carrier-io/carrier-io/master/grafana_dashboards/'
     'thresholds_dashboard.json'
 ]
+
+CARRIER_AUTH_SETTINGS = """
+global:
+  debug: false
+  disable_auth: false
+
+server:
+  global:
+    environment: production
+    engine.signals.on: true
+    server.socket_host: 0.0.0.0
+    server.socket_port: 80
+    server.thread_pool: 8
+    server.max_request_body_size: 0
+    server.socket_timeout: 60
+
+  "/":
+    tools.sessions.on: true
+    tools.sessions.name: auth_session_id
+    tools.sessions.domain: localhost
+    tools.sessions.httponly: true
+    tools.sessions.secure: false
+    tools.proxy.on: true
+    tools.proxy.local: Host
+    tools.secureheaders.on: true
+    tools.staticdir.on: true
+    tools.staticdir.dir: static
+
+
+endpoints:
+  root: "/forward-auth/"
+  saml: "/forward-auth/saml"
+  oidc: "/forward-auth/oidc"
+  info: "/forward-auth/info"
+  access_denied: "/access_denied"
+
+
+auth:
+  auth_redirect: "http://localhost/forward-auth/login"
+  login_handler: "/forward-auth/oidc/login"
+  logout_handler: "/forward-auth/oidc/logout"
+  # login_handler: "/forward-auth/saml/login"
+  # logout_handler: "/forward-auth/saml/logout"
+  login_default_redirect_url: http://localhost/
+  logout_default_redirect_url: http://localhost/
+  logout_allowed_redirect_urls:
+  - http://localhost/
+
+
+mappers:
+  header:
+    grafana:
+      X-WEBAUTH-USER: "'auth_attributes'.'preferred_username'"
+      X-WEBAUTH-NAME: "'auth_attributes'.'name'"
+      X-WEBAUTH-EMAIL: "'auth_attributes'.'email'"
+  json:
+    galloper:
+      login: "'auth_attributes'.'preferred_username'"
+      name: "'auth_attributes'.'name'"
+      email: "'auth_attributes'.'email'"
+
+
+saml:
+  strict: false
+  debug: false
+
+  sp:
+    entityId: carrier-saml
+    assertionConsumerService:
+      url: http://localhost/forward-auth/saml/acs
+      binding: urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
+    singleLogoutService:
+      url: http://localhost/forward-auth/saml/sls
+      binding: urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
+    NameIDFormat: urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+    x509cert: ${KEYCLOAK_SP_CERT}
+    privateKey: ${KEYCLOAK_PRIVATE_KEY}
+
+  idp:
+    entityId: http://localhost/auth/realms/test
+    singleSignOnService:
+      url: http://localhost/auth/realms/test/protocol/saml
+      binding: urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
+    singleLogoutService:
+      url: http://localhost/auth/realms/test/protocol/saml
+      binding: urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
+    x509cert: ${KEYCLOAK_IDP_CERT}
+
+  security:
+    authnRequestsSigned: true
+    logoutRequestSigned: true
+    signatureAlgorithm: http://www.w3.org/2001/04/xmldsig-more#rsa-sha256
+    digestAlgorithm: http://www.w3.org/2001/04/xmlenc#sha256
+
+
+oidc:
+  debug: true
+
+  provider:
+    configuration:
+      issuer: "http://localhost/auth/realms/test"
+      authorization_endpoint: "http://localhost/auth/realms/test/protocol/openid-connect/auth"
+      token_endpoint: "http://keycloak:8080/auth/realms/test/protocol/openid-connect/token"
+      token_introspection_endpoint: "http://localhost/auth/realms/test/protocol/openid-connect/token/introspect"
+      userinfo_endpoint: "http://keycloak:8080/auth/realms/test/protocol/openid-connect/userinfo"
+      end_session_endpoint: "http://localhost/auth/realms/test/protocol/openid-connect/logout"
+      jwks_uri: "http://keycloak:8080/auth/realms/test/protocol/openid-connect/certs"
+      check_session_iframe: "http://localhost/auth/realms/test/protocol/openid-connect/login-status-iframe.html"
+      grant_types_supported: ["authorization_code","implicit","refresh_token","password","client_credentials"]
+      response_types_supported: ["code","none","id_token","token","id_token token","code id_token","code token","code id_token token"]
+      subject_types_supported: ["public","pairwise"]
+      id_token_signing_alg_values_supported: ["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"]
+      id_token_encryption_alg_values_supported: ["RSA-OAEP","RSA1_5"]
+      id_token_encryption_enc_values_supported: ["A128GCM","A128CBC-HS256"]
+      userinfo_signing_alg_values_supported: ["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512","none"]
+      request_object_signing_alg_values_supported: ["PS384","ES384","RS384","ES256","RS256","ES512","PS256","PS512","RS512","none"]
+      response_modes_supported: ["query","fragment","form_post"]
+      registration_endpoint: "http://localhost/auth/realms/test/clients-registrations/openid-connect"
+      token_endpoint_auth_methods_supported: ["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"]
+      token_endpoint_auth_signing_alg_values_supported: ["PS384","ES384","RS384","ES256","RS256","ES512","PS256","PS512","RS512"]
+      claims_supported: ["aud","sub","iss","auth_time","name","given_name","family_name","preferred_username","email","acr"]
+      claim_types_supported: ["normal"]
+      claims_parameter_supported: False
+      scopes_supported: ["openid","offline_access","profile","email","address","phone","roles","web-origins","microprofile-jwt"]
+      request_parameter_supported: True
+      request_uri_parameter_supported: True
+      code_challenge_methods_supported: ["plain","S256"]
+      tls_client_certificate_bound_access_tokens: True
+      introspection_endpoint: "http://localhost/auth/realms/test/protocol/openid-connect/token/introspect"
+
+    registration:
+      client_id: carrier-oidc
+      client_secret: 565c7a98-0f30-4acf-8dcd-e8c0fe7df06e
+      redirect_uris:
+      - "http://localhost/forward-auth/oidc/callback"
+      post_logout_redirect_uris:
+      - "http://localhost"
+
+"""
