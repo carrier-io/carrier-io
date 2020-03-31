@@ -1,22 +1,23 @@
 version: '3'
 services:
   traefik:
-    image: traefik:1.7
+    image: traefik:cantal
     restart: unless-stopped
     volumes:
-      - /opt/carrier/traefik/traefik.toml:/etc/traefik/traefik.toml
+      - $CARRIER_PATH/traefik/traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock
-      - /opt/carrier/traefik/userfile:/etc/traefik/userfile
     ports:
       - 80:80
+    labels:
+      - 'carrier=traefik'
     container_name: carrier-traefic
   postgres:
     image: postgres:12.2
     restart: unless-stopped
     container_name: carrier-postgres
     volumes:
-      - /opt/carrier/postgre:/var/lib/postgresql/data
-      - ./ext/postgre_schemas.sh:/docker-entrypoint-initdb.d/postgre_schemas.sh
+      - $CARRIER_PATH/postgre:/var/lib/postgresql/data
+      - $CARRIER_PATH/ext/postgre_schemas.sh:/docker-entrypoint-initdb.d/postgre_schemas.sh
     environment:
       - POSTGRES_DB=$POSTGRES_DB
       - POSTGRES_USER=$POSTGRES_USER
@@ -26,9 +27,54 @@ services:
     labels:
       - 'traefik.enable=false'
       - 'carrier=postgres'
+  keycloak:
+    image: jboss/keycloak:9.0.0
+    restart: unless-stopped
+    container_name: carrier-keycloak
+    depends_on:
+      - postgres
+    volumes:
+      - $CARRIER_PATH/carrier-auth/carrier.json:$KEYCLOAK_IMPORT
+    environment:
+      - DB_ADDR=carrier-postgres
+      - DB_VENDOR=$DATABASE_VENDOR
+      - KEYCLOAK_USER=$KEYCLOAK_USER
+      - KEYCLOAK_PASSWORD=$KEYCLOAK_PASSWORD
+      - KEYCLOAK_IMPORT=$KEYCLOAK_IMPORT
+      - DB_DATABASE=$POSTGRES_DB
+      - DB_USER=$POSTGRES_USER
+      - DB_PASSWORD=$POSTGRES_PASSWORD
+      - DB_SCHEMA=$KEYCLOAK_DB_SCHEMA
+      - PROXY_ADDRESS_FORWARDING=$PROXY_ADDRESS_FORWARDING
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.keycloak.rule=PathPrefix(`/auth`)'
+      - 'traefik.http.services.keycloak.loadbalancer.server.port=8080'
+      - 'carrier=keycloak'
+  auth:
+    image: lifedjik/traefik-forward-auth-saml:0.1
+    restart: unless-stopped
+    container_name: carrier-auth
+    depends_on:
+      - keycloak
+    environment:
+      - CONFIG_FILENAME=$AUTH_CONFIG_FILENAME
+      - APP_HOST=$APP_HOST
+      - KEYCLOAK_KEY=$KEYCLOAK_KEY
+    volumes:
+      - $CARRIER_PATH/carrier-auth/settings.yaml:$AUTH_CONFIG_FILENAME
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.carrier-auth.rule=PathPrefix(`/forward-auth`)'
+      - 'traefik.http.services.carrier-auth.loadbalancer.server.port=80'
+      - 'carrier=auth'
   galloper:
     image: getcarrier/galloper:latest
     restart: unless-stopped
+    depends_on:
+      - redis
+      - minio
+      - postgres
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
@@ -48,11 +94,12 @@ services:
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
     labels:
-      - 'traefik.backend=galoper'
-      - 'traefic.port=5000'
-      - 'traefik.frontend.rule=PathPrefixStrip: /'
-      - 'traefik.frontend.passHostHeader=true'
-      - 'traefik.frontend.auth.basic.usersFile=/etc/traefik/userfile'
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.galloper.rule=PathPrefix(`/`)'
+      - 'traefik.http.services.galloper.loadbalancer.server.port=5000'
+      - 'traefik.http.middlewares.galloper-auth.forwardauth.address=http://carrier-auth/forward-auth/auth?target=json&scope=galloper'
+      - 'traefik.http.routers.galloper.middlewares=galloper-auth@docker'
+      - 'carrier=galloper'
     container_name: carrier-galloper
   influx:
     image: influxdb:1.7
@@ -63,7 +110,7 @@ services:
       - INFLUXDB_DATA_WAL_DIR=$INFLUXDB_DATA_WAL_DIR
       - INFLUXDB_HTTP_ENABLED=$INFLUXDB_HTTP_ENABLED
     volumes:
-      - /opt/carrier/influx:/var/lib/influxdb/data
+      - $CARRIER_PATH/influx:/var/lib/influxdb/data
     ports:
       - 2003:2003
       - 8086:8086
@@ -76,21 +123,31 @@ services:
     depends_on:
       - influx
     volumes:
-      - /opt/carrier/grafana:/var/lib/grafana
+      - $CARRIER_PATH/grafana:/var/lib/grafana
     environment:
       - GF_PANELS_DISABLE_SANITIZE_HTML=$GF_PANELS_DISABLE_SANITIZE_HTML
-      - GF_AUTH_ANONYMOUS_ENABLED=$GF_AUTH_ANONYMOUS_ENABLED
-      - GF_AUTH_BASIC_ENABLED=$GF_AUTH_BASIC_ENABLED
       - GF_AUTH_PROXY_ENABLED=$GF_AUTH_PROXY_ENABLED
       - GF_SECURITY_ADMIN_PASSWORD=$GF_SECURITY_ADMIN_PASSWORD
       - GF_INSTALL_PLUGINS=$GF_INSTALL_PLUGINS
       - GF_SERVER_ROOT_URL=$GF_SERVER_ROOT_URL
+      - GF_SERVER_SERVE_FROM_SUB_PATH=$GF_SERVER_SERVE_FROM_SUB_PATH
+      - GF_SECURITY_ADMIN_USER=$GF_SECURITY_ADMIN_USER
+      - GF_SECURITY_DISABLE_GRAVATAR=$GF_SECURITY_DISABLE_GRAVATAR
+      - GF_SECURITY_ALLOW_EMBEDDING=$GF_SECURITY_ALLOW_EMBEDDING
+      - GF_AUTH_DISABLE_LOGIN_FORM=$GF_AUTH_DISABLE_LOGIN_FORM
+      - GF_AUTH_SIGNOUT_REDIRECT_URL=$APP_HOST/forward-auth/oidc/logout
+      - GF_AUTH_PROXY_HEADER_NAME=$GF_AUTH_PROXY_HEADER_NAME
+      - GF_AUTH_PROXY_HEADER_PROPERTY=$GF_AUTH_PROXY_HEADER_PROPERTY
+      - GF_AUTH_PROXY_HEADERS=$GF_AUTH_PROXY_HEADERS
+      - GF_AUTH_PROXY_AUTO_SIGN_UP=$GF_AUTH_PROXY_AUTO_SIGN_UP
     labels:
-      - 'traefik.backend=grafana'
-      - 'traefic.port=3000'
-      - 'traefik.frontend.rule=PathPrefixStrip: /grafana'
-      - 'traefik.frontend.passHostHeader=true'
-      - 'traefik.frontend.auth.basic.usersFile=/etc/traefik/userfile'
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.grafana.rule=PathPrefix(`/grafana`)'
+      - 'traefik.http.services.grafana.loadbalancer.server.port=3000'
+      - 'traefik.http.middlewares.grafana-auth.forwardauth.address=http://carrier-auth/forward-auth/auth?target=header&scope=grafana'
+      - 'traefik.http.middlewares.grafana-auth.forwardauth.authResponseHeaders=X-WEBAUTH-USER, X-WEBAUTH-NAME, X-WEBAUTH-EMAIL'
+      - 'traefik.http.routers.grafana.middlewares=grafana-auth@docker'
+      - 'carrier=grafana'
     user: root
     container_name: carrier-grafana
   loki:
@@ -108,7 +165,7 @@ services:
       - MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY
       - MINIO_SECRET_KEY=$MINIO_SECRET_KEY
     volumes:
-      - /opt/carrier/minio:/data
+      - $CARRIER_PATH/minio:/data
     labels:
       - 'traefik.enable=false'
     container_name: carrier-minio

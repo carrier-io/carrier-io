@@ -22,7 +22,7 @@ import json
 import docker
 from requests import get, post
 
-from installer import constants
+from deprecated.installer import constants
 
 
 class ProvisionDocker(object):

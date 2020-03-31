@@ -14,9 +14,9 @@
 
 from json import dumps
 
-from installer.libs.docker_part import ProvisionDocker
+from deprecated.installer.libs import ProvisionDocker
 
-from installer.libs.utlis import str2bool
+from deprecated.installer.libs import str2bool
 from flask import Flask, render_template, request, Response
 from cachelib import SimpleCache
 

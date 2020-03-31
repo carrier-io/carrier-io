@@ -6,49 +6,43 @@
 
 ### Prerequisites
 
+Install docker and docker-compose on machine you want carrier to be installed
+
 Ports required for minimal installation to work:
 
 80 - basic port where Galloper will be serving
 
-8080 - Traefik stats port
-
-2003 - Grafite protocol (Usage is minimal, will be removed in next release)
-
 8086 - InfluxDB port
-
-5432 - PostgreSQL port
-
-6379 - Redis port for tasks management (Will be replaced in next release)
 
 3100 - Loki port for logs aggregartion
 
 4444 - WebDriver port for UI performance
 
-9999 - UI performance control API port
+9999 - UI performance control API port (this one will be changed to FaaS in next builds)
 
 Note: In order to use different port for Traefik statistic interface (:8080) you may want to specify ` -e TRAEFIK_STATS_PORT=<your_port> ` while starting installation container
 
 ### Installing Carrier instance
 
-1. Run the docker command
-   
-   `docker run -it --rm -p 9999:9999 -v <local folder for docker-compose>://opt/carrier -v //var/run/docker.sock://var/run/docker.sock getcarrier/carrier-io:latest`
+We deprecated an installer container. It will be back in future releases.
 
-2. Open `http://localhost:9999` in your browser
+Currently in order to install carrier you need to copy everything from `carrier-io/dev` directory to the place you are planning to have major components store it's data (some persistent storage)
 
-3. Fill IP and amount of worker slots you want be available on this server 
+Modify configurations stored in `.env` file. You'd need to modify APP_HOST and CARRIER_PATH to make it work. 
 
-   Mark all images you want to be pre-fetched on particular server (jMeter, Gatling, SAST and DAST) 
+`APP_HOST` is URL of your machine including protocol (e.g. http://server)  
 
-4. Fill Grafana Admin password on second screen
+`CARRIER_PATH` is the path on your machine where you saved content of `dev` folder
 
-5. Review configuration and proceed with installation
+run `docker-compose up -d` within `dev` folder
 
-6. Once installation is done you will see `Installation complete ...` message in log trace area
+after some time (required for all objects to boot 1-2 minutes) you can access your deployment through browser
 
-Jenkins will is available at `<public_dns>/jenkins` (only in case you choose an option to install it)
+default login is `user` with password `user`
 
-Grafana will is available at `<public_dns>/grafana` (only in case you choose an option to install it)  
+to configure auth you need to access http://YOUR_IP/auth/admin and use credentials `carrier\carrier`
+
+### CURRENTLY IT IS WORK IN PROGRESS. PLEASE use :sqlite_edition branch for couple of days :D
 
 
 ## Configuration of interceptor (scale unit)
