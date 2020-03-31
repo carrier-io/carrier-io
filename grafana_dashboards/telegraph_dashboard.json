@@ -76,6 +76,7 @@
             "minSpan": 8,
             "nullPointMode": "connected",
             "nullText": null,
+            "options": {},
             "postfix": "",
             "postfixFontSize": "50%",
             "prefix": "UPTIME",
@@ -195,6 +196,7 @@
             "minSpan": 8,
             "nullPointMode": "connected",
             "nullText": null,
+            "options": {},
             "postfix": "",
             "postfixFontSize": "50%",
             "prefix": "Disk space: ",
@@ -393,6 +395,7 @@
       },
       {
         "collapsed": false,
+        "datasource": null,
         "gridPos": {
           "h": 1,
           "w": 24,
@@ -414,6 +417,7 @@
         "editable": true,
         "error": false,
         "fill": 0,
+        "fillGradient": 0,
         "grid": {},
         "gridPos": {
           "h": 8,
@@ -537,6 +541,7 @@
         "editable": true,
         "error": false,
         "fill": 1,
+        "fillGradient": 0,
         "grid": {},
         "gridPos": {
           "h": 8,
@@ -669,6 +674,7 @@
         "editable": true,
         "error": false,
         "fill": 1,
+        "fillGradient": 0,
         "grid": {},
         "gridPos": {
           "h": 8,
@@ -867,8 +873,9 @@
               }
             ],
             "measurement": "disk_total",
+            "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT mean(total) AS \"total\", mean(used) as \"used\" FROM \"disk\" WHERE \"host\" =~ /$server$/ AND \"path\" = '/' AND $timeFilter GROUP BY time($interval), \"host\", \"path\"",
+            "query": "SELECT mean(total) AS \"total\", mean(used) as \"used\" FROM \"disk\" WHERE $timeFilter GROUP BY time($interval), \"host\", \"path\"",
             "rawQuery": true,
             "refId": "B",
             "resultFormat": "time_series",
@@ -937,6 +944,7 @@
         "editable": true,
         "error": false,
         "fill": 1,
+        "fillGradient": 0,
         "grid": {},
         "gridPos": {
           "h": 8,
@@ -1006,8 +1014,9 @@
               }
             ],
             "measurement": "io_reads",
+            "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT non_negative_derivative(mean(reads),1s) as \"read\" FROM \"diskio\" WHERE \"host\" =~ /$server$/ AND \"name\" =~ /(v|s)d(a|b|c|d)$/ AND $timeFilter GROUP BY time($interval), *",
+            "query": "SELECT non_negative_derivative(mean(reads),1s) as \"read\" FROM \"diskio\" WHERE  $timeFilter GROUP BY time($interval), *",
             "rawQuery": true,
             "refId": "B",
             "resultFormat": "time_series",
@@ -1055,8 +1064,9 @@
               }
             ],
             "measurement": "io_reads",
+            "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT non_negative_derivative(mean(writes),1s) as \"write\" FROM \"diskio\" WHERE \"host\" =~ /$server$/ AND \"name\" =~ /(v|s)d(a|b|c|d)$/ AND $timeFilter GROUP BY time($interval), *",
+            "query": "SELECT non_negative_derivative(mean(writes),1s) as \"write\" FROM \"diskio\" WHERE $timeFilter GROUP BY time($interval), *",
             "rawQuery": true,
             "refId": "C",
             "resultFormat": "time_series",
@@ -1194,8 +1204,9 @@
               }
             ],
             "measurement": "io_reads",
+            "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT non_negative_derivative(mean(read_bytes),1s) as \"read\" FROM \"diskio\" WHERE \"host\" =~ /$server$/ AND \"name\" =~ /(v|s)d(a|b|c|d)$/ AND $timeFilter GROUP BY time($interval), *",
+            "query": "SELECT non_negative_derivative(mean(read_bytes),1s) as \"read\" FROM \"diskio\" WHERE  $timeFilter GROUP BY time($interval), *",
             "rawQuery": true,
             "refId": "B",
             "resultFormat": "time_series",
@@ -1243,8 +1254,9 @@
               }
             ],
             "measurement": "io_reads",
+            "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT non_negative_derivative(mean(write_bytes),1s) as \"write\" FROM \"diskio\" WHERE \"host\" =~ /$server$/ AND \"name\" =~ /(v|s)d(a|b|c|d)$/ AND $timeFilter GROUP BY time($interval), *",
+            "query": "SELECT non_negative_derivative(mean(write_bytes),1s) as \"write\" FROM \"diskio\" WHERE $timeFilter GROUP BY time($interval), *",
             "rawQuery": true,
             "refId": "C",
             "resultFormat": "time_series",
@@ -1313,6 +1325,7 @@
         "editable": true,
         "error": false,
         "fill": 1,
+        "fillGradient": 0,
         "grid": {},
         "gridPos": {
           "h": 8,
@@ -1382,8 +1395,9 @@
               }
             ],
             "measurement": "io_reads",
+            "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT non_negative_derivative(mean(read_time),1s) as \"read\" FROM \"diskio\" WHERE \"host\" =~ /$server$/ AND \"name\" =~ /(v|s)d(a|b|c|d)$/ AND $timeFilter GROUP BY time($interval), *",
+            "query": "SELECT non_negative_derivative(mean(read_time),1s) as \"read\" FROM \"diskio\" WHERE  $timeFilter GROUP BY time($interval), *",
             "rawQuery": true,
             "refId": "B",
             "resultFormat": "time_series",
@@ -1431,8 +1445,9 @@
               }
             ],
             "measurement": "io_reads",
+            "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT non_negative_derivative(mean(write_time),1s) as \"write\" FROM \"diskio\" WHERE \"host\" =~ /$server$/ AND \"name\" =~ /(v|s)d(a|b|c|d)$/ AND $timeFilter GROUP BY time($interval), *",
+            "query": "SELECT non_negative_derivative(mean(write_time),1s) as \"write\" FROM \"diskio\" WHERE  $timeFilter GROUP BY time($interval), *",
             "rawQuery": true,
             "refId": "A",
             "resultFormat": "time_series",
@@ -1561,8 +1576,9 @@
               }
             ],
             "measurement": "swap_in",
+            "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT mean(free) as \"free\", mean(used) as \"used\", mean(total) as \"total\" FROM \"swap\" WHERE host =~ /$server$/ AND $timeFilter GROUP BY time($interval), host ORDER BY asc",
+            "query": "SELECT mean(free) as \"free\", mean(used) as \"used\", mean(total) as \"total\" FROM \"swap\" WHERE  $timeFilter GROUP BY time($interval), host ORDER BY asc",
             "rawQuery": true,
             "refId": "B",
             "resultFormat": "time_series",
@@ -1809,7 +1825,7 @@
         "steppedLine": false,
         "targets": [
           {
-            "alias": "DaemonThreadCount",
+            "alias": "$tag_host:DaemonThreadCount",
             "dsType": "influxdb",
             "groupBy": [
               {
@@ -1825,8 +1841,9 @@
                 "type": "fill"
               }
             ],
+            "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT \"DaemonThreadCount\" FROM java_threading WHERE $timeFilter",
+            "query": "SELECT \"DaemonThreadCount\" FROM java_threading WHERE $timeFilter group by host",
             "rawQuery": true,
             "refId": "A",
             "resultFormat": "time_series",
@@ -1847,7 +1864,7 @@
             "tags": []
           },
           {
-            "alias": "PeakThread",
+            "alias": "$tag_host:PeakThread",
             "dsType": "influxdb",
             "groupBy": [
               {
@@ -1863,8 +1880,9 @@
                 "type": "fill"
               }
             ],
+            "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT \"PeakThreadCount\"  FROM java_threading WHERE $timeFilter",
+            "query": "SELECT \"PeakThreadCount\"  FROM java_threading WHERE $timeFilter group by host",
             "rawQuery": true,
             "refId": "B",
             "resultFormat": "time_series",
@@ -1885,7 +1903,7 @@
             "tags": []
           },
           {
-            "alias": "TotalStartedThreads",
+            "alias": "$tag_host:TotalStartedThreads",
             "dsType": "influxdb",
             "groupBy": [
               {
@@ -1901,8 +1919,9 @@
                 "type": "fill"
               }
             ],
+            "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT \"TotalStartedThreadCount\"  FROM java_threading WHERE $timeFilter",
+            "query": "SELECT \"TotalStartedThreadCount\"  FROM java_threading WHERE $timeFilter group by host",
             "rawQuery": true,
             "refId": "C",
             "resultFormat": "time_series",
@@ -1923,7 +1942,7 @@
             "tags": []
           },
           {
-            "alias": "ThreadCount",
+            "alias": "$tag_host:ThreadCount",
             "dsType": "influxdb",
             "groupBy": [
               {
@@ -1939,8 +1958,9 @@
                 "type": "fill"
               }
             ],
+            "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT \"ThreadCount\"  FROM java_threading WHERE $timeFilter",
+            "query": "SELECT \"ThreadCount\"  FROM java_threading WHERE $timeFilter group by host",
             "rawQuery": true,
             "refId": "D",
             "resultFormat": "time_series",
@@ -2009,6 +2029,7 @@
         "dashes": false,
         "datasource": "telegraf",
         "fill": 1,
+        "fillGradient": 0,
         "gridPos": {
           "h": 7,
           "w": 12,
@@ -2044,7 +2065,7 @@
         "steppedLine": false,
         "targets": [
           {
-            "alias": "LoadedClassCount",
+            "alias": "$tag_host:LoadedClassCount",
             "dsType": "influxdb",
             "groupBy": [
               {
@@ -2060,8 +2081,9 @@
                 "type": "fill"
               }
             ],
+            "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT LoadedClassCount FROM java_class_loading WHERE $timeFilter",
+            "query": "SELECT LoadedClassCount FROM java_class_loading WHERE $timeFilter group by host",
             "rawQuery": true,
             "refId": "A",
             "resultFormat": "time_series",
@@ -2082,7 +2104,7 @@
             "tags": []
           },
           {
-            "alias": "TotalLoadedClassCount",
+            "alias": "$tag_host:TotalLoadedClassCount",
             "dsType": "influxdb",
             "groupBy": [
               {
@@ -2098,8 +2120,9 @@
                 "type": "fill"
               }
             ],
+            "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT TotalLoadedClassCount FROM java_class_loading WHERE $timeFilter",
+            "query": "SELECT TotalLoadedClassCount FROM java_class_loading WHERE $timeFilter group by host",
             "rawQuery": true,
             "refId": "B",
             "resultFormat": "time_series",
@@ -2168,6 +2191,7 @@
         "dashes": false,
         "datasource": "telegraf",
         "fill": 1,
+        "fillGradient": 0,
         "gridPos": {
           "h": 7,
           "w": 12,
@@ -2203,7 +2227,7 @@
         "steppedLine": false,
         "targets": [
           {
-            "alias": "HeapMemoryUsage",
+            "alias": "$tag_host:HeapMemoryUsage",
             "dsType": "influxdb",
             "groupBy": [
               {
@@ -2219,8 +2243,9 @@
                 "type": "fill"
               }
             ],
+            "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT HeapMemoryUsage.used FROM java_memory WHERE $timeFilter",
+            "query": "SELECT HeapMemoryUsage.used FROM java_memory WHERE $timeFilter group by host",
             "rawQuery": true,
             "refId": "A",
             "resultFormat": "time_series",
@@ -2241,7 +2266,7 @@
             "tags": []
           },
           {
-            "alias": "NonHeapMemoryUsage",
+            "alias": "$tag_host:NonHeapMemoryUsage",
             "dsType": "influxdb",
             "groupBy": [
               {
@@ -2257,8 +2282,9 @@
                 "type": "fill"
               }
             ],
+            "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT NonHeapMemoryUsage.used FROM java_memory WHERE $timeFilter",
+            "query": "SELECT NonHeapMemoryUsage.used FROM java_memory WHERE $timeFilter group by host",
             "rawQuery": true,
             "refId": "B",
             "resultFormat": "time_series",
@@ -2363,7 +2389,7 @@
         "steppedLine": false,
         "targets": [
           {
-            "alias": "PeakUsage",
+            "alias": "$tag_host:PeakUsage",
             "dsType": "influxdb",
             "groupBy": [
               {
@@ -2379,8 +2405,9 @@
                 "type": "fill"
               }
             ],
+            "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT PeakUsage.used FROM java_memory_pool where $timeFilter",
+            "query": "SELECT PeakUsage.used FROM java_memory_pool where $timeFilter group by host",
             "rawQuery": true,
             "refId": "B",
             "resultFormat": "time_series",
@@ -2401,7 +2428,7 @@
             "tags": []
           },
           {
-            "alias": "Usage",
+            "alias": "$tag_host:Usage",
             "dsType": "influxdb",
             "groupBy": [
               {
@@ -2417,8 +2444,9 @@
                 "type": "fill"
               }
             ],
+            "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT Usage.used FROM java_memory_pool where $timeFilter",
+            "query": "SELECT Usage.used FROM java_memory_pool where $timeFilter group by host",
             "rawQuery": true,
             "refId": "C",
             "resultFormat": "time_series",
