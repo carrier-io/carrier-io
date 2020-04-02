@@ -14,7 +14,7 @@ pipeline {
 			steps {
 				sh "mkdir reports || echo 'Ok'"
 				sh "git checkout -- examples/configs/zapdast.yaml"
-			    sh "docker run -d --rm --name dvna -p 9999:9090 -d appsecco/dvna:sqlite"
+			    sh "docker run -d --rm --name dvna -p 9090:9090 -d appsecco/dvna:sqlite"
 			}
 		}
 		stage('Smoke tests') {

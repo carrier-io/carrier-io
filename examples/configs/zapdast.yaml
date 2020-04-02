@@ -9,6 +9,10 @@ global:  # Common settings for all suites
       galloper: galloper-url
       user: galloper-login
       password: galloper-password
+    quality_gate:
+      thresholds:
+        Critical: 1
+        High: 5
   reporters: # Reporters config
     html: # HTML reporter
       file: /tmp/reports/report.html

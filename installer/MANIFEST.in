@@ -1,4 +1,0 @@
-graft installer/static
-graft installer/templates
-graft installer/env_files
-global-exclude *.pyc

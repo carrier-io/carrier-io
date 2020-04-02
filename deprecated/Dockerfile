@@ -5,9 +5,9 @@ RUN apk update && apk add --no-cache supervisor docker
 RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools
 
-ADD installer/setup.py /tmp/setup.py
-ADD installer/MANIFEST.in /tmp/MANIFEST.in
-ADD installer/requirements.txt /tmp/requirements.txt
+ADD installer /tmp/setup.py
+ADD installer /tmp/MANIFEST.in
+ADD installer /tmp/requirements.txt
 COPY installer /tmp/installer
 
 RUN cd /tmp && python setup.py install && rm -rf /tmp/*

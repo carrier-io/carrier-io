@@ -1,0 +1,39 @@
+global:
+  debug: false
+  disable_auth: false
+endpoints:
+  root: "/forward-auth"
+  saml: "/forward-auth/saml"
+  oidc: "/forward-auth/oidc"
+  info: "/forward-auth/info"
+  access_denied: "/access_denied"
+auth:
+  auth_redirect: "${APP_HOST}/forward-auth/login"
+  login_handler: "${APP_HOST}/forward-auth/oidc/login"
+  token_handler: "${APP_HOST}/forward-auth/oidc/token"
+  logout_handler: "${APP_HOST}/forward-auth/oidc/logout"
+  login_default_redirect_url: "${APP_HOST}/"
+  logout_default_redirect_url: "${APP_HOST}/"
+  logout_allowed_redirect_urls:
+  - ${APP_HOST}/
+mappers:
+  header:
+    grafana:
+      X-WEBAUTH-USER: "'auth_attributes'.'preferred_username'"
+      X-WEBAUTH-NAME: "'auth_attributes'.'name'"
+      X-WEBAUTH-EMAIL: "'auth_attributes'.'email'"
+  json:
+    galloper:
+      login: "'auth_attributes'.'preferred_username'"
+      name: "'auth_attributes'.'name'"
+      email: "'auth_attributes'.'email'"
+oidc:
+  debug: true
+  issuer: "${APP_HOST}/auth/realms/carrier"
+  registration:
+    client_id: carrier-oidc
+    client_secret: ${KEYCLOAK_KEY}
+    redirect_uris:
+    - "${APP_HOST}/forward-auth/oidc"
+    post_logout_redirect_uris:
+    - "${APP_HOST}"
