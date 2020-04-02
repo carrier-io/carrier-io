@@ -52,7 +52,7 @@ services:
       - 'traefik.http.services.keycloak.loadbalancer.server.port=8080'
       - 'carrier=keycloak'
   auth:
-    image: lifedjik/traefik-forward-auth-saml:0.1
+    image: getcarrier/carrier-auth:latest
     restart: unless-stopped
     container_name: carrier-auth
     depends_on:
