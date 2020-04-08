@@ -61,6 +61,9 @@ services:
       - CONFIG_FILENAME=$AUTH_CONFIG_FILENAME
       - APP_HOST=$APP_HOST
       - KEYCLOAK_KEY=$KEYCLOAK_KEY
+      - REDIS_HOST=carrier-redis
+      - REDIS_DB=$AUTH_REDIS_DB
+      - REDIS_PASSWORD=$REDIS_PASSWORD
     volumes:
       - $CARRIER_PATH/carrier-auth/settings.yaml:$AUTH_CONFIG_FILENAME
     labels:
