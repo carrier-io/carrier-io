@@ -35,6 +35,7 @@ services:
       - postgres
     volumes:
       - $CARRIER_PATH/carrier-auth/carrier.json:$KEYCLOAK_IMPORT
+      - $CARRIER_PATH/ext/disablessl.sh:/tmp/disablessl.sh
     environment:
       - DB_ADDR=carrier-postgres
       - DB_VENDOR=$DATABASE_VENDOR
