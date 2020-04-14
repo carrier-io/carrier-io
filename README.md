@@ -30,7 +30,7 @@ Note: In order to use different port for Traefik statistic interface (:8080) you
 
 1. Run the docker command
    
-   `docker run -it --rm -p 9999:9999 -v <local folder for docker-compose>://opt/carrier -v //var/run/docker.sock://var/run/docker.sock getcarrier/carrier-io:latest`
+   `docker run -it --rm -p 9999:9999 -v <local folder for docker-compose>://opt/carrier -v //var/run/docker.sock://var/run/docker.sock getcarrier/carrier-io:sqlite`
 
 2. Open `http://localhost:9999` in your browser
 
