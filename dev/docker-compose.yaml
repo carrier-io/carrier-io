@@ -189,6 +189,8 @@ services:
   observer_chrome:
     image: getcarrier/observer-chrome:latest
     restart: unless-stopped
+    volumes:
+      - /dev/shm:/dev/shm
     ports:
       - 4444:4444
       - 9999:9999
