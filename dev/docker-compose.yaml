@@ -27,6 +27,18 @@ services:
     labels:
       - 'traefik.enable=false'
       - 'carrier=postgres'
+  vault:
+    image: vault:latest
+    restart: unless-stopped
+    environment:
+      - 'VAULT_LOCAL_CONFIG={"disable_mlock":true,"listener":{"tcp":{"address":"0.0.0.0:8200","tls_disable": 1}},"storage":{"postgresql":{"connection_url":"postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@carrier-postgres:5432/${POSTGRES_DB}?sslmode=disable"}},"ui":false}'
+    command: vault server -config=/vault/config/local.json
+    labels:
+      - 'traefik.enable=false'
+      - 'carrier=vault'
+    container_name: carrier-vault
+    depends_on:
+      - postgres
   keycloak:
     image: jboss/keycloak:9.0.0
     restart: unless-stopped
@@ -79,6 +91,7 @@ services:
       - redis
       - minio
       - postgres
+      - vault
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
@@ -97,6 +110,7 @@ services:
       - POSTGRES_DB=$POSTGRES_DB
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - VAULT_URL=$VAULT_URL
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.galloper.rule=PathPrefix(`/`)'
