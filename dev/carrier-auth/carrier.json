@@ -4,7 +4,7 @@
   "displayName" : "Carrier",
   "displayNameHtml" : "Carrier",
   "notBefore" : 0,
-  "revokeRefreshToken" : true,
+  "revokeRefreshToken" : false,
   "refreshTokenMaxReuse" : 0,
   "accessTokenLifespan" : 300,
   "accessTokenLifespanForImplicitFlow" : 900,
