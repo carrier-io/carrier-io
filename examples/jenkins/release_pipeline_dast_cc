@@ -87,6 +87,25 @@ pipeline {
 					}
 				}
 			}
+
+			stage('UI performance') {
+			    steps {
+					script {
+                        def params = [
+								"-t",
+								"-e REDIS_HOST=$galloper",
+								"-e REDIS_PASSWORD=$redis_pwd"
+						]
+
+					    docker.image("getcarrier/control_tower:latest").inside(dockerParamsString){
+									echo "Starting job"
+									sh """run -c getcarrier/observer:latest \\
+									   -e '{ "cmd": "-f data.zip -sc /tmp/data/webmail.side -r html", "REMOTE_URL": "demo.getcarrier.io:4444", "LISTENER_URL": "demo.getcarrier.io:9999","GALLOPER_URL": "http://demo.getcarrier.io/api/v1", "GALLOPER_PROJECT_ID": "1"}' \\
+									   -r 1 -t observer -q 1 -n web_perf"""
+						}
+					}
+				}
+			}
 		}
 		stage('Promote Build') {
 			steps {
