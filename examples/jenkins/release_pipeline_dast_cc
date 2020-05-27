@@ -8,7 +8,7 @@ pipeline {
 		stage('Deploying Project') {
 			steps {
 				sh "mkdir reports || echo 'Ok'"
-			    docker run -d -p 9099:8080 -t --rm --name springboot-petclinic getcarrier/petclinic:latest
+			    sh "docker run -d -p 9099:8080 -t --rm --name springboot-petclinic getcarrier/petclinic:latest"
 			}
 		}
 		stage('Smoke tests') {
