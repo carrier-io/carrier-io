@@ -7,8 +7,8 @@ global:  # Common settings for all suites
       severity: Info # Minimal severity level to report, one of: Critical, High, Medium, Low, Info
     false_positive:
       galloper: galloper-url
-      user: galloper-login
-      password: galloper-password
+      token: galloper-token
+      project_id: 1
     quality_gate:
       thresholds:
         Critical: 1
@@ -20,8 +20,8 @@ global:  # Common settings for all suites
       file: /tmp/reports/report.xml
     galloper:
       url: galloper-url
-      login: galloper-login
-      password: galloper-password
+      token: galloper-token
+      project_id: 1
 suites: # Test suites
   dast_zap:
     settings: # General config

@@ -78,6 +78,7 @@ pipeline {
 				stage('UI performance') {
                     steps {
                         script {
+                            def dockerParamsString = "--entrypoint=''"
                             def params = [
                                     "-t",
                                     "-e REDIS_HOST=$redis_host",
