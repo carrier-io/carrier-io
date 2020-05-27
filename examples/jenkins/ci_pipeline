@@ -41,10 +41,10 @@ pipeline {
                     // Change something in the file
                     data.global.processing.false_positive.galloper = "http://$galloper"
                     data.global.processing.false_positive.project_id = 1
-                    data.global.processing.false_positive.token = "token"
+                    data.global.processing.false_positive.token = "$token"
                     data.global.reporters.galloper.url = "http://$galloper"
                     data.global.reporters.galloper.project_id = 1
-                    data.global.reporters.galloper.token = "token"
+                    data.global.reporters.galloper.token = "$token"
                     data.global.reporters.html.file = "$WORKSPACE/reports/sast_report.html"
                     data.global.reporters.junit.file = "$WORKSPACE/reports/sast_report.xml"
                     data.suites.sca.build_id = "$BUILD_ID"
