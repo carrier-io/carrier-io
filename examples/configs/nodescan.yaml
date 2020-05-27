@@ -7,8 +7,8 @@ global:  # Common settings for all suites
       severity: Info # Minimal severity level to report, one of: Critical, High, Medium, Low, Info
     false_positive:
       galloper: galloper-url
-      user: galloper-login
-      password: galloper-password
+      project_id: 1
+      token: galloper-token
     quality_gate:
       thresholds:
         Critical: 1
@@ -20,8 +20,8 @@ global:  # Common settings for all suites
       file: /tmp/reports/report.xml
     galloper:
       url: galloper-url
-      login: galloper-login
-      password: galloper-password
+      project_id: 1
+      token: galloper-token
 suites: # Test suites
   sca:  # Example test suite
     settings:  # Settings

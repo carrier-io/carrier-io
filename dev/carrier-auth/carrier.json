@@ -579,6 +579,19 @@
         "claim.name" : "clientHost",
         "jsonType.label" : "String"
       }
+    }, {
+        "id": "e6ca26a4-9711-4564-9d09-c60bf008ba07",
+        "name": "GetGroups",
+        "protocol": "openid-connect",
+        "protocolMapper": "oidc-group-membership-mapper",
+        "consentRequired": false,
+        "config": {
+            "full.path": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "groups",
+            "userinfo.token.claim": "true"
+        }
     } ],
     "defaultClientScopes" : [ "web-origins", "role_list", "profile", "roles", "email" ],
     "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
