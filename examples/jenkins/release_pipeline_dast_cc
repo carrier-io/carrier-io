@@ -3,6 +3,8 @@ pipeline {
 	environment {
 		galloper = credentials("galloper-url")
         token = credentials("galloper-token-1")
+        redis_pwd = credentials("redis_pwd")
+        redis_host = credentials("redis_host")
 	}
 	stages {
 		stage('Deploying Project') {
@@ -36,11 +38,11 @@ pipeline {
 							for (param in params) {
 								dockerParamsString += " ${param}"
 							}
-								docker.image("getcarrier/control_tower:latest").inside(dockerParamsString){
-									echo "Starting job"
-									sh """run --test_id=9e3c19b1-b18d-422f-a935-12625eac7249 -p $WORKSPACE/reports"""
-								}
-						    }
+                            docker.image("getcarrier/control_tower:latest").inside(dockerParamsString){
+                                echo "Starting job"
+                                sh """run --test_id=9e3c19b1-b18d-422f-a935-12625eac7249 -p $WORKSPACE/reports"""
+                            }
+						}
 					}
 				}
 				stage('DAST') {
@@ -74,20 +76,22 @@ pipeline {
 					}
 				}
 			}
-
 			stage('UI performance') {
 			    steps {
 					script {
                         def params = [
 								"-t",
-								"-e REDIS_HOST=$galloper",
-								"-e REDIS_PASSWORD=$redis_pwd"
+								"-e REDIS_HOST=$redis_host",
+								"-e REDIS_PASSWORD=$redis_pwd",
+								"-e token=$token"
 						]
-
+						for (param in params) {
+                            dockerParamsString += " ${param}"
+                        }
 					    docker.image("getcarrier/control_tower:latest").inside(dockerParamsString){
 									echo "Starting job"
 									sh """run -c getcarrier/observer:latest \\
-									   -e '{ "cmd": "-f data.zip -sc /tmp/data/webmail.side -r html", "REMOTE_URL": "demo.getcarrier.io:4444", "LISTENER_URL": "demo.getcarrier.io:9999","GALLOPER_URL": "http://demo.getcarrier.io/api/v1", "GALLOPER_PROJECT_ID": "1"}' \\
+									   -e '{ "cmd": "-f webmail.zip -sc /tmp/data/webmail.side -r html", "REMOTE_URL": "$redis_host:4444", "LISTENER_URL": "$redis_host:9999","GALLOPER_URL": "$galloper-url/api/v1", "GALLOPER_PROJECT_ID": "1"}' \\
 									   -r 1 -t observer -q 1 -n web_perf"""
 						}
 					}
