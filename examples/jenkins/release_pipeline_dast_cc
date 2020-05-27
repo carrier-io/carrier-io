@@ -89,10 +89,10 @@ pipeline {
                             dockerParamsString += " ${param}"
                         }
 					    docker.image("getcarrier/control_tower:latest").inside(dockerParamsString){
-									echo "Starting job"
-									sh """run -c getcarrier/observer:latest \\
-									   -e '{ "cmd": "-f webmail.zip -sc /tmp/data/webmail.side -r html", "REMOTE_URL": "$redis_host:4444", "LISTENER_URL": "$redis_host:9999","GALLOPER_URL": "$galloper-url/api/v1", "GALLOPER_PROJECT_ID": "1"}' \\
-									   -r 1 -t observer -q 1 -n web_perf"""
+                            echo "Starting job"
+                            sh """run -c getcarrier/observer:latest \\
+                               -e '{ "cmd": "-f webmail.zip -sc /tmp/data/webmail.side -r html", "REMOTE_URL": "$redis_host:4444", "LISTENER_URL": "$redis_host:9999","GALLOPER_URL": "$galloper/api/v1", "GALLOPER_PROJECT_ID": "1"}' \\
+                               -r 1 -t observer -q 1 -n web_perf"""
 						}
 					}
 				}
