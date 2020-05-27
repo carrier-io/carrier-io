@@ -1,20 +1,14 @@
 pipeline {
 	agent any
 	environment {
-		galloper_auth = credentials("galloper-auth")
-		redis_pwd = credentials("redis-password")
 		galloper = credentials("galloper-url")
-        webhook = credentials("postprocessing")
-        galloper_usr = credentials("galloper_login")
-        galloper_pwd = credentials("galloper_password")
-        application_url = credentials("app-url")
+        token = credentials("galloper-token-1")
 	}
 	stages {
 		stage('Deploying Project') {
 			steps {
 				sh "mkdir reports || echo 'Ok'"
-				sh "git checkout -- examples/configs/zapdast.yaml"
-			    sh "docker run -d --rm --name dvna -p 9090:9090 -d appsecco/dvna:sqlite"
+			    docker run -d -p 9099:8080 -t --rm --name springboot-petclinic getcarrier/petclinic:latest
 			}
 		}
 		stage('Smoke tests') {
@@ -35,23 +29,16 @@ pipeline {
 							def dockerParamsString = "--entrypoint=''"
 							def params = [
 								"-t",
-								"-e REDIS_HOST=$galloper",
-								"-e REDIS_PASSWORD=$redis_pwd",
-								"-e loki_host=http://$galloper",
-								"-e loki_port=3100",
-								"-e galloper_url=http://$galloper_auth@$galloper",
-								"-e bucket=tests",
-								"-e artifact=Archive.zip",
-								"-e GALLOPER_WEB_HOOK=http://$galloper_auth@$galloper$webhook"
+								"-e project_id=1",
+								"-e galloper_url=$galloper",
+								"-e token=$token"
 							]
 							for (param in params) {
 								dockerParamsString += " ${param}"
 							}
 								docker.image("getcarrier/control_tower:latest").inside(dockerParamsString){
 									echo "Starting job"
-									sh """run -c getcarrier/perfmeter:latest \\
-									   -e '{\"cmd\": \"-n -t /mnt/jmeter/FloodIO.jmx -Jtest.type=debug -Jenv.type=debug -Jinflux.host=$galloper -JVUSERS=5 -JDURATION=30 -JRAMP_UP=10 -Jtest_name=Flood\"}' \\
-									   -t perfmeter -n DemoTest -q 2 -j True -qg True -p $WORKSPACE/reports"""
+									sh """run --test_id=9e3c19b1-b18d-422f-a935-12625eac7249 -p $WORKSPACE/reports"""
 								}
 						    }
 					}
@@ -63,15 +50,15 @@ pipeline {
                             def data = readYaml file: filename
 
                             // Change something in the file
-                            data.global.processing.false_positive.galloper = "http://$galloper"
-                            data.global.processing.false_positive.user = "$galloper_usr"
-                            data.global.processing.false_positive.password = "$galloper_pwd"
-                            data.global.reporters.galloper.url = "http://$galloper"
-                            data.global.reporters.galloper.login = "$galloper_usr"
-                            data.global.reporters.galloper.password = "$galloper_pwd"
+                            data.global.processing.false_positive.galloper = "$galloper"
+                            data.global.processing.false_positive.project_id = 1
+                            data.global.processing.false_positive.token = "$token"
+                            data.global.reporters.galloper.url = "$galloper"
+                            data.global.reporters.galloper.project_id = 1
+                            data.global.reporters.galloper.token = "$token"
                             data.global.reporters.html.file = "$WORKSPACE/reports/dast_report.html"
                             data.global.reporters.junit.file = "$WORKSPACE/reports/dast_report.xml"
-                            data.suites.dast_zap.scanners.dast.zap.target = "$application_url"
+                            data.suites.dast_zap.scanners.dast.zap.target = "http://172.31.2.142:9099"
                             data.suites.dast_zap.settings.build_id = "$BUILD_ID"
                             //writing changes to yaml
                             writeYaml file: "scan_config.yaml", data: data
@@ -96,7 +83,7 @@ pipeline {
 	}
 	post {
 		always {
-		    sh "docker stop dvna"
+		    sh "docker stop springboot-petclinic"
 			junit allowEmptyResults: true, healthScaleFactor: 5.0, testResults: 'reports/*.xml'
 			archiveArtifacts artifacts: 'reports/*.html', fingerprint: true
 			cleanWs()
