@@ -58,7 +58,7 @@ pipeline {
                         dockerParamsString += " ${param}"
                     }
                     docker.image("getcarrier/sast:latest").inside(dockerParamsString){
-                        sh "dusty run -c $WORKSPACE/scan_config.yaml -s sca -d"
+                        sh "dusty run -c $WORKSPACE/scan_config.yaml -s sca"
                     }
                 }
             }

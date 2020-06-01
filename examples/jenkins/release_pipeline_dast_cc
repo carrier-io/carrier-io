@@ -70,7 +70,7 @@ pipeline {
 								dockerParamsString += " ${param}"
 							}
                             docker.image("getcarrier/dast:latest").inside(dockerParamsString){
-                                sh" dusty run -c $WORKSPACE/scan_config.yaml -s dast_zap -d"
+                                sh" dusty run -c $WORKSPACE/scan_config.yaml -s dast_zap"
                             }
 					    }
 					}
