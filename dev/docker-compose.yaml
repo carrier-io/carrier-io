@@ -16,7 +16,7 @@ services:
     restart: unless-stopped
     container_name: carrier-postgres
     volumes:
-      # - $CARRIER_PATH/postgre:/var/lib/postgresql/data
+      - $CARRIER_PATH/postgre:/var/lib/postgresql/data
       - $CARRIER_PATH/ext/postgre_schemas.sh:/docker-entrypoint-initdb.d/postgre_schemas.sh
     environment:
       - POSTGRES_DB=$POSTGRES_DB
@@ -27,8 +27,6 @@ services:
     labels:
       - 'traefik.enable=false'
       - 'carrier=postgres'
-    ports:
-      - 5432:5432
   vault:
     image: vault:latest
     restart: unless-stopped
@@ -96,7 +94,6 @@ services:
       - vault
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /home/sergey/SynologyDrive/Github/galloper/galloper:/usr/local/lib/python3.7/site-packages/Galloper-1.0.0-py3.7.egg/galloper
     environment:
       - REDIS_HOST=carrier-redis
       - POSTGRES_HOST=carrier-postgres
