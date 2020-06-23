@@ -22,7 +22,7 @@ pipeline {
                         dockerParamsString += " ${param}"
                     }
                     docker.image("maven:3-openjdk-8").inside(dockerParamsString){
-                        sh "cd code/spring-petclinic &&  mvn clean install"
+                        sh "cd code/spring-petclinic  && unset MAVEN_CONFIG && env && mvn clean install"
                     }
                 }
 			}
