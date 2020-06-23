@@ -48,7 +48,7 @@ pipeline {
                     data.global.reporters.html.file = "$WORKSPACE/reports/sast_report.html"
                     data.global.reporters.junit.file = "$WORKSPACE/reports/sast_report.xml"
                     data.suites.sca.build_id = "$BUILD_ID"
-                    data.suites.sca.scanners.sast.nodejs.code="$WORKSPACE/code/spring-petclinic"
+                    data.suites.sca.scanners.sast.java.code="$WORKSPACE/code/spring-petclinic"
                     data.suites.sca.scanners.sast.gitleaks.code="$WORKSPACE/code/spring-petclinic"
                     //writing changes to yaml
                     writeYaml file: "scan_config.yaml", data: data
