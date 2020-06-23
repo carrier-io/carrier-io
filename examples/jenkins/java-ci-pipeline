@@ -1,0 +1,79 @@
+pipeline {
+	agent any
+	environment {
+		galloper = credentials("galloper-url")
+        token = credentials("galloper-token-1")
+	}
+	stages {
+		stage('Pull Code') {
+			steps {
+				sh "mkdir reports || echo 'Ok'"
+				sh "git checkout -- examples/configs/javascan.yaml"
+                sh "mkdir code && cd code && git clone https://github.com/spring-projects/spring-petclinic.git  "
+
+			}
+		}
+		stage('Build Code') {
+			steps {
+			    script{
+                    def dockerParamsString = "--entrypoint=''"
+                    def params = ["-t"]
+                    for (param in params) {
+                        dockerParamsString += " ${param}"
+                    }
+                    docker.image("maven:3-openjdk-8").inside(dockerParamsString){
+                        sh "cd code/spring-petclinic &&  mvn clean build"
+                    }
+                }
+			}
+		}
+		stage('Code style check') {
+		    steps {
+				echo "Assume it is fine"
+			}
+		}
+		stage('SAST') {
+            steps {
+                script {
+                    def filename = 'examples/configs/javascan.yaml'
+                    def data = readYaml file: filename
+
+                    // Change something in the file
+                    data.global.processing.false_positive.galloper = "$galloper"
+                    data.global.processing.false_positive.project_id = 1
+                    data.global.processing.false_positive.token = "$token"
+                    data.global.reporters.galloper.url = "$galloper"
+                    data.global.reporters.galloper.project_id = 1
+                    data.global.reporters.galloper.token = "$token"
+                    data.global.reporters.html.file = "$WORKSPACE/reports/sast_report.html"
+                    data.global.reporters.junit.file = "$WORKSPACE/reports/sast_report.xml"
+                    data.suites.sca.build_id = "$BUILD_ID"
+                    data.suites.sca.scanners.sast.nodejs.code="$WORKSPACE/code/spring-petclinic"
+                    data.suites.sca.scanners.sast.gitleaks.code="$WORKSPACE/code/spring-petclinic"
+                    //writing changes to yaml
+                    writeYaml file: "scan_config.yaml", data: data
+                    def dockerParamsString = "--entrypoint=''"
+                    def params = ["-t"]
+                    for (param in params) {
+                        dockerParamsString += " ${param}"
+                    }
+                    docker.image("getcarrier/sast:latest").inside(dockerParamsString){
+                        sh "dusty run -c $WORKSPACE/scan_config.yaml -s sca"
+                    }
+                }
+            }
+        }
+		stage('Promote Build') {
+			steps {
+                echo "assuming good here"
+			}
+		}
+	}
+	post {
+		always {
+			junit allowEmptyResults: true, healthScaleFactor: 5.0, testResults: 'reports/*.xml'
+			archiveArtifacts artifacts: 'reports/*.html', fingerprint: true
+			cleanWs()
+		}
+	}
+}
