@@ -1,0 +1,5 @@
+access_key = "your_access_key"
+secret_key = "your_secret_key"
+vm_type = "your_vm"
+ami = "your_ami"
+key_name = "your_keypairs"
