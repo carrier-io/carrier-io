@@ -65,11 +65,7 @@ def ssh():
         sshuser = request.form['username']
         sshrsa = request.files['file']
         sshrsa.save(os.path.join('/installer/ssh_install', "id_rsa"))
-        with open("carrier.log", "r") as f:
-            content = f.read()
-        cmd = os.system("bash /installer/ssh_install/install.sh " + sshipaddr + " " + sshuser)
-        for line in self._popen_yield(cmd):
-            yield line
+        os.system("bash /installer/ssh_install/install.sh " + sshipaddr + " " + sshuser)
     else:
         return render_template('ssh.html')
 
