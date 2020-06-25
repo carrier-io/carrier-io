@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/style.css">
+    <title>Carrier cloud install</title>
+  </head>
+
+  <body>
+    <div class="container">
+      <form method="post" enctype="multipart/form-data">
+
+        <div class="form-group">
+          <label for="exampleFormControlFile1">AWS key pairs</label>
+          <input type="file" class="form-control-file" name="file">
+          <small class="form-text text-muted"> You can create your key here: https://console.aws.amazon.com/iam/home?region=us-east-1#/security_credentials</small>
+        </div>
+
+        <div class="form-group">
+          <label for="exampleFormControlFile1">AWS Access Key Id</label>
+          <input type="text" class="form-control" name="accesskey" placeholder="Enter your account name" required>
+          <small class="form-text text-muted"> You can find your credentials here: https://console.aws.amazon.com/iam/home?region=us-east-1#/security_credentials</small>
+        </div>
+        
+        <div class="form-group">
+          <label for="exampleFormControlFile1">AWS Secret Key</label>
+          <input type="text" class="form-control" name="secretkey" placeholder="Enter your account name" required>
+          <small class="form-text text-muted"> You can find your credentials here: https://console.aws.amazon.com/iam/home?region=us-east-1#/security_credentials</small>
+        </div>
+
+        <div class="vmtype">
+        <label> Select Virtual Machine type: </label>
+        <select class="custom-select" name="vmtype">
+          <option value="t2.micro"> Test [1 CPU 1 RAM] </option>
+          <option value="t2.xlarge" selected> Low [4 CPU 16 RAM] (Recommended) </option>
+          <option value="t2.2xlarge"> Medium [8 CPU 32 RAM] </option>
+        </select>
+        </div>
+
+        <p></p>
+        <div class="ostype">
+        <label> Select Operating System: </label>
+        <select class="custom-select" name="ostype">
+          <option value="ami-085925f297f89fce1" selected> Ubuntu 18.04 </option>
+          <option value="centos-cloud/centos-7"> Centos 7 </option>
+        </select>
+        </div>
+
+        <p></p>
+        <button type="submit" class="btn btn-primary" value="Upload">Install</button>
+
+      </form>
+    </div>
+
+    <script src="static/js/jquery.slim.min.js"></script>
+    <script src="static/js/popper.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+  </body>
+</html>
