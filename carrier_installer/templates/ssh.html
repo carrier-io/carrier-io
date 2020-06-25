@@ -2,42 +2,34 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="static/css/bootstrap.min.css">
-    <link rel="stylesheet" href="static/css/style.css">
-    <title>Carrier ssh install</title>
+    <meta name="viewport" content="width=device-width, initial-scale=4, shrink-to-fit=no">
+    <link type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link type="text/css" href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <title>Carrier SSH installer</title>
   </head>
 
   <body>
-    <div class="container">
+    <div class="container midscreen w-50 float-left ml-5">
 
       <form method="post" enctype="multipart/form-data">
         <div class="form-group">
           <label for="ipaddr">IP Address</label>
-          <input type="text" class="form-control" name="ipaddr" placeholder="Enter ip address" required>
+          <input type="text" class="form-control" name="ipaddr" id="ipaddr" placeholder="Enter ip address" required>
         </div>
         <div class="form-group">
           <label for="username">Username</label>
-          <input type="text" class="form-control" name="username" placeholder="Enter username" required>
+          <input type="text" class="form-control" name="username" id="username" placeholder="Enter username" required>
         </div>
         <div class="form-group">
           <label for="sshrsa">Example file input</label>
-          <input type="file" class="form-control-file" name="file">
+          <input type="file" class="form-control-file" id="sshrsa" name="file">
         </div>
         <button type="submit" class="btn btn-primary" value="Upload">Install</button>
       </form>
     </div>
-    <div class="container">
-      <div class="col align-self-end">
-        <pre>
-          logs: here
-          
-          {{ logs }}
-        </pre>
-      </div>
-    </div>
-    <script src="static/js/jquery.slim.min.js"></script>
-    <script src="static/js/popper.min.js"></script>
-    <script src="static/js/bootstrap.min.js"></script>
+
+    <script src="{{ url_for('static', filename='js/jquery.slim.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
   </body>
 </html>

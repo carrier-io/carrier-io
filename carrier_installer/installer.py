@@ -7,8 +7,8 @@ from subprocess import Popen, PIPE, CalledProcessError
 
 installer = Flask(__name__)
 
-def _popen_yield(self, cmd):
-    popen = Popen(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True, cwd=constants.WORKDIR)
+def _popen_yield(cmd):
+    popen = Popen(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True)
     for stdout_line in iter(popen.stdout.readline, ""):
         yield f"{stdout_line}\n"
     popen.stdout.close()
@@ -49,6 +49,7 @@ def gcp():
     else:
         return render_template('gcp.html')
 
+
 @installer.route('/azure', methods=['GET', 'POST'])
 def azure():
     if request.method == 'POST':
@@ -57,6 +58,7 @@ def azure():
         return test
     else:
         return render_template('azure.html')
+
 
 @installer.route('/ssh', methods=['GET', 'POST'])
 def ssh():
@@ -67,11 +69,10 @@ def ssh():
         sshrsa.save(os.path.join('/installer/ssh_install', "id_rsa"))
         with open("carrier.log", "r") as f:
             content = f.read()
-        cmd = os.system("bash /installer/ssh_install/install.sh " + sshipaddr + " " + sshuser)
-        for line in self._popen_yield(cmd):
-            yield line
+        os.system("bash /installer/ssh_install/install.sh " + sshipaddr + " " + sshuser)
     else:
         return render_template('ssh.html')
+
 
 @installer.route('/local', methods=['GET', 'POST'])
 def self():
@@ -82,5 +83,6 @@ def self():
     else:
         return render_template('local.html')
 
+
 if __name__ == "__main__":
-    installer.run(host="0.0.0.0", port="1337")
+    installer.run(host="0.0.0.0", port="1337", debug=True)

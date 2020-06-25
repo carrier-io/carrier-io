@@ -2,24 +2,25 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="static/css/bootstrap.min.css">
-    <link rel="stylesheet" href="static/css/style.css">
-    <title>Carrier test install</title>
+    <meta name="viewport" content="width=device-width, initial-scale=4, shrink-to-fit=no">
+    <link type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link type="text/css" href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <title>Carrier Azure installer</title>
   </head>
 
   <body>
+    <div class="container midscreen w-50 float-left ml-5">
+      <form method="post">
+        <div class="form-group">
+          <label for="file">file</label>
+          <input type="file" class="form-control" name="file" id="file" placeholder="Enter your file">
+        </div>
+        <button type="submit" class="btn btn-primary">Install</button>
+      </form>
+    </div>
 
-    <form method="post">
-      <div class="form-group">
-        <label for="file">file</label>
-        <input type="file" class="form-control" name="file" placeholder="Enter your file">
-      </div>
-      <button type="submit" class="btn btn-primary">Install</button>
-    </form>
-
-    <script src="static/js/jquery.slim.min.js"></script>
-    <script src="static/js/popper.min.js"></script>
-    <script src="static/js/bootstrap.min.js"></script>
+    <script src="{{ url_for('static', filename='js/jquery.slim.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
   </body>
 </html>

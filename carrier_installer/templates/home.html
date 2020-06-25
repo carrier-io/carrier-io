@@ -3,52 +3,100 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=4, shrink-to-fit=no">
-    <link rel="stylesheet" href="static/css/bootstrap.min.css">
-    <link rel="stylesheet" href="static/css/style.css">
+    <link type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link type="text/css" href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
     <title>Carrier installer</title>
   </head>
   <body>
-    <div class="container">
-      <div class="row row-cols-1 row-cols-md-2">
-        <div class="col mb-4">
-          <div class="card">
+    <div class="container midscreen">
+      <div class="row">
+        <div class="col-3">
+          <div class="card" style="width: 16rem; height: 13rem;">
             <div class="card-body">
-              <h5 class="card-title">Clouds</h5>
-              <p class="card-text">This function can create Virtual Machine on your Cloud account with installed Carrier inside.</p>
-              <a href="/aws" class="btn btn-dark">AWS</a>
-              <a href="/gcp" class="btn btn-dark">GCP</a>
-              <a href="/azure" class="btn btn-dark">Azure</a>
+              <div class="row">
+                <div class="col-4">
+                  <img src="{{ url_for('static', filename='img/cloud.png') }}" class="img-top mt-2" alt="Cloud">
+                </div>
+                <div class="col-8">
+                  <h5 class="card-title">Cloud</h5>
+                  <p class="card-text">Provisions VM and configures Carrier on it</p>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="row float-right mt-1">
+                <a href="/aws" class="btn btn-sm btn-outline-secondary mr-2">AWS</a>
+                <a href="/gcp" class="btn btn-sm btn-outline-secondary mr-2">GCP</a>
+                <a href="/azure" class="btn btn-sm btn-outline-secondary mr-2">Azure</a>
+              </div>
             </div>
           </div>
         </div>
-        <div class="col mb-4">
-          <div class="card">
+        <div class="col-3">
+          <div class="card" style="width: 16rem; height: 13rem;">
             <div class="card-body">
-              <h5 class="card-title">SSH</h5>
-              <p class="card-text">This function can install Carrier across ssh connection.</p>
-              <a href="/ssh" class="btn btn-dark">Install</a>
+              <div class="row">
+                <div class="col-4">
+                  <img src="{{ url_for('static', filename='img/ssh.png') }}" class="img-top mt-2" alt="Cloud">
+                </div>
+                <div class="col-8">
+                  <h5 class="card-title">SSH</h5>
+                  <p class="card-text">Configure carrier over SSH on existing server</p>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="row float-right mt-1">
+                <a href="/ssh" class="btn btn-sm btn-outline-secondary mr-2">Install</a>
+              </div>
             </div>
           </div>
         </div>
-        <div class="col mb-4">
-          <div class="card">
+        <div class="col-3">
+          <div class="card" style="width: 16rem; height: 13rem;">
             <div class="card-body">
-              <h5 class="card-title">Local installation</h5>
-              <p class="card-text">This function can install Carrier locally.</p>
-              <a href="/local" class="btn btn-dark">Install</a>
+              <div class="row">
+                <div class="col-4">
+                  <img src="{{ url_for('static', filename='img/local.png') }}" class="img-top mt-2" alt="Cloud">
+                </div>
+                <div class="col-8">
+                  <h5 class="card-title">Local </h5>
+                  <p class="card-text">Installs Carrier on current machine</p>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="row float-right mt-1">
+                <a href="/local" class="btn btn-sm btn-outline-secondary mr-2">Install</a>
+              </div>
             </div>
           </div>
         </div>
-        <div class="col mb-4">
-          <div class="card">
+        <div class="col-3">
+          <div class="card" style="width: 16rem; height: 13rem;">
             <div class="card-body">
-              <h5 class="card-title">Kubernetes</h5>
-              <p class="card-text">minikube kubespray helm chart etc...</p>
-              <a href="/" class="btn btn-dark">install</a>
+              <div class="row">
+                <div class="col-3">
+                  <img src="{{ url_for('static', filename='img/kuber.png') }}" class="img-top pt-2" alt="Cloud">
+                </div>
+                <div class="col-1"></div>
+                <div class="col-7">
+                  <h5 class="card-title">Kubernetes</h5>
+                  <p class="card-text">Installs carrier on Kubernetess cluster</p>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="row float-right mt-1">
+                <a href="/" class="btn btn-sm btn-outline-secondary mr-2 disabled">Under development</a>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <script src="{{ url_for('static', filename='js/jquery.slim.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
   </body>
 </html>

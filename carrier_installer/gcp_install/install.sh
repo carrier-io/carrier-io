@@ -16,7 +16,7 @@ sleep 75
 
 carrierhost=`grep -w "nat_ip" "terraform.tfstate" | cut -d: -f2 | sed s/' '//g | sed s/'"'//g | sed s/','//g`
 accountname=`grep -w "account_name" "/installer/gcp_install/terraform.tfvars" | cut -d= -f2 | sed s/'"'//g | sed s/' '//g`
-sed -i "s/localhost/${carrierhost}/g" /installer/gcp_install/vars/default.yml
+sed -i "s/localhost/${carrierhost}/g" /installer/vars/default.yml
 
 cat << EOF > /installer/gcp_install/gcphost
 [myhost]
