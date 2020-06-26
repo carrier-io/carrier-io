@@ -30,8 +30,9 @@ def aws():
         vmtype = request.form['vmtype']
         awsacc = request.form['accesskey']
         awssec = request.form['secretkey']
+        awsregion = request.form['region']
         awsfile.save(os.path.join('/installer/aws_install', awsfile.filename))
-        test = os.system("bash /installer/aws_install/install.sh " + vmtype + " " + ostype + " " + awsacc + " " + awssec)
+        test = os.system("bash /installer/aws_install/install.sh " + vmtype + " " + ostype + " " + awsacc + " " + awssec + " " + awsregion)
         return "status here"
     else:
         return render_template('aws.html')
