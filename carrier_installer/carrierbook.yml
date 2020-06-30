@@ -101,7 +101,15 @@
       register: output
 
     - name: sleep
-      command: sleep 40
+      command: sleep 35
+
+    - name: Copy file with owner and permissions
+      copy:
+        src: /installer/https_required.sh
+        dest: /tmp/https_required.sh
+
+    - name: https required
+      shell: bash /tmp/https_required.sh
 
     - debug:
         var: output

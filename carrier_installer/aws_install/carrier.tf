@@ -14,6 +14,30 @@ resource "aws_security_group" "Carrier_security_group" {
     to_port     = 22
     protocol    = "tcp"
   }
+  ingress {
+    cidr_blocks = "${var.ingressCIDRblock}"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+  }
+  ingress {
+    cidr_blocks = "${var.ingressCIDRblock}"
+    from_port   = 3100
+    to_port     = 3100
+    protocol    = "tcp"
+  }
+  ingress {
+    cidr_blocks = "${var.ingressCIDRblock}"
+    from_port   = 6379
+    to_port     = 6379
+    protocol    = "tcp"
+  }
+  ingress {
+    cidr_blocks = "${var.ingressCIDRblock}"
+    from_port   = 8086
+    to_port     = 8086
+    protocol    = "tcp"
+  }
   egress {
     from_port   = 0
     to_port     = 0
