@@ -93,9 +93,7 @@ pipeline {
                             }
                             docker.image("getcarrier/control_tower:latest").inside(dockerParamsString){
                                 echo "Starting job"
-                                sh """run -c getcarrier/observer:latest \\
-                                   -e '{ "cmd": "-f webmail.zip -sc /tmp/data/webmail.side -r html", "REMOTE_URL": "$redis_host:4444", "LISTENER_URL": "$redis_host:9999"}' \\
-                                   -r 1 -t observer -q 1 -n web_perf -j true"""
+                                sh """run --test_id 2f65cf3a-3874-416f-b827-ec9e500df61a"""
                             }
                         }
                     }
