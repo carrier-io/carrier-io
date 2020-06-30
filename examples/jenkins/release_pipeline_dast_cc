@@ -40,7 +40,7 @@ pipeline {
 							}
                             docker.image("getcarrier/control_tower:latest").inside(dockerParamsString){
                                 echo "Starting job"
-                                sh """run --test_id=9e3c19b1-b18d-422f-a935-12625eac7249 -p $WORKSPACE/reports"""
+                                sh """run --test_id=c0277fb0-3bea-46ca-a242-f3f37e797a82 -p $WORKSPACE/reports"""
                             }
 						}
 					}
