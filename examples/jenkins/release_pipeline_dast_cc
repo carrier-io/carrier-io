@@ -81,6 +81,8 @@ pipeline {
                             def dockerParamsString = "--entrypoint=''"
                             def params = [
                                     "-t",
+                                    "-e REDIS_HOST=$redis_host",
+                                    "-e REDIS_PASSWORD=$redis_pwd",
                                     "-e token=$token",
                                     "-e galloper_url=$galloper",
                                     "-e bucket=reports",
@@ -91,7 +93,9 @@ pipeline {
                             }
                             docker.image("getcarrier/control_tower:latest").inside(dockerParamsString){
                                 echo "Starting job"
-                                sh """run -c getcarrier/observer:latest -t observer -tid 2f65cf3a-3874-416f-b827-ec9e500df61a"""
+                                sh """run -c getcarrier/observer:latest \\
+                                   -e '{ "cmd": "-f webmail.zip -sc /tmp/data/webmail.side -l 1 -a max -r html", "REMOTE_URL": "$redis_host:4444", "LISTENER_URL": "$redis_host:9999"}' \\
+                                   -r 1 -t observer -q 1 -n web_perf -j true"""
                             }
                         }
                     }
