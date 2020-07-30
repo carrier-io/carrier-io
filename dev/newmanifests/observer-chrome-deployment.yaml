@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.7.0 (HEAD)
+    traefik.enable: "false"
+  creationTimestamp: null
+  labels:
+    io.kompose.service: observer-chrome
+  name: observer-chrome
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: observer-chrome
+    spec:
+      containers:
+      - image: getcarrier/observer-chrome:latest
+        name: observer-chrome
+        ports:
+        - containerPort: 4444
+        - containerPort: 9999
+        resources: {}
+        volumeMounts:
+        - mountPath: /dev/shm
+          name: observer-chrome-claim0
+      restartPolicy: Always
+      volumes:
+      - name: observer-chrome-claim0
+        persistentVolumeClaim:
+          claimName: observer-chrome-claim0
+status: {}

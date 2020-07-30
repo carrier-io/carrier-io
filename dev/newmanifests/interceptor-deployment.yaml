@@ -1,0 +1,44 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.7.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: interceptor
+  name: interceptor
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: interceptor
+    spec:
+      containers:
+      - env:
+        - name: CPU_CORES
+          value: "2"
+        - name: CPU_QUOTA
+          value: "1"
+        - name: RAM_QUOTA
+          value: 6g
+        - name: REDIS_HOST
+          value: carrier-redis
+        - name: REDIS_PASSWORD
+          value: password
+        image: getcarrier/interceptor:latest
+        name: carrier-interceptor
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/run/docker.sock
+          name: interceptor-claim0
+      restartPolicy: Always
+      volumes:
+      - name: interceptor-claim0
+        persistentVolumeClaim:
+          claimName: interceptor-claim0
+status: {}

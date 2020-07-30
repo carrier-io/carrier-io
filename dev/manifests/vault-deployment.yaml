@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    carrier: vault
+    kompose.cmd: kompose convert
+    kompose.version: 1.7.0 (HEAD)
+    traefik.enable: "false"
+  creationTimestamp: null
+  labels:
+    io.kompose.service: vault
+  name: vault
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: vault
+    spec:
+      containers:
+      - args:
+        - vault
+        - server
+        - -config=/vault/config/local.json
+        env:
+        - name: VAULT_LOCAL_CONFIG
+          value: '{"disable_mlock":true,"listener":{"tcp":{"address":"0.0.0.0:8200","tls_disable":
+            1}},"storage":{"postgresql":{"connection_url":"postgres://:@carrier-postgres:5432/?sslmode=disable"}},"ui":false}'
+        image: vault:latest
+        name: carrier-vault
+        resources: {}
+      restartPolicy: Always
+status: {}

@@ -1,0 +1,58 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    carrier: galloper
+    kompose.cmd: kompose convert
+    kompose.version: 1.7.0 (HEAD)
+    traefik.enable: "true"
+    traefik.http.middlewares.galloper-auth.forwardauth.address: http://carrier-auth/forward-auth/auth?target=json&scope=galloper
+    traefik.http.routers.galloper.middlewares: galloper-auth@docker
+    traefik.http.routers.galloper.rule: PathPrefix(`/`)
+    traefik.http.services.galloper.loadbalancer.server.port: "5000"
+  creationTimestamp: null
+  labels:
+    io.kompose.service: galloper
+  name: galloper
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: galloper
+    spec:
+      containers:
+      - env:
+        - name: APP_HOST
+        - name: CPU_CORES
+        - name: DATABASE_SCHEMA
+        - name: DATABASE_VENDOR
+        - name: MINIO_ACCESS_KEY
+        - name: MINIO_HOST
+        - name: MINIO_REGION
+        - name: MINIO_SECRET_KEY
+        - name: POSTGRES_DB
+        - name: POSTGRES_HOST
+          value: carrier-postgres
+        - name: POSTGRES_PASSWORD
+        - name: POSTGRES_USER
+        - name: REDIS_DB
+        - name: REDIS_HOST
+          value: carrier-redis
+        - name: REDIS_PASSWORD
+        - name: VAULT_URL
+        image: getcarrier/galloper:latest
+        name: carrier-galloper
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/run/docker.sock
+          name: galloper-claim0
+      restartPolicy: Always
+      volumes:
+      - name: galloper-claim0
+        persistentVolumeClaim:
+          claimName: galloper-claim0
+status: {}

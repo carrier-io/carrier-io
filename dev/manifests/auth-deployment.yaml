@@ -1,0 +1,45 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    carrier: auth
+    kompose.cmd: kompose convert
+    kompose.version: 1.7.0 (HEAD)
+    traefik.enable: "true"
+    traefik.http.routers.carrier-auth.rule: PathPrefix(`/forward-auth`)
+    traefik.http.services.carrier-auth.loadbalancer.server.port: "80"
+  creationTimestamp: null
+  labels:
+    io.kompose.service: auth
+  name: auth
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: auth
+    spec:
+      containers:
+      - env:
+        - name: APP_HOST
+        - name: CONFIG_FILENAME
+        - name: KEYCLOAK_KEY
+        - name: REDIS_DB
+        - name: REDIS_HOST
+          value: carrier-redis
+        - name: REDIS_PASSWORD
+        image: getcarrier/carrier-auth:latest
+        name: carrier-auth
+        resources: {}
+        volumeMounts:
+        - mountPath: /opt/carrier/carrier-auth/settings.yaml
+          name: auth-claim0
+      restartPolicy: Always
+      volumes:
+      - name: auth-claim0
+        persistentVolumeClaim:
+          claimName: auth-claim0
+status: {}

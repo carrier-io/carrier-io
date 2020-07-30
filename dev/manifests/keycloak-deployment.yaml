@@ -1,0 +1,54 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    carrier: keycloak
+    kompose.cmd: kompose convert
+    kompose.version: 1.7.0 (HEAD)
+    traefik.enable: "true"
+    traefik.http.routers.keycloak.rule: PathPrefix(`/auth`)
+    traefik.http.services.keycloak.loadbalancer.server.port: "8080"
+  creationTimestamp: null
+  labels:
+    io.kompose.service: keycloak
+  name: keycloak
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: keycloak
+    spec:
+      containers:
+      - env:
+        - name: DB_ADDR
+          value: carrier-postgres
+        - name: DB_DATABASE
+        - name: DB_PASSWORD
+        - name: DB_SCHEMA
+        - name: DB_USER
+        - name: DB_VENDOR
+        - name: KEYCLOAK_IMPORT
+        - name: KEYCLOAK_PASSWORD
+        - name: KEYCLOAK_USER
+        - name: PROXY_ADDRESS_FORWARDING
+        image: jboss/keycloak:9.0.0
+        name: carrier-keycloak
+        resources: {}
+        volumeMounts:
+        - mountPath: /opt/carrier/carrier-auth/carrier.json
+          name: keycloak-claim0
+        - mountPath: /tmp/disablessl.sh
+          name: keycloak-claim1
+      restartPolicy: Always
+      volumes:
+      - name: keycloak-claim0
+        persistentVolumeClaim:
+          claimName: keycloak-claim0
+      - name: keycloak-claim1
+        persistentVolumeClaim:
+          claimName: keycloak-claim1
+status: {}

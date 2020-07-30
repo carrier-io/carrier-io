@@ -1,0 +1,11 @@
+[api]
+  dashboard = true
+
+[ping]
+  manualRouting = true
+
+[entryPoints]
+  [entryPoints.http]
+    address = ":8081"
+    [entryPoints.http.forwardedHeaders]
+      insecure = true

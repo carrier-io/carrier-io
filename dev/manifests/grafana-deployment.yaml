@@ -1,0 +1,58 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    carrier: grafana
+    kompose.cmd: kompose convert
+    kompose.version: 1.7.0 (HEAD)
+    traefik.enable: "true"
+    traefik.http.middlewares.grafana-auth.forwardauth.address: http://carrier-auth/forward-auth/auth?target=header&scope=grafana
+    traefik.http.middlewares.grafana-auth.forwardauth.authResponseHeaders: X-WEBAUTH-USER,
+      X-WEBAUTH-NAME, X-WEBAUTH-EMAIL
+    traefik.http.routers.grafana.middlewares: grafana-auth@docker
+    traefik.http.routers.grafana.rule: PathPrefix(`/grafana`)
+    traefik.http.services.grafana.loadbalancer.server.port: "3000"
+  creationTimestamp: null
+  labels:
+    io.kompose.service: grafana
+  name: grafana
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: grafana
+    spec:
+      containers:
+      - env:
+        - name: GF_AUTH_DISABLE_LOGIN_FORM
+        - name: GF_AUTH_PROXY_AUTO_SIGN_UP
+        - name: GF_AUTH_PROXY_ENABLED
+        - name: GF_AUTH_PROXY_HEADERS
+        - name: GF_AUTH_PROXY_HEADER_NAME
+        - name: GF_AUTH_PROXY_HEADER_PROPERTY
+        - name: GF_AUTH_SIGNOUT_REDIRECT_URL
+          value: /forward-auth/oidc/logout
+        - name: GF_INSTALL_PLUGINS
+        - name: GF_PANELS_DISABLE_SANITIZE_HTML
+        - name: GF_SECURITY_ADMIN_PASSWORD
+        - name: GF_SECURITY_ADMIN_USER
+        - name: GF_SECURITY_ALLOW_EMBEDDING
+        - name: GF_SECURITY_DISABLE_GRAVATAR
+        - name: GF_SERVER_ROOT_URL
+        - name: GF_SERVER_SERVE_FROM_SUB_PATH
+        image: grafana/grafana:6.4.4
+        name: carrier-grafana
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/grafana
+          name: grafana-claim0
+      restartPolicy: Always
+      volumes:
+      - name: grafana-claim0
+        persistentVolumeClaim:
+          claimName: grafana-claim0
+status: {}

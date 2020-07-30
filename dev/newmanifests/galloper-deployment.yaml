@@ -1,0 +1,72 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    carrier: galloper
+    kompose.cmd: kompose convert
+    kompose.version: 1.7.0 (HEAD)
+    traefik.enable: "true"
+    traefik.http.middlewares.galloper-auth.forwardauth.address: http://carrier-auth/forward-auth/auth?target=json&scope=galloper
+    traefik.http.routers.galloper.middlewares: galloper-auth@docker
+    traefik.http.routers.galloper.rule: PathPrefix(`/`)
+    traefik.http.services.galloper.loadbalancer.server.port: "5000"
+  creationTimestamp: null
+  labels:
+    io.kompose.service: galloper
+  name: galloper
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: galloper
+    spec:
+      containers:
+      - env:
+        - name: APP_HOST
+          value: http://localhost
+        - name: CPU_CORES
+          value: "2"
+        - name: DATABASE_SCHEMA
+          value: carrier
+        - name: DATABASE_VENDOR
+          value: postgres
+        - name: MINIO_ACCESS_KEY
+          value: admin
+        - name: MINIO_HOST
+          value: http://carrier-minio:9000
+        - name: MINIO_REGION
+          value: us-east-1
+        - name: MINIO_SECRET_KEY
+          value: password
+        - name: POSTGRES_DB
+          value: carrier
+        - name: POSTGRES_HOST
+          value: carrier-postgres
+        - name: POSTGRES_PASSWORD
+          value: password
+        - name: POSTGRES_USER
+          value: carrier
+        - name: REDIS_DB
+          value: "2"
+        - name: REDIS_HOST
+          value: carrier-redis
+        - name: REDIS_PASSWORD
+          value: password
+        - name: VAULT_URL
+          value: http://carrier-vault:8200
+        image: getcarrier/galloper:latest
+        name: carrier-galloper
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/run/docker.sock
+          name: galloper-claim0
+      restartPolicy: Always
+      volumes:
+      - name: galloper-claim0
+        persistentVolumeClaim:
+          claimName: galloper-claim0
+status: {}

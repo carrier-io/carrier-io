@@ -1,0 +1,12 @@
+apiVersion: v1
+data:
+  traefik.yml: |
+    entryPoints:
+      http:
+       address: ":8081"
+      metrics:
+       address: ":8082"
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: traefik-config

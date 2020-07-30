@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    carrier: grafana
+    kompose.cmd: kompose convert
+    kompose.version: 1.7.0 (HEAD)
+    traefik.enable: "true"
+    traefik.http.middlewares.grafana-auth.forwardauth.address: http://carrier-auth/forward-auth/auth?target=header&scope=grafana
+    traefik.http.middlewares.grafana-auth.forwardauth.authResponseHeaders: X-WEBAUTH-USER,
+      X-WEBAUTH-NAME, X-WEBAUTH-EMAIL
+    traefik.http.routers.grafana.middlewares: grafana-auth@docker
+    traefik.http.routers.grafana.rule: PathPrefix(`/grafana`)
+    traefik.http.services.grafana.loadbalancer.server.port: "3000"
+  creationTimestamp: null
+  labels:
+    io.kompose.service: grafana
+  name: grafana
+spec:
+  clusterIP: None
+  ports:
+  - name: headless
+    port: 55555
+    targetPort: 0
+  selector:
+    io.kompose.service: grafana
+status:
+  loadBalancer: {}

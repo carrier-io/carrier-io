@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.7.0 (HEAD)
+    traefik.enable: "false"
+  creationTimestamp: null
+  labels:
+    io.kompose.service: loki
+  name: loki
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: loki
+    spec:
+      containers:
+      - args:
+        - -config.file=/etc/loki/local-config.yaml
+        image: grafana/loki:latest
+        name: carrier-loki
+        ports:
+        - containerPort: 3100
+        resources: {}
+      restartPolicy: Always
+status: {}

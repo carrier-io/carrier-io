@@ -1,0 +1,41 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    carrier: traefik
+    kompose.cmd: kompose convert
+    kompose.version: 1.7.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: traefik
+  name: traefik
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: traefik
+    spec:
+      containers:
+      - image: traefik:cantal
+        name: carrier-traefic
+        ports:
+        - containerPort: 80
+        resources: {}
+        volumeMounts:
+        - mountPath: /etc/traefik/traefik.toml
+          name: traefik-claim0
+        - mountPath: /var/run/docker.sock
+          name: traefik-claim1
+      restartPolicy: Always
+      volumes:
+      - name: traefik-claim0
+        persistentVolumeClaim:
+          claimName: traefik-claim0
+      - name: traefik-claim1
+        persistentVolumeClaim:
+          claimName: traefik-claim1
+status: {}

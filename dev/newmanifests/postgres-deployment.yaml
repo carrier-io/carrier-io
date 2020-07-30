@@ -1,0 +1,51 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    carrier: postgres
+    kompose.cmd: kompose convert
+    kompose.version: 1.7.0 (HEAD)
+    traefik.enable: "false"
+  creationTimestamp: null
+  labels:
+    io.kompose.service: postgres
+  name: postgres
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: postgres
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_DB
+          value: carrier
+        - name: POSTGRES_INITDB_ARGS
+          value: --data-checksums
+        - name: POSTGRES_PASSWORD
+          value: password
+        - name: POSTGRES_SCHEMAS
+          value: carrier,keycloak
+        - name: POSTGRES_USER
+          value: carrier
+        image: postgres:12.2
+        name: carrier-postgres
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: postgres-claim0
+        - mountPath: /docker-entrypoint-initdb.d/postgre_schemas.sh
+          name: postgres-claim1
+      restartPolicy: Always
+      volumes:
+      - name: postgres-claim0
+        persistentVolumeClaim:
+          claimName: postgres-claim0
+      - name: postgres-claim1
+        configMap:
+          name: postgres-config
+status: {}

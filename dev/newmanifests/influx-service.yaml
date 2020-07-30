@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.7.0 (HEAD)
+    traefik.enable: "false"
+  creationTimestamp: null
+  labels:
+    io.kompose.service: influx
+  name: influx
+spec:
+  ports:
+  - name: "2003"
+    port: 2003
+    targetPort: 2003
+  - name: "8086"
+    port: 8086
+    targetPort: 8086
+  selector:
+    io.kompose.service: influx
+status:
+  loadBalancer: {}
