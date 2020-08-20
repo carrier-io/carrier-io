@@ -40,7 +40,7 @@ pipeline {
 							}
                             docker.image("getcarrier/control_tower:latest").inside(dockerParamsString){
                                 echo "Starting job"
-                                sh """run --test_id=c0277fb0-3bea-46ca-a242-f3f37e797a82 -p $WORKSPACE/reports"""
+                                sh """run --test_id=$backend_test_id -p $WORKSPACE/reports"""
                             }
 						}
 					}
@@ -60,7 +60,7 @@ pipeline {
                             data.global.reporters.galloper.token = "$token"
                             data.global.reporters.html.file = "$WORKSPACE/reports/dast_report.html"
                             data.global.reporters.junit.file = "$WORKSPACE/reports/dast_report.xml"
-                            data.suites.dast_zap.scanners.dast.zap.target = "http://172.31.2.142:9099"
+                            data.suites.dast_zap.scanners.dast.zap.target = "http://$security_entrypoint:9099"
                             data.suites.dast_zap.settings.build_id = "$BUILD_ID"
                             //writing changes to yaml
                             writeYaml file: "scan_config.yaml", data: data
@@ -75,29 +75,6 @@ pipeline {
 					    }
 					}
 				}
-				stage('UI performance') {
-                    steps {
-                        script {
-                            def dockerParamsString = "--entrypoint=''"
-                            def params = [
-                                    "-t",
-                                    "-e REDIS_HOST=$redis_host",
-                                    "-e REDIS_PASSWORD=$redis_pwd",
-                                    "-e token=$token",
-                                    "-e galloper_url=$galloper",
-                                    "-e bucket=reports",
-                                    "-e project_id=1"
-                            ]
-                            for (param in params) {
-                                dockerParamsString += " ${param}"
-                            }
-                            docker.image("getcarrier/control_tower:latest").inside(dockerParamsString){
-                                echo "Starting job"
-                                sh """run --test_id 2f65cf3a-3874-416f-b827-ec9e500df61a"""
-                            }
-                        }
-                    }
-                }
 			}
 		}
 		stage('Promote Build') {
