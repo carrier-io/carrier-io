@@ -4,7 +4,7 @@ global:  # Common settings for all suites
     project_name: PetClinic  # Project name
   processing: # Processing config
     min_severity_filter: # Filters findings below minimal severity level
-      severity: Medium # Minimal severity level to report, one of: Critical, High, Medium, Low, Info
+      severity: High # Minimal severity level to report, one of: Critical, High, Medium, Low, Info
     false_positive:
       galloper: galloper-url
       project_id: 1
