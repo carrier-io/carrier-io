@@ -9,7 +9,7 @@ pipeline {
 			steps {
 				sh "mkdir reports || echo 'Ok'"
 				sh "git checkout -- examples/configs/javascan.yaml"
-                sh "mkdir code && cd code && git clone https://github.com/spring-projects/spring-petclinic.git  "
+                sh "mkdir code && cd code && git clone https://github.com/carrier-io/spring-petclinic.git  "
 
 			}
 		}
