@@ -75,6 +75,29 @@ pipeline {
 					    }
 					}
 				}
+				stage('UI performance') {
+                    steps {
+                        script {
+                            def dockerParamsString = "--entrypoint=''"
+                            def params = [
+                                    "-t",
+                                    "-e REDIS_HOST=$redis_host",
+                                    "-e REDIS_PASSWORD=$redis_pwd",
+                                    "-e token=$token",
+                                    "-e galloper_url=$galloper",
+                                    "-e bucket=reports",
+                                    "-e project_id=1"
+                            ]
+                            for (param in params) {
+                                dockerParamsString += " ${param}"
+                            }
+                            docker.image("getcarrier/control_tower:latest").inside(dockerParamsString){
+                                echo "Starting job"
+                                sh """run --test_id $ui_test_id"""
+                            }
+                        }
+                    }
+                }
 			}
 		}
 		stage('Promote Build') {
