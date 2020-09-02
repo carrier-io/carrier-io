@@ -245,13 +245,15 @@ services:
   observer_hub:
     image: getcarrier/observer-hub:latest
     restart: unless-stopped
+    container_name: observer-hub
+    network_mode: "host"
     environment:
+      - TOKEN=$TOKEN
       - TZ=UTC
     volumes:
-      - /dev/shm:/dev/shm
+      - /tmp/hub:/tmp/hub
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - 'traefik.enable=false'
     ports:
       - 4444:4444
-    container_name: observer-hub
