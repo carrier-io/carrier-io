@@ -186,17 +186,6 @@ services:
       - $REDIS_PASSWORD
     labels:
       - 'traefik.enable=false'
-  observer_chrome:
-    image: getcarrier/observer-chrome:latest
-    restart: unless-stopped
-    volumes:
-      - /dev/shm:/dev/shm
-    ports:
-      - 4444:4444
-      - 9999:9999
-    container_name: observer-chrome
-    labels:
-      - 'traefik.enable=false'
   interceptor:
     image: getcarrier/interceptor:latest
     depends_on:
@@ -211,3 +200,15 @@ services:
       - REDIS_PASSWORD=$REDIS_PASSWORD
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+  observer_hub:
+     image: getcarrier/observer-hub:latest
+     container_name: observer-hub
+     network_mode: "host"
+     environment:
+     - TOKEN=$TOKEN
+     - TZ=UTC
+     ports:
+     - 4444:4444
+     volumes:
+     - /var/run/docker.sock:/var/run/docker.sock
+     - /tmp/hub:/tmp/hub
