@@ -1,16 +1,10 @@
 # Carrier | Continuous test execution platform
 
-
-
-## Standalone Deployment on server with Docker Installed
-
-### Prerequisites
-
-Install docker and docker-compose on machine you want carrier to be installed
+### Prerequisites 
 
 Ports required for minimal installation to work:
 
-80 - basic port where Galloper will be serving
+80/443 - basic port where Galloper will be serving
 
 8086 - InfluxDB port
 
@@ -18,32 +12,41 @@ Ports required for minimal installation to work:
 
 4444 - WebDriver port for UI performance
 
-9999 - UI performance control API port (this one will be changed to FaaS in next builds)
-
-Note: In order to use different port for Traefik statistic interface (:8080) you may want to specify ` -e TRAEFIK_STATS_PORT=<your_port> ` while starting installation container
+6379 - Redis for Celery
 
 ### Installing Carrier instance
+Installer is back, which is good news, we are adding features to it, currently it works with following assumptions:
+1. Installation is always happens to /opt/carrier
+2. Grafana should be configured manually if required (adding datasources and dashboards)
 
-We deprecated an installer container. It will be back in future releases.
+#### Local installation:
 
-Currently in order to install carrier you need to copy everything from `carrier-io/dev` directory to the place you are planning to have major components store it's data (some persistent storage)
+1. Run the docker command: 
+`docker run -it -v /opt:/opt -v /var/run/docker.sock:/var/run/docker.sock -p 1337:1337 getcarrier/installer`
 
-Modify configurations stored in `.env` file. You'd need to modify APP_HOST and CARRIER_PATH to make it work. 
+2. Open http://localhost:1337/ in your browser
 
-`APP_HOST` is URL of your machine including protocol (e.g. http://server)  
+3. Choose local
 
-`CARRIER_PATH` is the path on your machine where you saved content of `dev` folder
+#### Other installation:
 
-run `docker-compose up -d` within `dev` folder
+1. Run the docker command: 
+`docker run -it -p 1337:1337 getcarrier/installer`
 
-after some time (required for all objects to boot 1-2 minutes) you can access your deployment through browser
+2. Open http://localhost:1337/ in your browser
+3. Choose your preferred option
 
-default login is `user` with password `user`
+#### Clouds
 
-to configure auth you need to access http://YOUR_IP/auth/admin and use credentials `carrier\carrier`
+##### AWS:
+Provide AWS key pairs, AWS Access Key Id, AWS Secret Key, Region, Virtual Machine, Operating System.
 
-### CURRENTLY IT IS WORK IN PROGRESS. PLEASE use :sqlite_edition branch for couple of days :D
+##### GCP:
+Provide Google Cloud Platform credentials (json file), Google Cloud Platform Account Name, Region, Virtual Machine, Operating System.
 
+##### AZURE:
+Login to https://microsoft.com/devicelogin and type device CODE that provided you on installation page.
+Choose your Region, Virtual Machine type and Operating System.
 
 ## Configuration of interceptor (scale unit)
 
@@ -65,12 +68,3 @@ Server | CPU | RAM | HDD
 ------- | ---- | ---- | ----
 carrier | 4 | 16Gb | 200Gb
 interceptor | 1 | 3Gb | 20Gb
-
-
-## Uninstall Carrier
-
-1. Run the docker command
-   
-   `docker run -it --rm -p 9999:9999 -v //var/run/docker.sock://var/run/docker.sock getcarrier/carrier-io:latest`
-
-2. Open `http://localhost:9999/uninstall` in your browser

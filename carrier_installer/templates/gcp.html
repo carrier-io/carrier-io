@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=4, shrink-to-fit=no">
+    <link type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link type="text/css" href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <title>Carrier GCP installer</title>
+  </head>
+
+  <body>
+    <div class="container midscreen w-50 float-left ml-5">
+      <form method="post" enctype="multipart/form-data">
+
+        <div class="form-group">
+          <label for="file">Google Cloud Platform credentials</label>
+          <input type="file" class="form-control-file" name="file" id="file">
+        </div>
+
+        <div class="form-group">
+          <label for="gcpaccname">Google Cloud Platform Account Name</label>
+          <input type="text" class="form-control" name="gcpaccname" id="gcpaccname" placeholder="Enter your account name" required>
+        </div>
+
+        <div class="vmtype">
+        <label> Select Virtual Machine type: </label>
+        <select class="custom-select" name="vmtype">
+          <option value="n1-standard-1"> Test [1 CPU] </option>
+          <option value="n1-standard-4" selected> Low [4 CPU 15 RAM] (Recommended) </option>
+          <option value="n1-standard-8"> Medium [8 CPU 30 RAM] </option>
+        </select>
+        </div>
+
+    <p></p>
+        <div class="ostype">
+        <label> Select Operating System: </label>
+        <select class="custom-select" name="ostype">
+          <option value="ubuntu-os-cloud/ubuntu-1804-lts" selected> Ubuntu 18.04 </option>
+          <option value="ubuntu-os-cloud/ubuntu-1910"> Ubuntu 19.10 </option>
+          <option value="ubuntu-os-cloud/ubuntu-2004-lts"> Ubuntu 20.04 </option>
+          <option value="centos-cloud/centos-8"> Centos 8 </option>
+          <option value="centos-cloud/centos-7"> Centos 7 </option>
+          <option value="centos-cloud/centos-6"> Centos 6 </option>
+        </select>
+        </div>
+
+        <p></p>
+        <button type="submit" class="btn btn-primary" value="Upload">Install</button>
+
+      </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/jquery.slim.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  </body>
+</html>

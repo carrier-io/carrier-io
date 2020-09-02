@@ -8,8 +8,8 @@ pipeline {
 		stage('Pull Code') {
 			steps {
 				sh "mkdir reports || echo 'Ok'"
-				sh "git checkout -- examples/configs/nodescan.yaml"
-                sh "mkdir code && cd code && git clone https://github.com/appsecco/dvna.git"
+				sh "git checkout -- examples/configs/javascan.yaml"
+                sh "mkdir code && cd code && git clone https://github.com/carrier-io/spring-petclinic.git  "
 
 			}
 		}
@@ -21,8 +21,8 @@ pipeline {
                     for (param in params) {
                         dockerParamsString += " ${param}"
                     }
-                    docker.image("node:carbon").inside(dockerParamsString){
-                        sh "cd code/dvna &&  npm install $WORKSPACE/code/dvna"
+                    docker.image("maven:3-openjdk-8").inside(dockerParamsString){
+                        sh "cd code/spring-petclinic  && unset MAVEN_CONFIG && env && mvn clean install"
                     }
                 }
 			}
@@ -35,7 +35,7 @@ pipeline {
 		stage('SAST') {
             steps {
                 script {
-                    def filename = 'examples/configs/nodescan.yaml'
+                    def filename = 'examples/configs/javascan.yaml'
                     def data = readYaml file: filename
 
                     // Change something in the file
@@ -48,8 +48,8 @@ pipeline {
                     data.global.reporters.html.file = "$WORKSPACE/reports/sast_report.html"
                     data.global.reporters.junit.file = "$WORKSPACE/reports/sast_report.xml"
                     data.suites.sca.build_id = "$BUILD_ID"
-                    data.suites.sca.scanners.sast.nodejs.code="$WORKSPACE/code/dvna"
-                    data.suites.sca.scanners.sast.gitleaks.code="$WORKSPACE/code/dvna"
+                    data.suites.sca.scanners.sast.java.code="$WORKSPACE/code/spring-petclinic"
+                    data.suites.sca.scanners.sast.gitleaks.code="$WORKSPACE/code/spring-petclinic"
                     //writing changes to yaml
                     writeYaml file: "scan_config.yaml", data: data
                     def dockerParamsString = "--entrypoint=''"

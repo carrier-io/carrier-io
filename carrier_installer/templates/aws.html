@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=4, shrink-to-fit=no">
+    <link type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link type="text/css" href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <title>Carrier AWS installer</title>
+  </head>
+
+  <body>
+    <div class="container midscreen w-50 float-left ml-5">
+      <form method="post" enctype="multipart/form-data">
+
+        <small class="form-text text-muted"> You can create your key here: https://console.aws.amazon.com/iam/home?region=us-east-1#/security_credentials</small>
+        <div class="form-group">
+          <label for="keypair">AWS key pairs</label>
+          <input type="file" class="form-control-file" name="file" id="keypair">
+        </div>
+
+        <div class="form-group">
+          <label for="keyid">AWS Access Key Id</label>
+          <input type="text" class="form-control" name="accesskey" id="keyid" placeholder="Enter your account name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="secret">AWS Secret Key</label>
+          <input type="text" class="form-control" name="secretkey" id="secret" placeholder="Enter your account name" required>
+        </div>
+
+      <div class="vmtype">
+        <label> Select Region: </label>
+        <select class="custom-select" name="region">
+          <option value="us-east-1" selected> US East (N. Virginia)[default] </option>
+          <option value="us-east-2"> US East (Ohio) </option>
+          <option value="us-west-1"> US West (N. California) </option>
+          <option value="us-west-2"> US West (Oregon) </option>
+          <option value="ap-south-1"> Asia Pacific (Mumbai) </option>
+          <option value="ap-northeast-2"> Asia Pacific (Seoul) </option>
+          <option value="ap-southeast-1"> Asia Pacific (Singapore) </option>
+          <option value="ap-southeast-2"> Asia Pacific (Sydney) </option>
+          <option value="ap-northeast-1"> Asia Pacific (Tokyo) </option>
+          <option value="ca-central-1"> Canada (Central) </option>
+          <option value="eu-central-1"> Europe (Frankfurt) </option>
+          <option value="eu-west-1"> Europe (Ireland) </option>
+          <option value="eu-west-2"> Europe (London) </option>
+          <option value="eu-west-3"> Europe (Paris) </option>
+          <option value="eu-north-1"> Europe (Stockholm) </option>
+          <option value="sa-east-1"> South America (São Paulo) </option>
+        </select>
+        </div>
+        <p></p>
+        <div class="vmtype">
+        <label> Select Virtual Machine type: </label>
+        <select class="custom-select" name="vmtype">
+          <option value="t2.micro"> Test [1 CPU 1 RAM] </option>
+          <option value="t2.xlarge" selected> Low [4 CPU 16 RAM] (Recommended) </option>
+          <option value="t2.2xlarge"> Medium [8 CPU 32 RAM] </option>
+        </select>
+        </div>
+
+        <p></p>
+        <div class="ostype">
+        <label> Select Operating System: </label>
+        <select class="custom-select" name="ostype">
+          <option value="ubu1804" selected> Ubuntu Server 18.04 LTS </option>
+          <option disabled value="rhel8"> Red Hat Enterprise Linux 8 </option>
+        </select>
+        </div>
+
+        <p></p>
+        <button type="submit" class="btn btn-primary" value="Upload">Install</button>
+
+      </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/jquery.slim.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  </body>
+</html>

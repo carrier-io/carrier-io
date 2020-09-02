@@ -1,0 +1,6 @@
+{
+    "themes": [{
+        "name" : "carrier-login",
+        "types": [ "login" ]
+    }]
+}

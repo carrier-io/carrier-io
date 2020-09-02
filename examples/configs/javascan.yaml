@@ -1,10 +1,10 @@
 config_version: 2
 global:  # Common settings for all suites
   settings:  # Settings
-    project_name: NodeScan  # Project name
+    project_name: PetClinic  # Project name
   processing: # Processing config
     min_severity_filter: # Filters findings below minimal severity level
-      severity: Info # Minimal severity level to report, one of: Critical, High, Medium, Low, Info
+      severity: High # Minimal severity level to report, one of: Critical, High, Medium, Low, Info
     false_positive:
       galloper: galloper-url
       project_id: 1
@@ -25,7 +25,7 @@ global:  # Common settings for all suites
 suites: # Test suites
   sca:  # Example test suite
     settings:  # Settings
-      project_description: DVNA # Project description (or application name)
+      project_description: PetClinicCI # Project description (or application name)
       environment_name: master # Environment under testing (branch/module for SAST)
       testing_type: SAST # DAST or SAST
       scan_type: full # full, incremental or other scan description (e.g.: qualys, authorized, etc)
@@ -34,10 +34,9 @@ suites: # Test suites
         max_concurrent_scanners: 4  # Maximum number of concurrent SAST scanners
     scanners:
       sast:
-        nodejs:
+        java:
           code: /code
-          composition_analysis:
-            devdep: False
+          composition_analysis: True
         gitleaks:
           code: /code
           use_custom_rules: true
