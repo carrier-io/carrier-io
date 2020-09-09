@@ -5,10 +5,12 @@ services:
     restart: unless-stopped
     volumes:
       - $CARRIER_PATH/traefik/traefik.toml:/etc/traefik/traefik.toml
+      - $CARRIER_PATH/traefik/ssl.toml:/etc/traefik/ssl.toml
       - $CARRIER_PATH/traefik/config:/config
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 80:80
+      - 443:443
     labels:
       - 'carrier=traefik'
     container_name: carrier-traefic
@@ -62,7 +64,9 @@ services:
       - PROXY_ADDRESS_FORWARDING=$PROXY_ADDRESS_FORWARDING
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.keycloak.rule=PathPrefix(`/auth`)'
+      - 'traefik.http.routers.keycloak.rule=Host(`$APP_DOMAIN`) && PathPrefix(`/auth`)'
+      - 'traefik.http.routers.keycloak.tls=true'
+      - 'traefik.http.routers.keycloak.tls.certresolver=le'
       - 'traefik.http.services.keycloak.loadbalancer.server.port=8080'
       - 'carrier=keycloak'
   auth:
@@ -82,7 +86,9 @@ services:
       - $CARRIER_PATH/carrier-auth/settings.yaml:$AUTH_CONFIG_FILENAME
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.carrier-auth.rule=PathPrefix(`/forward-auth`)'
+      - 'traefik.http.routers.carrier-auth.rule=Host(`$APP_DOMAIN`) && PathPrefix(`/forward-auth`)'
+      - 'traefik.http.routers.carrier-auth.tls=true'
+      - 'traefik.http.routers.carrier-auth.tls.certresolver=le'
       - 'traefik.http.services.carrier-auth.loadbalancer.server.port=80'
       - 'carrier=auth'
   galloper:
@@ -114,7 +120,9 @@ services:
       - VAULT_URL=$VAULT_URL
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.galloper.rule=PathPrefix(`/`)'
+      - 'traefik.http.routers.galloper.rule=Host(`$APP_DOMAIN`) && PathPrefix(`/`)'
+      - 'traefik.http.routers.galloper.tls=true'
+      - 'traefik.http.routers.galloper.tls.certresolver=le'
       - 'traefik.http.middlewares.galloper-auth.forwardauth.address=http://carrier-auth/forward-auth/auth?target=json&scope=galloper'
       - 'traefik.http.routers.galloper.middlewares=galloper-auth@docker'
       - 'carrier=galloper'
@@ -160,7 +168,9 @@ services:
       - GF_AUTH_PROXY_AUTO_SIGN_UP=$GF_AUTH_PROXY_AUTO_SIGN_UP
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.grafana.rule=PathPrefix(`/grafana`)'
+      - 'traefik.http.routers.grafana.rule=Host(`$APP_DOMAIN`) && PathPrefix(`/grafana`)'
+      - 'traefik.http.routers.grafana.tls=true'
+      - 'traefik.http.routers.grafana.tls.certresolver=le'
       - 'traefik.http.services.grafana.loadbalancer.server.port=3000'
       - 'traefik.http.middlewares.grafana-auth.forwardauth.address=http://carrier-auth/forward-auth/auth?target=header&scope=grafana'
       - 'traefik.http.middlewares.grafana-auth.forwardauth.authResponseHeaders=X-WEBAUTH-USER, X-WEBAUTH-NAME, X-WEBAUTH-EMAIL'
@@ -221,7 +231,9 @@ services:
     user: root
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.jenkins.rule=PathPrefix(`/jenkins`)'
+      - 'traefik.http.routers.jenkins.rule=Host(`$APP_DOMAIN`) && PathPrefix(`/jenkins`)'
+      - 'traefik.http.routers.jenkins.tls=true'
+      - 'traefik.http.routers.jenkins.tls.certresolver=le'
       - 'traefik.http.services.jenkins.loadbalancer.server.port=8080'
       - 'carrier=jenkins'
     ports:
