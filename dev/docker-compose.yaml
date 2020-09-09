@@ -231,7 +231,7 @@ services:
     user: root
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.jenkins.rule=Host(`public.getcarrier.io`) && PathPrefix(`/jenkins`)'
+      - 'traefik.http.routers.jenkins.rule=Host(`$APP_DOMAIN`) && PathPrefix(`/jenkins`)'
       - 'traefik.http.routers.jenkins.tls=true'
       - 'traefik.http.routers.jenkins.tls.certresolver=le'
       - 'traefik.http.services.jenkins.loadbalancer.server.port=8080'
