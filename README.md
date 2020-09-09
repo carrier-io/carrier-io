@@ -1,70 +1,44 @@
-# Carrier | Continuous test execution platform
+# Carrier - Continuous Testing Toolkit 
 
-### Prerequisites 
+* CI friendly to run the tests in pipeline starting day one
+* Same Platform for Multiple Products to minimize maintenance
+* Scalable solution to accommodate various use-cases
 
-Ports required for minimal installation to work:
-
-80/443 - basic port where Galloper will be serving
-
-8086 - InfluxDB port
-
-3100 - Loki port for logs aggregartion
-
-4444 - WebDriver port for UI performance
-
-6379 - Redis for Celery
-
-### Installing Carrier instance
-Installer is back, which is good news, we are adding features to it, currently it works with following assumptions:
-1. Installation is always happens to /opt/carrier
-2. Grafana should be configured manually if required (adding datasources and dashboards)
-
-#### Local installation:
-
-1. Run the docker command: 
-`docker run -it -v /opt:/opt -v /var/run/docker.sock:/var/run/docker.sock -p 1337:1337 getcarrier/installer`
-
-2. Open http://localhost:1337/ in your browser
-
-3. Choose local
-
-#### Other installation:
-
-1. Run the docker command: 
-`docker run -it -p 1337:1337 getcarrier/installer`
-
-2. Open http://localhost:1337/ in your browser
-3. Choose your preferred option
-
-#### Clouds
-
-##### AWS:
-Provide AWS key pairs, AWS Access Key Id, AWS Secret Key, Region, Virtual Machine, Operating System.
-
-##### GCP:
-Provide Google Cloud Platform credentials (json file), Google Cloud Platform Account Name, Region, Virtual Machine, Operating System.
-
-##### AZURE:
-Login to https://microsoft.com/devicelogin and type device CODE that provided you on installation page.
-Choose your Region, Virtual Machine type and Operating System.
-
-## Configuration of interceptor (scale unit)
-
-As easy as export couple of vars and run a single container
-
-```
-export REDIS_PASSWORD=password
-export CPU_CORES=`nproc --all`
-export FULLHOST=<hostname of carrier>
-
-docker run -d --rm -v /var/run/docker.sock:/var/run/docker.sock \
-	   -e CPU_CORES=$CPU_CORES -e REDIS_PASSWORD=$REDIS_PASSWORD \
-     -e REDIS_HOST=$FULLHOST getcarrier/interceptor:latest
-```
-       
 ## Minimal System Requirements
 
 Server | CPU | RAM | HDD
 ------- | ---- | ---- | ----
 carrier | 4 | 16Gb | 200Gb
-interceptor | 1 | 3Gb | 20Gb
+interceptor | 2 | 8Gb | 20Gb
+
+
+## Docs
+
+[Installation](https://github.com/carrier-io/carrier-io/wiki/Quick-Start)
+
+
+[Performance Testing](https://github.com/carrier-io/carrier-io/wiki/Performance-Testing.-General-Concepts)
+
+* [Perfmeter (JMeter)](https://github.com/carrier-io/carrier-io/wiki/Performance-Testing.-PerfMeter-(jMeter\))
+* [Perfgun (Gatling)](https://github.com/carrier-io/carrier-io/wiki/Performance-Testing.-PerfGun-(Gatling\))
+* [Distributed Mode](https://github.com/carrier-io/carrier-io/wiki/Performance-Testing.-Distributed-Mode)
+* [Results Analysis](https://github.com/carrier-io/carrier-io/wiki/Performance-Testing.-Results-Analysis)
+* [Notification and Alerting](https://github.com/carrier-io/carrier-io/wiki/Performance-Testing.-Notification-and-Alerting)
+* [Cheat Sheet](https://github.com/carrier-io/carrier-io/wiki/Performance-Testing.-Cheat-Sheet)
+
+[Security Scanning](https://github.com/carrier-io/carrier-io/wiki/Security-Scanning.-General-Concepts)
+
+* [Static Application Security Testing](https://github.com/carrier-io/carrier-io/wiki/Security-Scanning.-SAST)
+* [Dynamic Application Security Testing](https://github.com/carrier-io/carrier-io/wiki/Security-Scanning.-DAST)
+* [Notification and Alerting](https://github.com/carrier-io/carrier-io/wiki/Security-Scanning.-Notification-and-Alerting)
+* [Cheat Sheet](https://github.com/carrier-io/carrier-io/wiki/Security-Scanning.-Cheat-Sheet)
+
+[Integrations](https://github.com/carrier-io/carrier-io/wiki/Integrations)
+
+* [Jira](https://github.com/carrier-io/carrier-io/wiki/Integrations.-Jira)
+* [Jenkins](https://github.com/carrier-io/carrier-io/wiki/Integrations.-Jenkins)
+* [Report Portal](https://github.com/carrier-io/carrier-io/wiki/Integrations.-Report-Portal)
+
+### FAQ
+* [AWS ALB and ELB configuration](https://github.com/carrier-io/carrier-io/wiki/Cloud.-AWS-ALB-and_ELB)
+* [Install Carrier with SSL](https://github.com/carrier-io/carrier-io/blob/master/installation_scripts/ssl/InstallationWithSSL.md)

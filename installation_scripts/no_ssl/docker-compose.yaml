@@ -1,0 +1,247 @@
+version: '3'
+services:
+  traefik:
+    image: traefik:cantal
+    restart: unless-stopped
+    volumes:
+      - $CARRIER_PATH/traefik/traefik.toml:/etc/traefik/traefik.toml
+      - $CARRIER_PATH/traefik/config:/config
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 80:80
+    labels:
+      - 'carrier=traefik'
+    container_name: carrier-traefic
+  postgres:
+    image: postgres:12.2
+    restart: unless-stopped
+    container_name: carrier-postgres
+    volumes:
+      - $CARRIER_PATH/postgre:/var/lib/postgresql/data
+      - $CARRIER_PATH/ext/postgre_schemas.sh:/docker-entrypoint-initdb.d/postgre_schemas.sh
+    environment:
+      - POSTGRES_DB=$POSTGRES_DB
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_SCHEMAS=$DB_POSTGRES_SCHEMAS
+      - POSTGRES_INITDB_ARGS=$POSTGRES_INITDB_ARGS
+    labels:
+      - 'traefik.enable=false'
+      - 'carrier=postgres'
+  vault:
+    image: vault:latest
+    restart: unless-stopped
+    environment:
+      - 'VAULT_LOCAL_CONFIG={"disable_mlock":true,"listener":{"tcp":{"address":"0.0.0.0:8200","tls_disable": 1}},"storage":{"postgresql":{"connection_url":"postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@carrier-postgres:5432/${POSTGRES_DB}?sslmode=disable"}},"ui":false}'
+    command: vault server -config=/vault/config/local.json
+    labels:
+      - 'traefik.enable=false'
+      - 'carrier=vault'
+    container_name: carrier-vault
+    depends_on:
+      - postgres
+  keycloak:
+    image: jboss/keycloak:9.0.0
+    restart: unless-stopped
+    container_name: carrier-keycloak
+    depends_on:
+      - postgres
+    volumes:
+      - $CARRIER_PATH/carrier-auth/carrier.json:$KEYCLOAK_IMPORT
+      - $CARRIER_PATH/ext/disablessl.sh:/tmp/disablessl.sh
+    environment:
+      - DB_ADDR=carrier-postgres
+      - DB_VENDOR=$DATABASE_VENDOR
+      - KEYCLOAK_USER=$KEYCLOAK_USER
+      - KEYCLOAK_PASSWORD=$KEYCLOAK_PASSWORD
+      - KEYCLOAK_IMPORT=$KEYCLOAK_IMPORT
+      - DB_DATABASE=$POSTGRES_DB
+      - DB_USER=$POSTGRES_USER
+      - DB_PASSWORD=$POSTGRES_PASSWORD
+      - DB_SCHEMA=$KEYCLOAK_DB_SCHEMA
+      - PROXY_ADDRESS_FORWARDING=$PROXY_ADDRESS_FORWARDING
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.keycloak.rule=PathPrefix(`/auth`)'
+      - 'traefik.http.services.keycloak.loadbalancer.server.port=8080'
+      - 'carrier=keycloak'
+  auth:
+    image: getcarrier/carrier-auth:latest
+    restart: unless-stopped
+    container_name: carrier-auth
+    depends_on:
+      - keycloak
+    environment:
+      - CONFIG_FILENAME=$AUTH_CONFIG_FILENAME
+      - APP_HOST=$APP_HOST
+      - KEYCLOAK_KEY=$KEYCLOAK_KEY
+      - REDIS_HOST=carrier-redis
+      - REDIS_DB=$AUTH_REDIS_DB
+      - REDIS_PASSWORD=$REDIS_PASSWORD
+    volumes:
+      - $CARRIER_PATH/carrier-auth/settings.yaml:$AUTH_CONFIG_FILENAME
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.carrier-auth.rule=PathPrefix(`/forward-auth`)'
+      - 'traefik.http.services.carrier-auth.loadbalancer.server.port=80'
+      - 'carrier=auth'
+  galloper:
+    image: getcarrier/galloper:latest
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - minio
+      - postgres
+      - vault
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - REDIS_HOST=carrier-redis
+      - POSTGRES_HOST=carrier-postgres
+      - REDIS_DB=$FAAS_REDIS_DB
+      - REDIS_PASSWORD=$REDIS_PASSWORD
+      - CPU_CORES=$FAAS_PARALLEL_TASKS
+      - APP_HOST=$APP_HOST
+      - MINIO_HOST=$MINIO_HOST
+      - MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY
+      - MINIO_SECRET_KEY=$MINIO_SECRET_KEY
+      - MINIO_REGION=$MINIO_REGION
+      - DATABASE_SCHEMA=$GL_POSTGRES_SCHEMA
+      - DATABASE_VENDOR=$DATABASE_VENDOR
+      - POSTGRES_DB=$POSTGRES_DB
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - VAULT_URL=$VAULT_URL
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.galloper.rule=PathPrefix(`/`)'
+      - 'traefik.http.middlewares.galloper-auth.forwardauth.address=http://carrier-auth/forward-auth/auth?target=json&scope=galloper'
+      - 'traefik.http.routers.galloper.middlewares=galloper-auth@docker'
+      - 'carrier=galloper'
+    container_name: carrier-galloper
+  influx:
+    image: influxdb:1.7
+    restart: unless-stopped
+    environment:
+      - INFLUXDB_META_DIR=$INFLUXDB_META_DIR
+      - INFLUXDB_DATA_DIR=$INFLUXDB_DATA_DIR
+      - INFLUXDB_DATA_WAL_DIR=$INFLUXDB_DATA_WAL_DIR
+      - INFLUXDB_HTTP_ENABLED=$INFLUXDB_HTTP_ENABLED
+    volumes:
+      - $CARRIER_PATH/influx:/var/lib/influxdb/data
+    ports:
+      - 2003:2003
+      - 8086:8086
+    labels:
+      - 'traefik.enable=false'
+    container_name: carrier-influx
+  grafana:
+    image: grafana/grafana:6.4.4
+    restart: unless-stopped
+    depends_on:
+      - influx
+    volumes:
+      - $CARRIER_PATH/grafana:/var/lib/grafana
+    environment:
+      - GF_PANELS_DISABLE_SANITIZE_HTML=$GF_PANELS_DISABLE_SANITIZE_HTML
+      - GF_AUTH_PROXY_ENABLED=$GF_AUTH_PROXY_ENABLED
+      - GF_SECURITY_ADMIN_PASSWORD=$GF_SECURITY_ADMIN_PASSWORD
+      - GF_INSTALL_PLUGINS=$GF_INSTALL_PLUGINS
+      - GF_SERVER_ROOT_URL=$GF_SERVER_ROOT_URL
+      - GF_SERVER_SERVE_FROM_SUB_PATH=$GF_SERVER_SERVE_FROM_SUB_PATH
+      - GF_SECURITY_ADMIN_USER=$GF_SECURITY_ADMIN_USER
+      - GF_SECURITY_DISABLE_GRAVATAR=$GF_SECURITY_DISABLE_GRAVATAR
+      - GF_SECURITY_ALLOW_EMBEDDING=$GF_SECURITY_ALLOW_EMBEDDING
+      - GF_AUTH_DISABLE_LOGIN_FORM=$GF_AUTH_DISABLE_LOGIN_FORM
+      - GF_AUTH_SIGNOUT_REDIRECT_URL=$APP_HOST/forward-auth/oidc/logout
+      - GF_AUTH_PROXY_HEADER_NAME=$GF_AUTH_PROXY_HEADER_NAME
+      - GF_AUTH_PROXY_HEADER_PROPERTY=$GF_AUTH_PROXY_HEADER_PROPERTY
+      - GF_AUTH_PROXY_HEADERS=$GF_AUTH_PROXY_HEADERS
+      - GF_AUTH_PROXY_AUTO_SIGN_UP=$GF_AUTH_PROXY_AUTO_SIGN_UP
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.grafana.rule=PathPrefix(`/grafana`)'
+      - 'traefik.http.services.grafana.loadbalancer.server.port=3000'
+      - 'traefik.http.middlewares.grafana-auth.forwardauth.address=http://carrier-auth/forward-auth/auth?target=header&scope=grafana'
+      - 'traefik.http.middlewares.grafana-auth.forwardauth.authResponseHeaders=X-WEBAUTH-USER, X-WEBAUTH-NAME, X-WEBAUTH-EMAIL'
+      - 'traefik.http.routers.grafana.middlewares=grafana-auth@docker'
+      - 'carrier=grafana'
+    user: root
+    container_name: carrier-grafana
+  loki:
+    image: grafana/loki:latest
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    labels:
+      - 'traefik.enable=false'
+    container_name: carrier-loki
+  minio:
+    image: minio/minio:RELEASE.2019-10-12T01-39-57Z
+    environment:
+      - MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY
+      - MINIO_SECRET_KEY=$MINIO_SECRET_KEY
+    volumes:
+      - $CARRIER_PATH/minio:/data
+    labels:
+      - 'traefik.enable=false'
+    container_name: carrier-minio
+    command: server /data
+  redis:
+    image: redis:5.0.7
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    container_name: carrier-redis
+    entrypoint:
+      - redis-server
+      - --requirepass
+      - $REDIS_PASSWORD
+    labels:
+      - 'traefik.enable=false'
+  interceptor:
+    image: getcarrier/interceptor:latest
+    depends_on:
+      - redis
+    restart: unless-stopped
+    container_name: carrier-interceptor
+    environment:
+      - RAM_QUOTA=$RAM_QUOTA
+      - CPU_QUOTA=$CPU_QUOTA
+      - CPU_CORES=$INTERPECTOR_TASKS
+      - REDIS_HOST=carrier-redis
+      - REDIS_PASSWORD=$REDIS_PASSWORD
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  jenkins:
+    image: jenkins/jenkins:lts
+    environment:
+      - JENKINS_OPTS="--prefix=/jenkins"
+    user: root
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.jenkins.rule=PathPrefix(`/jenkins`)'
+      - 'traefik.http.services.jenkins.loadbalancer.server.port=8080'
+      - 'carrier=jenkins'
+    ports:
+      - 50000:50000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+      - /opt/carrier/jenkins:/var/jenkins_home
+  observer_hub:
+    image: getcarrier/observer-hub:latest
+    restart: unless-stopped
+    container_name: observer-hub
+    network_mode: "host"
+    environment:
+      - TOKEN=$TOKEN
+      - TZ=UTC
+    volumes:
+      - /tmp/hub:/tmp/hub
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - 'traefik.enable=false'
+    ports:
+      - 4444:4444
