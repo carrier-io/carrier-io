@@ -19,8 +19,8 @@ interceptor | 2 | 8Gb | 20Gb
 
 [Performance Testing](https://github.com/carrier-io/carrier-io/wiki/Performance-Testing.-General-Concepts)
 
-* [Perfmeter (JMeter)](https://github.com/carrier-io/carrier-io/wiki/Performance-Testing.-PerfMeter-(jMeter\))
-* [Perfgun (Gatling)](https://github.com/carrier-io/carrier-io/wiki/Performance-Testing.-PerfGun-(Gatling\))
+* [Perfmeter (JMeter)](https://github.com/carrier-io/carrier-io/wiki/Performance-Testing.-PerfMeter-(jMeter) )
+* [Perfgun (Gatling)](https://github.com/carrier-io/carrier-io/wiki/Performance-Testing.-PerfGun-(Gatling) )
 * [Distributed Mode](https://github.com/carrier-io/carrier-io/wiki/Performance-Testing.-Distributed-Mode)
 * [Results Analysis](https://github.com/carrier-io/carrier-io/wiki/Performance-Testing.-Results-Analysis)
 * [Notification and Alerting](https://github.com/carrier-io/carrier-io/wiki/Performance-Testing.-Notification-and-Alerting)
