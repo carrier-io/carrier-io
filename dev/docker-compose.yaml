@@ -242,8 +242,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - 'traefik.enable=false'
-    ports:
-      - 4445:4445
   grid_router:
     image: aerokube/ggr:latest-release
     container_name: hub-router
@@ -251,3 +249,5 @@ services:
     volumes:
       - $CARRIER_PATH/grid-router/:/etc/grid-router:ro
     entrypoint: ["/usr/bin/ggr", "-guests-allowed", "-guests-quota", "test", "-listen", ":4444", "-users", "/etc/grid-router/users.htpasswd", "-quotaDir", "/etc/grid-router/quota"]
+    labels:
+      - 'traefik.enable=false'
