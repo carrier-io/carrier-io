@@ -112,6 +112,7 @@ services:
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
       - VAULT_URL=$VAULT_URL
+      - GRID_ROUTER_URL=$GRID_ROUTER_URL
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.galloper.rule=PathPrefix(`/`)'
