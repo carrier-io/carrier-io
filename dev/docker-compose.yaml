@@ -250,4 +250,4 @@ services:
       - $CARRIER_PATH/grid-router/:/etc/grid-router:ro
     entrypoint: ["/usr/bin/ggr", "-guests-allowed", "-guests-quota", "test", "-listen", ":4444", "-users", "/etc/grid-router/users.htpasswd", "-quotaDir", "/etc/grid-router/quota"]
     labels:
-      - 'traefik.enable=false'
+      - 'traefik.enable=true'
