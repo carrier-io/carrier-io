@@ -233,7 +233,7 @@ services:
   observer_hub:
     image: getcarrier/observer-hub:latest
     restart: unless-stopped
-    container_name: observer-hub
+    container_name: carrier-observer-hub
     network_mode: "host"
     environment:
       - PORT=4445
@@ -244,7 +244,7 @@ services:
       - 'traefik.enable=false'
   grid_router:
     image: aerokube/ggr:latest-release
-    container_name: hub-router
+    container_name: carrier-hub-router
     network_mode: "host"
     volumes:
       - $CARRIER_PATH/grid-router/:/etc/grid-router:ro
