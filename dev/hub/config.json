@@ -17,7 +17,7 @@
         "default":"79.0",
         "versions":{
             "79.0":{
-                "image": "getcarrier/observer-firefox:latest"
+                "image": "getcarrier/observer-firefox:79.0"
             }
         }
     }
