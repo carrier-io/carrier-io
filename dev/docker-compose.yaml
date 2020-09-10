@@ -236,12 +236,18 @@ services:
     container_name: observer-hub
     network_mode: "host"
     environment:
-      - TOKEN=$TOKEN
-      - TZ=UTC
+      - PORT=4445
     volumes:
-      - /tmp/hub:/tmp/hub
+      - $CARRIER_PATH/hub:/tmp/hub
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - 'traefik.enable=false'
     ports:
-      - 4444:4444
+      - 4445:4445
+  grid_router:
+    image: aerokube/ggr:latest-release
+    container_name: hub-router
+    network_mode: "host"
+    volumes:
+      - $CARRIER_PATH/grid-router/:/etc/grid-router:ro
+    entrypoint: ["/usr/bin/ggr", "-guests-allowed", "-guests-quota", "test", "-listen", ":4444", "-users", "/etc/grid-router/users.htpasswd", "-quotaDir", "/etc/grid-router/quota"]
