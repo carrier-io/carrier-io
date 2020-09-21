@@ -136,7 +136,7 @@ services:
       - INFLUXDB_DATA_WAL_DIR=$INFLUXDB_DATA_WAL_DIR
       - INFLUXDB_HTTP_ENABLED=$INFLUXDB_HTTP_ENABLED
     volumes:
-      - $CARRIER_PATH/influx:/var/lib/influxdb/data
+      - $CARRIER_PATH/influx:/var/lib/influxdb
     ports:
       - 2003:2003
       - 8086:8086
