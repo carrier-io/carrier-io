@@ -1,0 +1,16 @@
+[providers.docker]
+  endpoint = "unix:///var/run/docker.sock"
+  exposedByDefault = false
+  network = "carrier"
+
+[api]
+  dashboard = true
+
+[ping]
+  manualRouting = true
+
+[entryPoints]
+  [entryPoints.http]
+    address = ":80"
+    [entryPoints.http.forwardedHeaders]
+      insecure = true

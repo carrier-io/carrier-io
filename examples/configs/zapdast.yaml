@@ -1,7 +1,7 @@
 config_version: 2
 global:  # Common settings for all suites
   settings:  # Settings
-    project_name: DemoZap  # Project name
+    project_name: PetClinic  # Project name
   processing: # Processing config
     min_severity_filter: # Filters findings below minimal severity level
       severity: Info # Minimal severity level to report, one of: Critical, High, Medium, Low, Info
@@ -25,7 +25,7 @@ global:  # Common settings for all suites
 suites: # Test suites
   dast_zap:
     settings: # General config
-      project_description: DVNA
+      project_description: PetClinicCD
       environment_name: prod # Environment under testing (branch/module for DAST)
       testing_type: DAST # DAST or SAST
       scan_type: full # full, incremental or other scan description (e.g.: qualys, authorized, etc)

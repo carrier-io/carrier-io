@@ -4,7 +4,8 @@ services:
     image: traefik:cantal
     restart: unless-stopped
     volumes:
-      - ./traefik/traefik.toml:/etc/traefik/traefik.toml
+      - $CARRIER_PATH/traefik/traefik.toml:/etc/traefik/traefik.toml
+      - $CARRIER_PATH/traefik/config:/config
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 80:80
@@ -15,10 +16,9 @@ services:
     image: postgres:12.2
     restart: unless-stopped
     container_name: carrier-postgres
-    labels:
     volumes:
-      - postgre:/var/lib/postgresql/data
-      - ./ext/postgre_schemas.sh:/docker-entrypoint-initdb.d/postgre_schemas.sh
+      - $CARRIER_PATH/postgre:/var/lib/postgresql/data
+      - $CARRIER_PATH/ext/postgre_schemas.sh:/docker-entrypoint-initdb.d/postgre_schemas.sh
     environment:
       - POSTGRES_DB=$POSTGRES_DB
       - POSTGRES_USER=$POSTGRES_USER
@@ -28,7 +28,6 @@ services:
     labels:
       - 'traefik.enable=false'
       - 'carrier=postgres'
-      - 'kompose.volume.size=5Gi'
   vault:
     image: vault:latest
     restart: unless-stopped
@@ -48,8 +47,8 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ./carrier-auth/carrier.json:$KEYCLOAK_IMPORT
-      - ./ext/disablessl.sh:/tmp/disablessl.sh
+      - $CARRIER_PATH/carrier-auth/carrier.json:$KEYCLOAK_IMPORT
+      - $CARRIER_PATH/ext/disablessl.sh:/tmp/disablessl.sh
     environment:
       - DB_ADDR=carrier-postgres
       - DB_VENDOR=$DATABASE_VENDOR
@@ -80,7 +79,7 @@ services:
       - REDIS_DB=$AUTH_REDIS_DB
       - REDIS_PASSWORD=$REDIS_PASSWORD
     volumes:
-      - ./carrier-auth/settings.yaml:$AUTH_CONFIG_FILENAME
+      - $CARRIER_PATH/carrier-auth/settings.yaml:$AUTH_CONFIG_FILENAME
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.carrier-auth.rule=PathPrefix(`/forward-auth`)'
@@ -113,7 +112,6 @@ services:
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
       - VAULT_URL=$VAULT_URL
-      - GRID_ROUTER_URL=$GRID_ROUTER_URL
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.galloper.rule=PathPrefix(`/`)'
@@ -130,13 +128,12 @@ services:
       - INFLUXDB_DATA_WAL_DIR=$INFLUXDB_DATA_WAL_DIR
       - INFLUXDB_HTTP_ENABLED=$INFLUXDB_HTTP_ENABLED
     volumes:
-      - influx:/var/lib/influxdb/data
+      - $CARRIER_PATH/influx:/var/lib/influxdb/data
     ports:
       - 2003:2003
       - 8086:8086
     labels:
       - 'traefik.enable=false'
-      - 'kompose.volume.size=5Gi'
     container_name: carrier-influx
   grafana:
     image: grafana/grafana:6.4.4
@@ -144,7 +141,7 @@ services:
     depends_on:
       - influx
     volumes:
-      - grafana:/var/lib/grafana
+      - $CARRIER_PATH/grafana:/var/lib/grafana
     environment:
       - GF_PANELS_DISABLE_SANITIZE_HTML=$GF_PANELS_DISABLE_SANITIZE_HTML
       - GF_AUTH_PROXY_ENABLED=$GF_AUTH_PROXY_ENABLED
@@ -169,7 +166,6 @@ services:
       - 'traefik.http.middlewares.grafana-auth.forwardauth.authResponseHeaders=X-WEBAUTH-USER, X-WEBAUTH-NAME, X-WEBAUTH-EMAIL'
       - 'traefik.http.routers.grafana.middlewares=grafana-auth@docker'
       - 'carrier=grafana'
-      - 'kompose.volume.size=5Gi'
     user: root
     container_name: carrier-grafana
   loki:
@@ -187,7 +183,7 @@ services:
       - MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY
       - MINIO_SECRET_KEY=$MINIO_SECRET_KEY
     volumes:
-      - minio:/data
+      - $CARRIER_PATH/minio:/data
     labels:
       - 'traefik.enable=false'
     container_name: carrier-minio
@@ -237,21 +233,15 @@ services:
   observer_hub:
     image: getcarrier/observer-hub:latest
     restart: unless-stopped
-    container_name: carrier-observer-hub
+    container_name: observer-hub
     network_mode: "host"
     environment:
-      - PORT=4445
+      - TOKEN=$TOKEN
+      - TZ=UTC
     volumes:
-      - $CARRIER_PATH/hub:/tmp/hub
+      - /tmp/hub:/tmp/hub
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - 'traefik.enable=false'
-  grid_router:
-    image: aerokube/ggr:latest-release
-    container_name: carrier-hub-router
-    network_mode: "host"
-    volumes:
-      - $CARRIER_PATH/grid-router/:/etc/grid-router:ro
-    entrypoint: ["/usr/bin/ggr", "-guests-allowed", "-guests-quota", "test", "-listen", ":4444", "-users", "/etc/grid-router/users.htpasswd", "-quotaDir", "/etc/grid-router/quota"]
-    labels:
-      - 'traefik.enable=true'
+    ports:
+      - 4444:4444
