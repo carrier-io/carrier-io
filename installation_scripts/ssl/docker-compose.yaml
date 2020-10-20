@@ -51,6 +51,7 @@ services:
     volumes:
       - $CARRIER_PATH/carrier-auth/carrier.json:$KEYCLOAK_IMPORT
       - $CARRIER_PATH/ext/disablessl.sh:/tmp/disablessl.sh
+      - $CARRIER_PATH/keycloak/themes/src/main/resources/theme:/opt/jboss/keycloak/themes
     environment:
       - DB_ADDR=carrier-postgres
       - DB_VENDOR=$DATABASE_VENDOR
@@ -70,7 +71,7 @@ services:
       - 'traefik.http.services.keycloak.loadbalancer.server.port=8080'
       - 'carrier=keycloak'
   auth:
-    image: getcarrier/carrier-auth:latest
+    image: getcarrier/carrier-auth:2.0
     restart: unless-stopped
     container_name: carrier-auth
     depends_on:
@@ -118,6 +119,7 @@ services:
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
       - VAULT_URL=$VAULT_URL
+      - INFLUX_PASSWORD=$INFLUX_PASSWORD
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.galloper.rule=Host(`$APP_DOMAIN`) && PathPrefix(`/`)'
@@ -135,6 +137,7 @@ services:
       - INFLUXDB_DATA_DIR=$INFLUXDB_DATA_DIR
       - INFLUXDB_DATA_WAL_DIR=$INFLUXDB_DATA_WAL_DIR
       - INFLUXDB_HTTP_ENABLED=$INFLUXDB_HTTP_ENABLED
+      - INFLUXDB_HTTP_AUTH_ENABLED=$INFLUXDB_HTTP_AUTH_ENABLED
     volumes:
       - $CARRIER_PATH/influx:/var/lib/influxdb
     ports:
@@ -189,6 +192,7 @@ services:
     container_name: carrier-loki
   minio:
     image: minio/minio:RELEASE.2019-10-12T01-39-57Z
+    restart: unless-stopped
     environment:
       - MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY
       - MINIO_SECRET_KEY=$MINIO_SECRET_KEY
@@ -211,7 +215,7 @@ services:
     labels:
       - 'traefik.enable=false'
   interceptor:
-    image: getcarrier/interceptor:latest
+    image: getcarrier/interceptor:2.0
     depends_on:
       - redis
     restart: unless-stopped
@@ -243,7 +247,7 @@ services:
       - /usr/bin/docker:/usr/bin/docker
       - /opt/carrier/jenkins:/var/jenkins_home
   observer_hub:
-    image: getcarrier/observer-hub:latest
+    image: getcarrier/observer-hub:2.0
     restart: unless-stopped
     container_name: observer-hub
     network_mode: "host"
@@ -251,7 +255,7 @@ services:
       - TOKEN=$TOKEN
       - TZ=UTC
     volumes:
-      - /tmp/hub:/tmp/hub
+      - $CARRIER_PATH/hub:/tmp/hub
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - 'traefik.enable=false'

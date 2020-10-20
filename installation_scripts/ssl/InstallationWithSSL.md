@@ -35,8 +35,9 @@ cd /tmp
 git clone https://github.com/carrier-io/carrier-io.git
 cp -R /tmp/carrier-io/installation_scripts/ssl/* /opt/carrier/
 ```
-- edit .env file accoring to your domain/installation
+- edit .env file accoring to your domain/installation. Also you can set custom REDIS_PASSWORD and INFLUX_PASSWORD
 - edit /opt/carrier/traefik/traefik.toml with valid email for letsencrypt
+- edit /opt/carrier/bootstrap.sh with valid password for InfluxDB (replace INFLUXPASSWORD)
 
 - configure Jenkins authentication with Keycloak https://medium.com/faun/integrating-keycloak-sso-with-jenkins-957dd438f831
 
