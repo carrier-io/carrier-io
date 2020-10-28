@@ -113,6 +113,7 @@ services:
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
       - VAULT_URL=$VAULT_URL
+      - INFLUX_USER=$INFLUX_USER
       - INFLUX_PASSWORD=$INFLUX_PASSWORD
     labels:
       - 'traefik.enable=true'
