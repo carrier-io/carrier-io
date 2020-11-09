@@ -2,11 +2,22 @@
     "chrome": {
         "default": "83.0",
         "versions":{
+            "84.0":{
+                "image": "getcarrier/observer-chrome:84.0"
+            },
             "83.0":{
-                "image": "getcarrier/observer-chrome:latest",
+                "image": "getcarrier/observer-chrome:83.0",
                 "env": {
                     "VNC_NO_PASSWORD": 1
                 }
+            }
+        }
+    },
+    "firefox": {
+        "default":"79.0",
+        "versions":{
+            "79.0":{
+                "image": "getcarrier/observer-firefox:79.0"
             }
         }
     }

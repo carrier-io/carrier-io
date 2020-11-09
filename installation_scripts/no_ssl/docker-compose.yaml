@@ -2,6 +2,11 @@ version: '3'
 services:
   traefik:
     image: traefik:cantal
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     restart: unless-stopped
     volumes:
       - $CARRIER_PATH/traefik/traefik.toml:/etc/traefik/traefik.toml
@@ -14,6 +19,11 @@ services:
     container_name: carrier-traefic
   postgres:
     image: postgres:12.2
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     restart: unless-stopped
     container_name: carrier-postgres
     volumes:
@@ -29,7 +39,12 @@ services:
       - 'traefik.enable=false'
       - 'carrier=postgres'
   vault:
-    image: vault:latest
+    image: vault:1.4.2
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     restart: unless-stopped
     environment:
       - 'VAULT_LOCAL_CONFIG={"disable_mlock":true,"listener":{"tcp":{"address":"0.0.0.0:8200","tls_disable": 1}},"storage":{"postgresql":{"connection_url":"postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@carrier-postgres:5432/${POSTGRES_DB}?sslmode=disable"}},"ui":false}'
@@ -42,6 +57,11 @@ services:
       - postgres
   keycloak:
     image: jboss/keycloak:9.0.0
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     restart: unless-stopped
     container_name: carrier-keycloak
     depends_on:
@@ -68,6 +88,11 @@ services:
       - 'carrier=keycloak'
   auth:
     image: getcarrier/carrier-auth:2.0
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     restart: unless-stopped
     container_name: carrier-auth
     depends_on:
@@ -87,7 +112,12 @@ services:
       - 'traefik.http.services.carrier-auth.loadbalancer.server.port=80'
       - 'carrier=auth'
   galloper:
-    image: getcarrier/galloper:latest
+    image: getcarrier/galloper:2.0
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     restart: unless-stopped
     depends_on:
       - redis
@@ -113,8 +143,8 @@ services:
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
       - VAULT_URL=$VAULT_URL
-      - INFLUX_USER=$INFLUX_USER
       - INFLUX_PASSWORD=$INFLUX_PASSWORD
+      - INFLUX_USER=$INFLUX_USERNAME
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.galloper.rule=PathPrefix(`/`)'
@@ -124,6 +154,11 @@ services:
     container_name: carrier-galloper
   influx:
     image: influxdb:1.7
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     restart: unless-stopped
     environment:
       - INFLUXDB_META_DIR=$INFLUXDB_META_DIR
@@ -131,6 +166,7 @@ services:
       - INFLUXDB_DATA_WAL_DIR=$INFLUXDB_DATA_WAL_DIR
       - INFLUXDB_HTTP_ENABLED=$INFLUXDB_HTTP_ENABLED
       - INFLUXDB_HTTP_AUTH_ENABLED=$INFLUXDB_HTTP_AUTH_ENABLED
+      - INFLUXDB_DATA_MAX_SERIES_PER_DATABASE=$INFLUXDB_DATA_MAX_SERIES_PER_DATABASE
     volumes:
       - $CARRIER_PATH/influx:/var/lib/influxdb
     ports:
@@ -141,6 +177,11 @@ services:
     container_name: carrier-influx
   grafana:
     image: grafana/grafana:6.4.4
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     restart: unless-stopped
     depends_on:
       - influx
@@ -173,16 +214,26 @@ services:
     user: root
     container_name: carrier-grafana
   loki:
-    image: grafana/loki:latest
+    image: grafana/loki:1.6.0
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     restart: unless-stopped
     ports:
       - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml -table-manager.retention-period=$RETENTION_PERIOD -table-manager.retention-deletes-enabled=$RETENTION_DELETES_ENABLE
     labels:
       - 'traefik.enable=false'
     container_name: carrier-loki
   minio:
     image: minio/minio:RELEASE.2019-10-12T01-39-57Z
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     restart: unless-stopped
     environment:
       - MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY
@@ -195,6 +246,11 @@ services:
     command: server /data
   redis:
     image: redis:5.0.7
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     restart: unless-stopped
     ports:
       - 6379:6379
@@ -207,6 +263,11 @@ services:
       - 'traefik.enable=false'
   interceptor:
     image: getcarrier/interceptor:2.0
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     depends_on:
       - redis
     restart: unless-stopped
@@ -221,6 +282,11 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
   jenkins:
     image: jenkins/jenkins:lts
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     environment:
       - JENKINS_OPTS="--prefix=/jenkins"
     user: root
@@ -237,16 +303,33 @@ services:
       - /opt/carrier/jenkins:/var/jenkins_home
   observer_hub:
     image: getcarrier/observer-hub:2.0
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     restart: unless-stopped
-    container_name: observer-hub
-    network_mode: "host"
+    container_name: carrier-observer-hub
     environment:
-      - TOKEN=$TOKEN
-      - TZ=UTC
+      - PORT=4445
     volumes:
       - $CARRIER_PATH/hub:/tmp/hub
       - /var/run/docker.sock:/var/run/docker.sock
+    network_mode: "host"
     labels:
       - 'traefik.enable=false'
-    ports:
-      - 4444:4444
+  grid_router:
+    image: aerokube/ggr:latest-release
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    container_name: carrier-hub-router
+    restart: unless-stopped
+    network_mode: "host"
+    volumes:
+      - $CARRIER_PATH/grid-router/:/etc/grid-router:ro
+    entrypoint: ["/usr/bin/ggr", "-guests-allowed", "-guests-quota", "test", "-listen", ":4444", "-users", "/etc/grid-router/users.htpasswd", "-quotaDir", "/etc/grid-router/quota"]
+    labels:
+      - 'traefik.enable=true'

@@ -1,0 +1,16 @@
+apiVersion: 1
+datasources:
+ - name: jmeter
+   type: influxdb
+   access: proxy
+   orgId: 1
+   uid: 2
+   url: http://carrier-influx:8086
+   password: password
+   user: admin
+   database: jmeter
+   basicAuth: false
+   isDefault: true
+   jsonData: {"keepCookies":[]}
+   version: 1
+   editable: true

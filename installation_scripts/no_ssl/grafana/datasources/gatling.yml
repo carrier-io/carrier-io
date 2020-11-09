@@ -1,0 +1,16 @@
+apiVersion: 1
+datasources:
+ - name: gatling
+   type: influxdb
+   access: proxy
+   orgId: 1
+   uid: 1
+   url: http://carrier-influx:8086
+   password: password
+   user: admin
+   database: gatling
+   basicAuth: false
+   isDefault: false
+   jsonData: {"keepCookies":[]}
+   version: 1
+   editable: true
